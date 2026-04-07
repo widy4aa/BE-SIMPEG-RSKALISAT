@@ -1,0 +1,253 @@
+HASIL PEMBUATAN MIGRATION, MODEL, SEEDER BERDASARKAN ERD
+=========================================================
+
+1) MIGRATION
+------------
+File migration yang dibuat/diubah:
+
+- database/migrations/0001_01_01_000000_create_users_table.php (DIUBAH)
+	- users: id, username(unique), password, role(enum: admin/direktur/hrd/pegawai), is_active(bool), timestamps
+	- tetap menyertakan password_reset_tokens dan sessions bawaan Laravel
+
+- database/migrations/2026_04_07_000100_create_hris_tables.php (BARU)
+	Membuat tabel sesuai ERD:
+	- unit_kerja
+	- jenis_pegawai
+	- profesi
+	- pangkat
+	- jenis_sip
+	- jenis_diklat
+	- kategori_diklat
+	- pegawai
+	- jabatan
+	- pegawai_pribadi
+	- pegawai_pekerjaan
+	- riwayat_pekerjaan
+	- files
+	- pendidikan
+	- str
+	- sip
+	- penugasan_klinis
+	- keluarga
+	- diklat
+	- list_jadwal_diklat
+	- notification
+	- perubahan_data
+	- log_activity
+
+Catatan implementasi migration:
+- Foreign key disusun berurutan agar aman.
+- Kolom deleted_at di ERD sudah di-handle dengan softDeletes().
+- Relasi yang refer ke files (pangkat.sk_file_id, jabatan.sk_file_id, pegawai_pribadi.foto_id) dipasang setelah tabel files dibuat.
+
+
+2) MODEL + RELASI
+-----------------
+Model yang dibuat:
+
+- app/Models/Pegawai.php
+- app/Models/PegawaiPribadi.php
+- app/Models/PegawaiPekerjaan.php
+- app/Models/RiwayatPekerjaan.php
+- app/Models/JenisPegawai.php
+- app/Models/Profesi.php
+- app/Models/UnitKerja.php
+- app/Models/Jabatan.php
+- app/Models/Pangkat.php
+- app/Models/Pendidikan.php
+- app/Models/FileModel.php
+- app/Models/Keluarga.php
+- app/Models/JenisSip.php
+- app/Models/StrPegawai.php
+- app/Models/Sip.php
+- app/Models/PenugasanKlinis.php
+- app/Models/JenisDiklat.php
+- app/Models/KategoriDiklat.php
+- app/Models/Diklat.php
+- app/Models/ListJadwalDiklat.php
+- app/Models/NotificationModel.php
+- app/Models/PerubahanData.php
+- app/Models/LogActivity.php
+
+Model yang diubah:
+- app/Models/User.php
+
+Ringkasan relasi yang sudah dipasang (contoh utama):
+
+- User hasOne Pegawai
+- User hasMany NotificationModel, PerubahanData, LogActivity, FileModel(uploadedFiles)
+
+- Pegawai belongsTo User
+- Pegawai hasOne PegawaiPribadi
+- Pegawai hasMany PegawaiPekerjaan, RiwayatPekerjaan, Keluarga, ListJadwalDiklat
+
+- PegawaiPribadi belongsTo Pegawai
+- PegawaiPribadi belongsTo FileModel(foto)
+- PegawaiPribadi hasMany Pendidikan
+
+- PegawaiPekerjaan belongsTo Pegawai, JenisPegawai, Profesi, Jabatan, Pangkat
+- PegawaiPekerjaan hasMany RiwayatPekerjaan, StrPegawai, Sip, PenugasanKlinis
+
+- RiwayatPekerjaan belongsTo Pegawai, PegawaiPekerjaan, Jabatan, Pangkat
+
+- Jabatan belongsTo UnitKerja
+- Jabatan belongsTo FileModel(skFile)
+- Jabatan hasMany PegawaiPekerjaan, RiwayatPekerjaan
+
+- Pangkat belongsTo FileModel(skFile)
+- Pangkat hasMany PegawaiPekerjaan, RiwayatPekerjaan
+
+- Pendidikan belongsTo PegawaiPribadi
+- Pendidikan belongsTo FileModel(ijazahFile)
+
+- StrPegawai belongsTo PegawaiPekerjaan, FileModel(skFile)
+- Sip belongsTo PegawaiPekerjaan, JenisSip, FileModel(skFile)
+- PenugasanKlinis belongsTo PegawaiPekerjaan, FileModel(dokumenFile)
+
+- Diklat belongsTo JenisDiklat, KategoriDiklat
+- Diklat hasMany ListJadwalDiklat
+- ListJadwalDiklat belongsTo Diklat, Pegawai, FileModel(laporanFile)
+
+- NotificationModel, PerubahanData, LogActivity masing-masing belongsTo User
+
+
+3) SEEDER
+---------
+Seeder yang dibuat:
+
+- database/seeders/MasterReferensiSeeder.php
+	Mengisi data referensi awal:
+	- unit_kerja
+	- jenis_pegawai
+	- profesi
+	- jenis_sip
+	- jenis_diklat
+	- kategori_diklat
+
+- database/seeders/PegawaiSeeder.php
+	Mengisi sample user + pegawai + data pekerjaan.
+
+	POIN PENTING SESUAI PERMINTAAN:
+	- username untuk akun pegawai dipastikan sama dengan nik.
+	- Implementasi ada di loop seeding pegawai:
+		- firstOrCreate user dengan username = nik
+		- fallback update bila username tidak sama
+
+Seeder yang diubah:
+- database/seeders/DatabaseSeeder.php
+	- memanggil MasterReferensiSeeder dan PegawaiSeeder
+
+
+4) FACTORY
+----------
+File yang diubah:
+- database/factories/UserFactory.php
+	- disesuaikan ke skema baru users:
+		- username
+		- password
+		- role
+		- is_active
+
+
+5) VALIDASI YANG SUDAH DILAKUKAN
+--------------------------------
+- Cek error workspace: tidak ada error.
+- Menjalankan test:
+	- php artisan test
+	- hasil: PASS (2 test)
+- Menjalankan preview migration:
+	- php artisan migrate --pretend
+	- hasil: SQL migration berhasil tergenerate tanpa error.
+
+
+6) CARA MENJALANKAN
+-------------------
+Jalankan perintah berikut:
+
+1. php artisan migrate
+2. php artisan db:seed
+
+Atau reset total:
+
+1. php artisan migrate:fresh --seed
+
+
+7) CATATAN KONSISTENSI NAMA TABEL
+----------------------------------
+Nama tabel mengikuti ERD Anda (contoh: pegawai, pegawai_pribadi, notification, log_activity, dll),
+sehingga beberapa model menggunakan properti $table eksplisit untuk menjaga konsistensi.
+
+
+8) API LOGIN (NIK + PASSWORD + JWT)
+-----------------------------------
+Endpoint:
+- POST /api/login
+
+Arsitektur yang digunakan:
+- Controller: app/Http/Controllers/Api/AuthController.php
+- Service: app/Services/Auth/AuthService.php
+- Repository: app/Repositories/Auth/AuthRepository.php
+- Form Request (validasi): app/Http/Requests/Auth/LoginRequest.php
+- JWT helper service: app/Services/Security/JwtService.php
+- JWT config: config/jwt.php
+
+Route:
+- routes/api.php
+	- Route::post('/login', [AuthController::class, 'login']);
+
+Request body login:
+{
+	"nik": "3174010101010001",
+	"password": "password"
+}
+
+Validasi input:
+- nik: required|string|max:30
+- password: required|string|min:6
+
+Response sukses (HTTP 200):
+{
+	"success": true,
+	"message": "Login berhasil.",
+	"data": {
+		"token_type": "Bearer",
+		"access_token": "<jwt_token>",
+		"expires_in": 43200,
+		"user": {
+			"id": 1,
+			"nik": "3174010101010001",
+			"role": "pegawai",
+			"nama": "Budi Santoso"
+		}
+	}
+}
+
+Response error yang ditangani:
+
+1. Validasi gagal (HTTP 422)
+{
+	"success": false,
+	"message": "Validasi gagal.",
+	"errors": {
+		"nik": ["NIK wajib diisi."],
+		"password": ["Password wajib diisi."]
+	}
+}
+
+2. NIK/password salah (HTTP 401)
+{
+	"success": false,
+	"message": "NIK atau password tidak valid."
+}
+
+3. Akun tidak aktif (HTTP 403)
+{
+	"success": false,
+	"message": "Akun tidak aktif. Silakan hubungi admin."
+}
+
+Catatan keamanan JWT:
+- Token ditandatangani algoritma HS256.
+- Secret diambil dari JWT_SECRET (fallback ke APP_KEY jika JWT_SECRET belum diisi).
+- Durasi token diatur lewat JWT_TTL (default 43200 detik / 12 jam).
+

@@ -1,0 +1,276 @@
+Table users {
+  id int [pk, increment]
+  username varchar
+  password varchar [not null]
+  role enum [not null, note: 'admin, direktur, hrd, pegawai']
+  is_active boolean [default: true]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table pegawai {
+  id int [pk, increment]
+  user_id int [ref: - users.id]
+  nik varchar [unique, not null]
+  nip varchar [unique]
+  nama varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table pegawai_pribadi {
+  id int [pk, increment]
+  pegawai_id int [ref: - pegawai.id]
+  pendidikan_terakhir enum [null, note: 'SMA/SMK Sederajat, D3, S1/D4, S2, S3']
+  tanggal_lahir date
+  jenis_kelamin enum('L','P')
+  agama varchar
+  status_perkawinan varchar [null, note: 'kawin, belum kawin, cerai hidup, cerai mati']
+  alamat text
+  no_telp varchar
+  email varchar
+  foto_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table pegawai_pekerjaan {
+  id int [pk, increment]
+  pegawai_id int [ref: - pegawai.id]
+  jenis_pegawai_id int [ref: > jenis_pegawai.id]
+  profesi_id int [ref: > profesi.id]
+  jabatan_id int [ref: > jabatan.id]
+  status_pegawai enum [null, note:'aktif, tidak aktif']
+  tgl_masuk date
+  pangkat_id int [ref: > Pangkat.id]
+  golongan_ruang enum [null, note: 'I/a, I/b, I/c, I/d, II/a, II/b, II/c, II/d, III/a, III/b, III/c, III/d, IV/a, IV/b, IV/c, IV/d, IV/e']
+  TMT_CPNS date
+  TMT_PNS date
+  TMT_Pangkat_Akhir date
+  masa_kerja date
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table riwayat_pekerjaan {
+  id int [pk, increment]
+  pegawai_id int [ref: > pegawai.id]
+  pegawai_pekerjaan_id int [ref: > pegawai_pekerjaan.id]
+  jabatan_id int [ref: > jabatan.id]
+  pangkat_id int [ref: > Pangkat.id]
+  is_current boolean [default: false]
+  started_at date [null]
+  ended_at date [null]
+  note text [null]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+
+Table jenis_pegawai {
+  id int [pk, increment]
+  nama varchar [not null, note: 'PNS, PPPK Penuh Waktu, PPPK Paruh Waktu, BLUD']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table profesi {
+  id int [pk, increment]
+  nama varchar [not null, note: 'Dokter, Bidan, Perawat, dll']
+  kategori_tenaga varchar [note: 'Tenaga Kesehatan, Non Kesehatan']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table pendidikan {
+  id int [pk, increment]
+  pegawai_pribadi_id int [ref: > pegawai_pribadi.id]
+  jenjang varchar
+  institusi varchar
+  jurusan varchar
+  tahun_lulus int
+  nomor_ijazah varchar [null]
+  ijazah_file_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table jabatan {
+  id int [pk, increment]
+  nama varchar [not null]
+  unit_kerja varchar [ref: > unit_kerja.id]
+  TMT_mulai date
+  TMT_selesai date
+  sk_file_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+
+Table unit_kerja {
+  id int [pk, increment]
+  nama varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
+
+Table Pangkat {
+  id int [pk, increment]
+  nama varchar [not null]
+  pejabat_penetap varchar
+  TMT_sk date
+  sk_file_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table str {
+  id int [pk, increment]
+  pegawai_pekerjaan_id int [ref: > pegawai_pekerjaan.id]
+  nomor_str varchar
+  tanggal_terbit date
+  tanggal_kadaluarsa date
+  sk_file_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table sip {
+  id int [pk, increment]
+  pegawai_pekerjaan_id int [ref: > pegawai_pekerjaan.id]
+  jenis_sip_id int [ref: > jenis_sip.id]
+  nomor_sip varchar
+  tanggal_terbit date
+  tanggal_kadaluarsa date
+  sk_file_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+table jenis_sip{
+    id int [pk, increment]
+    nama varchar [not null, note: 'SIP Praktik Mandiri, SIP Praktik Bersama, SIP Praktik Rumah Sakit']
+    created_at timestamp
+    updated_at timestamp
+}
+
+Table penugasan_klinis {
+  id int [pk, increment]
+  pegawai_pekerjaan_id int [ref: > pegawai_pekerjaan.id]
+  nomor_surat varchar
+  tgl_mulai date
+  tgl_kadaluarsa date
+  dokumen_file_id int [ref: > files.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table keluarga {
+  id int [pk, increment]
+  pegawai_id int [ref: > pegawai.id]
+  nama varchar
+  hubungan enum [note: 'suami, istri, anak, orang tua, saudara']
+  tanggal_lahir date
+  pekerjaan varchar
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+
+// DIKLAT
+Table jenis_diklat {
+  id int [pk, increment]
+  nama varchar [not null, note: 'ASN/Tenkes']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table kategori_diklat {
+  id int [pk, increment]
+  nama varchar [not null, note: 'Struktural, Fungsional, Teknis, Akred']
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table diklat {
+  id int [pk, increment]
+  jenis_diklat_id int [ref: > jenis_diklat.id]
+  kategori_diklat_id int [ref: > kategori_diklat.id]
+  nama_kegiatan varchar 
+  penyelenggara varchar
+  tanggal_mulai date
+  tanggal_selesai date
+  tempat varchar
+  waktu time
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table list_jadwal_diklat {
+  id int [pk, increment]
+  diklat_id int [ref: > diklat.id]
+  pegawai_id int [ref: > pegawai.id]
+  laporan_file_id int [ref: > files.id]
+  uploaded_at timestamp
+  status_diklat enum [not null, note: 'belum terlaksana, sedang terlaksana, sudah terlaksana']
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}  
+
+
+Table notification {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  title varchar
+  message text
+  is_read boolean [default: false]
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table perubahan_data {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  table_name varchar
+  record_id int
+  field_name varchar
+  old_value text
+  new_value text
+  created_at timestamp
+}
+
+Table log_activity {
+  id int [pk, increment]
+  user_id int [ref: > users.id]
+  activity varchar
+  created_at timestamp
+}
+
+
+Table files {
+  id int [pk, increment]
+  table_name varchar [not null, note: 'nama table yang di-reference']
+  record_id int [not null, note: 'id dari record di table tersebut']
+  file_type enum [note: 'foto, sertifikat, surat, dokumen']
+  file_path varchar [not null]
+  file_name varchar
+  file_size int [note: 'dalam bytes']
+  uploaded_by int [ref: > users.id]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
