@@ -2,20 +2,26 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
+
+    protected $fillable = [
+        'username',
+        'password',
+        'role',
+        'is_active',
+    ];
+
+    protected $hidden = [
+        'password',
+    ];
 
     /**
      * Get the attributes that should be cast.
@@ -25,8 +31,33 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
+    }
+
+    public function pegawai()
+    {
+        return $this->hasOne(Pegawai::class);
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(NotificationModel::class);
+    }
+
+    public function perubahanData()
+    {
+        return $this->hasMany(PerubahanData::class);
+    }
+
+    public function logActivities()
+    {
+        return $this->hasMany(LogActivity::class);
+    }
+
+    public function uploadedFiles()
+    {
+        return $this->hasMany(FileModel::class, 'uploaded_by');
     }
 }

@@ -56,3 +56,12 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Log Terakhir
+
+- Tanggal: 2026-04-07
+- Penambahan skema HRIS berbasis ERD: migration, model, relasi, dan seeder data referensi.
+- Seeder diperbarui agar akun admin, hrd, direktur, dan pegawai memiliki data lengkap (users, pegawai, pegawai_pribadi, pegawai_pekerjaan, riwayat_pekerjaan).
+- Login API ditambahkan di endpoint `POST /api/login` dengan arsitektur Controller-Service-Repository.
+- Login menggunakan `nik` + `password`, menghasilkan JWT token, serta handling error validasi (422), kredensial salah (401), dan akun nonaktif (403).
+- Konfigurasi JWT ditambahkan lewat `config/jwt.php` dan variabel env `JWT_SECRET`, `JWT_TTL`.
