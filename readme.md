@@ -29,6 +29,10 @@ This repository is used for backend API development of BE-SIMPEG-RSKALISAT.
 ## Documentation
 
 - API Documentation: [dokumentasi.md](dokumentasi.md)
+- ERD Database (DBML): [dbfix.dbml](dbfix.dbml)
+- Bahan Bimbingan: [bahan_bimbingan/bahan_bimbingan.md](bahan_bimbingan/bahan_bimbingan.md)
+
+Untuk menampilkan ERD secara visual, buka file [dbfix.dbml](dbfix.dbml) atau paste isinya ke https://dbdiagram.io.
 
 ## Learning Laravel
 
