@@ -22,7 +22,10 @@ class PegawaiPribadi extends Model
         'alamat',
         'no_telp',
         'email',
-        'foto_id',
+        'foto_path',
+        'ktp_file_path',
+        'kk_file_path',
+        'buku_nikah_file_path',
     ];
 
     protected function casts(): array
@@ -37,13 +40,13 @@ class PegawaiPribadi extends Model
         return $this->belongsTo(Pegawai::class);
     }
 
-    public function foto()
-    {
-        return $this->belongsTo(FileModel::class, 'foto_id');
-    }
-
     public function pendidikan()
     {
         return $this->hasMany(Pendidikan::class);
+    }
+
+    public function keluarga()
+    {
+        return $this->hasMany(Keluarga::class);
     }
 }

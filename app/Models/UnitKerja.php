@@ -15,8 +15,8 @@ class UnitKerja extends Model
         'nama',
     ];
 
-    public function jabatan()
+    public function unitKerjaPegawai()
     {
-        return $this->hasMany(Jabatan::class);
+        return $this->hasMany(UnitKerjaPegawai::class);
     }
 }

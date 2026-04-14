@@ -6,8 +6,10 @@ use App\Models\JenisDiklat;
 use App\Models\JenisPegawai;
 use App\Models\JenisSip;
 use App\Models\KategoriDiklat;
+use App\Models\Pangkat;
 use App\Models\Profesi;
 use App\Models\UnitKerja;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
 
 class MasterReferensiSeeder extends Seeder
@@ -37,6 +39,22 @@ class MasterReferensiSeeder extends Seeder
                 ['nama' => $item['nama']],
                 ['kategori_tenaga' => $item['kategori_tenaga']]
             );
+        }
+
+        foreach (['Penata Muda', 'Penata Muda Tingkat I', 'Penata'] as $nama) {
+            Pangkat::query()->firstOrCreate(['nama' => $nama]);
+        }
+
+        foreach ([
+            'I/a', 'I/b', 'I/c', 'I/d',
+            'II/a', 'II/b', 'II/c', 'II/d',
+            'III/a', 'III/b', 'III/c', 'III/d',
+            'IV/a', 'IV/b', 'IV/c', 'IV/d', 'IV/e',
+        ] as $nama) {
+            DB::table('golongan_ruang')->updateOrInsert(['nama' => $nama], [
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
         }
 
         foreach (['SIP Praktik Mandiri', 'SIP Praktik Bersama', 'SIP Praktik Rumah Sakit'] as $nama) {

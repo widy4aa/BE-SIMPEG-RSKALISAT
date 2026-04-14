@@ -56,8 +56,4 @@ class User extends Authenticatable
         return $this->hasMany(LogActivity::class);
     }
 
-    public function uploadedFiles()
-    {
-        return $this->hasMany(FileModel::class, 'uploaded_by');
-    }
 }

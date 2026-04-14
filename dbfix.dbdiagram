@@ -1,0 +1,624 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "users",
+      "schemaName": "public",
+      "x": 12,
+      "y": 12
+    },
+    {
+      "name": "pegawai",
+      "schemaName": "public",
+      "x": 589.0644235685897,
+      "y": -312.9264036447551
+    },
+    {
+      "name": "pegawai_pribadi",
+      "schemaName": "public",
+      "x": 1153.564453125,
+      "y": 12
+    },
+    {
+      "name": "profesi_pegawai",
+      "schemaName": "public",
+      "x": -49.13927143681388,
+      "y": 2183.4994850810453
+    },
+    {
+      "name": "pangkat_pegawai",
+      "schemaName": "public",
+      "x": 316.4341224969096,
+      "y": 2214.0691207994523
+    },
+    {
+      "name": "jabatan_pegawai",
+      "schemaName": "public",
+      "x": 693.1237476009628,
+      "y": 2197.3947740439576
+    },
+    {
+      "name": "golongan_ruang_pegawai",
+      "schemaName": "public",
+      "x": -49.13927143681388,
+      "y": 2826.0691207994523
+    },
+    {
+      "name": "unit_kerja_pegawai",
+      "schemaName": "public",
+      "x": 233.48133403193611,
+      "y": 2826.0691207994523
+    },
+    {
+      "name": "jenis_pegawai",
+      "schemaName": "public",
+      "x": 12,
+      "y": 314
+    },
+    {
+      "name": "profesi",
+      "schemaName": "public",
+      "x": 12,
+      "y": 520
+    },
+    {
+      "name": "pendidikan",
+      "schemaName": "public",
+      "x": 1713.27392578125,
+      "y": 12
+    },
+    {
+      "name": "jabatan",
+      "schemaName": "public",
+      "x": 592.76171875,
+      "y": 1210
+    },
+    {
+      "name": "unit_kerja",
+      "schemaName": "public",
+      "x": 12,
+      "y": 758
+    },
+    {
+      "name": "pangkat",
+      "schemaName": "public",
+      "x": -49.13927143681388,
+      "y": 3228.0691207994523
+    },
+    {
+      "name": "golongan_ruang",
+      "schemaName": "public",
+      "x": -49.13927143681388,
+      "y": 2616.0691207994523
+    },
+    {
+      "name": "str",
+      "schemaName": "public",
+      "x": 1713.27392578125,
+      "y": 442
+    },
+    {
+      "name": "sip",
+      "schemaName": "public",
+      "x": 1713.27392578125,
+      "y": 1636
+    },
+    {
+      "name": "jenis_sip",
+      "schemaName": "public",
+      "x": 12,
+      "y": 1298
+    },
+    {
+      "name": "penugasan_klinis",
+      "schemaName": "public",
+      "x": 1713.27392578125,
+      "y": 808
+    },
+    {
+      "name": "keluarga",
+      "schemaName": "public",
+      "x": 1153.564453125,
+      "y": 538
+    },
+    {
+      "name": "jenis_diklat",
+      "schemaName": "public",
+      "x": 12,
+      "y": 1504
+    },
+    {
+      "name": "kategori_diklat",
+      "schemaName": "public",
+      "x": 12,
+      "y": 1710
+    },
+    {
+      "name": "diklat",
+      "schemaName": "public",
+      "x": 592.76171875,
+      "y": 1598
+    },
+    {
+      "name": "list_jadwal_diklat",
+      "schemaName": "public",
+      "x": 1153.564453125,
+      "y": 1496
+    },
+    {
+      "name": "notification",
+      "schemaName": "public",
+      "x": 592.76171875,
+      "y": 346
+    },
+    {
+      "name": "perubahan_data",
+      "schemaName": "public",
+      "x": 592.76171875,
+      "y": 648
+    },
+    {
+      "name": "log_activity",
+      "schemaName": "public",
+      "x": 592.76171875,
+      "y": 982
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": [
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "users",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "user_id"
+      ],
+      "secondTableName": "pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "jenis_pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "jenis_pegawai_id"
+      ],
+      "secondTableName": "pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "profesi",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "profesi_id"
+      ],
+      "secondTableName": "pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "jabatan",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "jabatan_id"
+      ],
+      "secondTableName": "pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pangkat",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pangkat_id"
+      ],
+      "secondTableName": "pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "golongan_ruang",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "golongan_ruang_id"
+      ],
+      "secondTableName": "pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "pegawai_pribadi",
+      "secondSchemaName": "public",
+      "secondRelation": "1",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "profesi_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "profesi",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "profesi_id"
+      ],
+      "secondTableName": "profesi_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "pangkat_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pangkat",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pangkat_id"
+      ],
+      "secondTableName": "pangkat_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "jabatan_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "jabatan",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "jabatan_id"
+      ],
+      "secondTableName": "jabatan_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "golongan_ruang_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "golongan_ruang",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "golongan_ruang_id"
+      ],
+      "secondTableName": "golongan_ruang_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "unit_kerja_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "unit_kerja",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "unit_kerja_id"
+      ],
+      "secondTableName": "unit_kerja_pegawai",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai_pribadi",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_pribadi_id"
+      ],
+      "secondTableName": "pendidikan",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "str",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "sip",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "jenis_sip",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "jenis_sip_id"
+      ],
+      "secondTableName": "sip",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "penugasan_klinis",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai_pribadi",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_pribadi_id"
+      ],
+      "secondTableName": "keluarga",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "jenis_diklat",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "jenis_diklat_id"
+      ],
+      "secondTableName": "diklat",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "kategori_diklat",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "kategori_diklat_id"
+      ],
+      "secondTableName": "diklat",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "diklat",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "diklat_id"
+      ],
+      "secondTableName": "list_jadwal_diklat",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "pegawai",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "pegawai_id"
+      ],
+      "secondTableName": "list_jadwal_diklat",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "users",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "user_id"
+      ],
+      "secondTableName": "notification",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "users",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "user_id"
+      ],
+      "secondTableName": "perubahan_data",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    },
+    {
+      "firstFieldNames": [
+        "id"
+      ],
+      "firstTableName": "users",
+      "firstSchemaName": "public",
+      "firstRelation": "1",
+      "secondFieldNames": [
+        "user_id"
+      ],
+      "secondTableName": "log_activity",
+      "secondSchemaName": "public",
+      "secondRelation": "*",
+      "checkPoints": []
+    }
+  ]
+}

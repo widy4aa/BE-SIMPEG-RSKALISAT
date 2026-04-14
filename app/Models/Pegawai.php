@@ -17,7 +17,29 @@ class Pegawai extends Model
         'nik',
         'nip',
         'nama',
+        'jenis_pegawai_id',
+        'profesi_id',
+        'jabatan_id',
+        'status_pegawai',
+        'tgl_masuk',
+        'pangkat_id',
+        'golongan_ruang_id',
+        'tmt_cpns',
+        'tmt_pns',
+        'tmt_pangkat_akhir',
+        'masa_kerja',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'tgl_masuk' => 'date',
+            'tmt_cpns' => 'date',
+            'tmt_pns' => 'date',
+            'tmt_pangkat_akhir' => 'date',
+            'masa_kerja' => 'date',
+        ];
+    }
 
     public function user()
     {
@@ -29,23 +51,78 @@ class Pegawai extends Model
         return $this->hasOne(PegawaiPribadi::class);
     }
 
-    public function pekerjaan()
+    public function jenisPegawai()
     {
-        return $this->hasMany(PegawaiPekerjaan::class);
+        return $this->belongsTo(JenisPegawai::class);
     }
 
-    public function riwayatPekerjaan()
+    public function profesi()
     {
-        return $this->hasMany(RiwayatPekerjaan::class);
+        return $this->belongsTo(Profesi::class);
+    }
+
+    public function jabatan()
+    {
+        return $this->belongsTo(Jabatan::class);
+    }
+
+    public function pangkat()
+    {
+        return $this->belongsTo(Pangkat::class);
+    }
+
+    public function golonganRuang()
+    {
+        return $this->belongsTo(GolonganRuang::class);
     }
 
     public function keluarga()
     {
-        return $this->hasMany(Keluarga::class);
+        return $this->hasManyThrough(Keluarga::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
     }
 
     public function jadwalDiklat()
     {
         return $this->hasMany(ListJadwalDiklat::class);
+    }
+
+    public function profesiPegawai()
+    {
+        return $this->hasMany(ProfesiPegawai::class);
+    }
+
+    public function pangkatPegawai()
+    {
+        return $this->hasMany(PangkatPegawai::class);
+    }
+
+    public function jabatanPegawai()
+    {
+        return $this->hasMany(JabatanPegawai::class);
+    }
+
+    public function golonganRuangPegawai()
+    {
+        return $this->hasMany(GolonganRuangPegawai::class);
+    }
+
+    public function unitKerjaPegawai()
+    {
+        return $this->hasMany(UnitKerjaPegawai::class);
+    }
+
+    public function strs()
+    {
+        return $this->hasMany(StrPegawai::class);
+    }
+
+    public function sips()
+    {
+        return $this->hasMany(Sip::class);
+    }
+
+    public function penugasanKlinis()
+    {
+        return $this->hasMany(PenugasanKlinis::class);
     }
 }

@@ -16,7 +16,7 @@ class Pangkat extends Model
         'nama',
         'pejabat_penetap',
         'tmt_sk',
-        'sk_file_id',
+        'sk_file_path',
     ];
 
     protected function casts(): array
@@ -26,18 +26,13 @@ class Pangkat extends Model
         ];
     }
 
-    public function skFile()
+    public function pegawai()
     {
-        return $this->belongsTo(FileModel::class, 'sk_file_id');
+        return $this->hasMany(Pegawai::class);
     }
 
-    public function pegawaiPekerjaan()
+    public function pangkatPegawai()
     {
-        return $this->hasMany(PegawaiPekerjaan::class);
-    }
-
-    public function riwayatPekerjaan()
-    {
-        return $this->hasMany(RiwayatPekerjaan::class);
+        return $this->hasMany(PangkatPegawai::class);
     }
 }

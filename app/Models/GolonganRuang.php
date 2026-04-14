@@ -5,15 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Profesi extends Model
+class GolonganRuang extends Model
 {
     use HasFactory;
 
-    protected $table = 'profesi';
+    protected $table = 'golongan_ruang';
 
     protected $fillable = [
         'nama',
-        'kategori_tenaga',
     ];
 
     public function pegawai()
@@ -21,8 +20,8 @@ class Profesi extends Model
         return $this->hasMany(Pegawai::class);
     }
 
-    public function profesiPegawai()
+    public function golonganRuangPegawai()
     {
-        return $this->hasMany(ProfesiPegawai::class);
+        return $this->hasMany(GolonganRuangPegawai::class);
     }
 }

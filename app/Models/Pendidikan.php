@@ -19,16 +19,11 @@ class Pendidikan extends Model
         'jurusan',
         'tahun_lulus',
         'nomor_ijazah',
-        'ijazah_file_id',
+        'ijazah_file_path',
     ];
 
     public function pegawaiPribadi()
     {
         return $this->belongsTo(PegawaiPribadi::class);
-    }
-
-    public function ijazahFile()
-    {
-        return $this->belongsTo(FileModel::class, 'ijazah_file_id');
     }
 }

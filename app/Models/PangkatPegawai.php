@@ -6,30 +6,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class StrPegawai extends Model
+class PangkatPegawai extends Model
 {
     use HasFactory, SoftDeletes;
 
-    protected $table = 'str';
+    protected $table = 'pangkat_pegawai';
 
     protected $fillable = [
         'pegawai_id',
-        'nomor_str',
-        'tanggal_terbit',
-        'tanggal_kadaluarsa',
-        'sk_file_path',
+        'pangkat_id',
+        'is_current',
+        'started_at',
+        'ended_at',
+        'note',
     ];
 
     protected function casts(): array
     {
         return [
-            'tanggal_terbit' => 'date',
-            'tanggal_kadaluarsa' => 'date',
+            'is_current' => 'boolean',
+            'started_at' => 'date',
+            'ended_at' => 'date',
         ];
     }
 
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class);
+    }
+
+    public function pangkat()
+    {
+        return $this->belongsTo(Pangkat::class);
     }
 }

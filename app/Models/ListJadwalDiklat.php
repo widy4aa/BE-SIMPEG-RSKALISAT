@@ -15,7 +15,7 @@ class ListJadwalDiklat extends Model
     protected $fillable = [
         'diklat_id',
         'pegawai_id',
-        'laporan_file_id',
+        'laporan_file_path',
         'uploaded_at',
         'status_diklat',
     ];
@@ -35,10 +35,5 @@ class ListJadwalDiklat extends Model
     public function pegawai()
     {
         return $this->belongsTo(Pegawai::class);
-    }
-
-    public function laporanFile()
-    {
-        return $this->belongsTo(FileModel::class, 'laporan_file_id');
     }
 }

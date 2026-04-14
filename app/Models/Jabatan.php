@@ -14,10 +14,9 @@ class Jabatan extends Model
 
     protected $fillable = [
         'nama',
-        'unit_kerja_id',
         'tmt_mulai',
         'tmt_selesai',
-        'sk_file_id',
+        'sk_file_path',
     ];
 
     protected function casts(): array
@@ -28,23 +27,13 @@ class Jabatan extends Model
         ];
     }
 
-    public function unitKerja()
+    public function pegawai()
     {
-        return $this->belongsTo(UnitKerja::class);
+        return $this->hasMany(Pegawai::class);
     }
 
-    public function skFile()
+    public function jabatanPegawai()
     {
-        return $this->belongsTo(FileModel::class, 'sk_file_id');
-    }
-
-    public function pegawaiPekerjaan()
-    {
-        return $this->hasMany(PegawaiPekerjaan::class);
-    }
-
-    public function riwayatPekerjaan()
-    {
-        return $this->hasMany(RiwayatPekerjaan::class);
+        return $this->hasMany(JabatanPegawai::class);
     }
 }

@@ -13,7 +13,7 @@ class Keluarga extends Model
     protected $table = 'keluarga';
 
     protected $fillable = [
-        'pegawai_id',
+        'pegawai_pribadi_id',
         'nama',
         'hubungan',
         'tanggal_lahir',
@@ -27,8 +27,8 @@ class Keluarga extends Model
         ];
     }
 
-    public function pegawai()
+    public function pegawaiPribadi()
     {
-        return $this->belongsTo(Pegawai::class);
+        return $this->belongsTo(PegawaiPribadi::class);
     }
 }

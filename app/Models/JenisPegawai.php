@@ -15,8 +15,8 @@ class JenisPegawai extends Model
         'nama',
     ];
 
-    public function pegawaiPekerjaan()
+    public function pegawai()
     {
-        return $this->hasMany(PegawaiPekerjaan::class);
+        return $this->hasMany(Pegawai::class);
     }
 }

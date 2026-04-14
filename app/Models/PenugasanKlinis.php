@@ -13,11 +13,11 @@ class PenugasanKlinis extends Model
     protected $table = 'penugasan_klinis';
 
     protected $fillable = [
-        'pegawai_pekerjaan_id',
+        'pegawai_id',
         'nomor_surat',
         'tgl_mulai',
         'tgl_kadaluarsa',
-        'dokumen_file_id',
+        'dokumen_file_path',
     ];
 
     protected function casts(): array
@@ -28,13 +28,8 @@ class PenugasanKlinis extends Model
         ];
     }
 
-    public function pegawaiPekerjaan()
+    public function pegawai()
     {
-        return $this->belongsTo(PegawaiPekerjaan::class);
-    }
-
-    public function dokumenFile()
-    {
-        return $this->belongsTo(FileModel::class, 'dokumen_file_id');
+        return $this->belongsTo(Pegawai::class);
     }
 }

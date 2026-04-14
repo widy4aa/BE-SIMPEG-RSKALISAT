@@ -13,12 +13,12 @@ class Sip extends Model
     protected $table = 'sip';
 
     protected $fillable = [
-        'pegawai_pekerjaan_id',
+        'pegawai_id',
         'jenis_sip_id',
         'nomor_sip',
         'tanggal_terbit',
         'tanggal_kadaluarsa',
-        'sk_file_id',
+        'sk_file_path',
     ];
 
     protected function casts(): array
@@ -29,18 +29,13 @@ class Sip extends Model
         ];
     }
 
-    public function pegawaiPekerjaan()
+    public function pegawai()
     {
-        return $this->belongsTo(PegawaiPekerjaan::class);
+        return $this->belongsTo(Pegawai::class);
     }
 
     public function jenisSip()
     {
         return $this->belongsTo(JenisSip::class);
-    }
-
-    public function skFile()
-    {
-        return $this->belongsTo(FileModel::class, 'sk_file_id');
     }
 }
