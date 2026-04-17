@@ -5,12 +5,18 @@ namespace Database\Seeders;
 use App\Models\Jabatan;
 use App\Models\JabatanPegawai;
 use App\Models\JenisPegawai;
+use App\Models\JenisSip;
+use App\Models\Keluarga;
+use App\Models\NotificationModel;
 use App\Models\Pangkat;
 use App\Models\PangkatPegawai;
 use App\Models\Pegawai;
 use App\Models\PegawaiPribadi;
+use App\Models\PenugasanKlinis;
 use App\Models\ProfesiPegawai;
 use App\Models\Profesi;
+use App\Models\Sip;
+use App\Models\StrPegawai;
 use App\Models\UnitKerjaPegawai;
 use App\Models\UnitKerja;
 use App\Models\User;
@@ -61,6 +67,8 @@ class PegawaiSeeder extends Seeder
             ['kategori_tenaga' => 'Non Kesehatan']
         );
 
+        $jenisSip = JenisSip::query()->firstOrCreate(['nama' => 'SIP Praktik Rumah Sakit']);
+
         $pegawaiSeeds = [
             [
                 'nik' => '3174010101010099',
@@ -69,6 +77,55 @@ class PegawaiSeeder extends Seeder
                 'role' => 'admin',
                 'jenis_kelamin' => 'L',
                 'jabatan_id' => $jabatanAdmin->id,
+                'foto_path' => 'dokumen/foto/admin-simpeg.jpg',
+                'ktp_file_path' => 'dokumen/ktp/admin-simpeg.pdf',
+                'kk_file_path' => 'dokumen/kk/admin-simpeg.pdf',
+                'buku_nikah_file_path' => 'dokumen/buku_nikah/admin-simpeg.pdf',
+                'keluarga' => [
+                    [
+                        'nama' => 'Dina Sari',
+                        'hubungan' => 'istri',
+                        'tanggal_lahir' => '1987-05-20',
+                        'pekerjaan' => 'Guru',
+                    ],
+                    [
+                        'nama' => 'Rafi Pratama',
+                        'hubungan' => 'anak',
+                        'tanggal_lahir' => '2013-02-15',
+                        'pekerjaan' => 'Pelajar',
+                    ],
+                ],
+                'str' => [
+                    [
+                        'nomor_str' => 'STR-3174010101010099-01',
+                        'tanggal_terbit' => '2023-01-01',
+                        'tanggal_kadaluarsa' => '2027-12-31',
+                        'sk_file_path' => 'dokumen/str/admin-simpeg.pdf',
+                    ],
+                ],
+                'sip' => [
+                    [
+                        'nomor_sip' => 'SIP-3174010101010099-01',
+                        'tanggal_terbit' => '2024-01-01',
+                        'tanggal_kadaluarsa' => '2027-12-31',
+                        'sk_file_path' => 'dokumen/sip/admin-simpeg.pdf',
+                    ],
+                ],
+                'penugasan_klinis' => [
+                    [
+                        'nomor_surat' => 'SK-KLINIS-ADM-001',
+                        'tgl_mulai' => '2024-01-01',
+                        'tgl_kadaluarsa' => '2026-12-31',
+                        'dokumen_file_path' => 'dokumen/penugasan/admin-simpeg.pdf',
+                    ],
+                ],
+                'notifications' => [
+                    [
+                        'title' => 'Selamat Datang',
+                        'message' => 'Akun admin SIMPEG berhasil dibuat.',
+                        'is_read' => false,
+                    ],
+                ],
             ],
             [
                 'nik' => '3174010101010098',
@@ -77,6 +134,55 @@ class PegawaiSeeder extends Seeder
                 'role' => 'hrd',
                 'jenis_kelamin' => 'P',
                 'jabatan_id' => $jabatanHrd->id,
+                'foto_path' => 'dokumen/foto/hrd-simpeg.jpg',
+                'ktp_file_path' => 'dokumen/ktp/hrd-simpeg.pdf',
+                'kk_file_path' => 'dokumen/kk/hrd-simpeg.pdf',
+                'buku_nikah_file_path' => 'dokumen/buku_nikah/hrd-simpeg.pdf',
+                'keluarga' => [
+                    [
+                        'nama' => 'Andi Wijaya',
+                        'hubungan' => 'suami',
+                        'tanggal_lahir' => '1984-03-10',
+                        'pekerjaan' => 'Wiraswasta',
+                    ],
+                    [
+                        'nama' => 'Nadia Putri',
+                        'hubungan' => 'anak',
+                        'tanggal_lahir' => '2012-09-17',
+                        'pekerjaan' => 'Pelajar',
+                    ],
+                ],
+                'str' => [
+                    [
+                        'nomor_str' => 'STR-3174010101010098-01',
+                        'tanggal_terbit' => '2022-07-01',
+                        'tanggal_kadaluarsa' => '2027-06-30',
+                        'sk_file_path' => 'dokumen/str/hrd-simpeg.pdf',
+                    ],
+                ],
+                'sip' => [
+                    [
+                        'nomor_sip' => 'SIP-3174010101010098-01',
+                        'tanggal_terbit' => '2023-01-01',
+                        'tanggal_kadaluarsa' => '2027-12-31',
+                        'sk_file_path' => 'dokumen/sip/hrd-simpeg.pdf',
+                    ],
+                ],
+                'penugasan_klinis' => [
+                    [
+                        'nomor_surat' => 'SK-KLINIS-HRD-001',
+                        'tgl_mulai' => '2023-02-01',
+                        'tgl_kadaluarsa' => '2026-01-31',
+                        'dokumen_file_path' => 'dokumen/penugasan/hrd-simpeg.pdf',
+                    ],
+                ],
+                'notifications' => [
+                    [
+                        'title' => 'Reminder Data',
+                        'message' => 'Silakan cek kelengkapan data pegawai.',
+                        'is_read' => false,
+                    ],
+                ],
             ],
             [
                 'nik' => '3174010101010001',
@@ -85,14 +191,55 @@ class PegawaiSeeder extends Seeder
                 'role' => 'pegawai',
                 'jenis_kelamin' => 'L',
                 'jabatan_id' => $jabatan->id,
-            ],
-            [
-                'nik' => '3174010101010002',
-                'nip' => '199202022012012002',
-                'nama' => 'Siti Rahma',
-                'role' => 'pegawai',
-                'jenis_kelamin' => 'P',
-                'jabatan_id' => $jabatan->id,
+                'foto_path' => 'dokumen/foto/budi-santoso.jpg',
+                'ktp_file_path' => 'dokumen/ktp/budi-santoso.pdf',
+                'kk_file_path' => 'dokumen/kk/budi-santoso.pdf',
+                'buku_nikah_file_path' => 'dokumen/buku_nikah/budi-santoso.pdf',
+                'keluarga' => [
+                    [
+                        'nama' => 'Ani Lestari',
+                        'hubungan' => 'istri',
+                        'tanggal_lahir' => '1991-04-11',
+                        'pekerjaan' => 'Perawat',
+                    ],
+                    [
+                        'nama' => 'Fajar Santoso',
+                        'hubungan' => 'anak',
+                        'tanggal_lahir' => '2016-06-03',
+                        'pekerjaan' => 'Pelajar',
+                    ],
+                ],
+                'str' => [
+                    [
+                        'nomor_str' => 'STR-3174010101010001-01',
+                        'tanggal_terbit' => '2023-05-01',
+                        'tanggal_kadaluarsa' => '2028-04-30',
+                        'sk_file_path' => 'dokumen/str/budi-santoso.pdf',
+                    ],
+                ],
+                'sip' => [
+                    [
+                        'nomor_sip' => 'SIP-3174010101010001-01',
+                        'tanggal_terbit' => '2024-01-15',
+                        'tanggal_kadaluarsa' => '2028-01-14',
+                        'sk_file_path' => 'dokumen/sip/budi-santoso.pdf',
+                    ],
+                ],
+                'penugasan_klinis' => [
+                    [
+                        'nomor_surat' => 'SK-KLINIS-BUDI-001',
+                        'tgl_mulai' => '2024-03-01',
+                        'tgl_kadaluarsa' => '2026-02-28',
+                        'dokumen_file_path' => 'dokumen/penugasan/budi-santoso.pdf',
+                    ],
+                ],
+                'notifications' => [
+                    [
+                        'title' => 'Update Profil',
+                        'message' => 'Profil Anda telah diperbarui.',
+                        'is_read' => true,
+                    ],
+                ],
             ],
             [
                 'nik' => '3174010101010003',
@@ -101,6 +248,49 @@ class PegawaiSeeder extends Seeder
                 'role' => 'direktur',
                 'jenis_kelamin' => 'L',
                 'jabatan_id' => $jabatanDirektur->id,
+                'foto_path' => 'dokumen/foto/agus-priyanto.jpg',
+                'ktp_file_path' => 'dokumen/ktp/agus-priyanto.pdf',
+                'kk_file_path' => 'dokumen/kk/agus-priyanto.pdf',
+                'buku_nikah_file_path' => 'dokumen/buku_nikah/agus-priyanto.pdf',
+                'keluarga' => [
+                    [
+                        'nama' => 'Rina Anggraini',
+                        'hubungan' => 'istri',
+                        'tanggal_lahir' => '1988-11-01',
+                        'pekerjaan' => 'ASN',
+                    ],
+                ],
+                'str' => [
+                    [
+                        'nomor_str' => 'STR-3174010101010003-01',
+                        'tanggal_terbit' => '2021-01-01',
+                        'tanggal_kadaluarsa' => '2026-12-31',
+                        'sk_file_path' => 'dokumen/str/agus-priyanto.pdf',
+                    ],
+                ],
+                'sip' => [
+                    [
+                        'nomor_sip' => 'SIP-3174010101010003-01',
+                        'tanggal_terbit' => '2021-02-01',
+                        'tanggal_kadaluarsa' => '2026-01-31',
+                        'sk_file_path' => 'dokumen/sip/agus-priyanto.pdf',
+                    ],
+                ],
+                'penugasan_klinis' => [
+                    [
+                        'nomor_surat' => 'SK-KLINIS-DIR-001',
+                        'tgl_mulai' => '2023-01-01',
+                        'tgl_kadaluarsa' => '2026-12-31',
+                        'dokumen_file_path' => 'dokumen/penugasan/agus-priyanto.pdf',
+                    ],
+                ],
+                'notifications' => [
+                    [
+                        'title' => 'Laporan Bulanan',
+                        'message' => 'Laporan bulanan SDM siap untuk ditinjau.',
+                        'is_read' => false,
+                    ],
+                ],
             ],
         ];
 
@@ -133,7 +323,7 @@ class PegawaiSeeder extends Seeder
                 ]
             );
 
-            PegawaiPribadi::query()->updateOrCreate(
+            $pegawaiPribadi = PegawaiPribadi::query()->updateOrCreate(
                 ['pegawai_id' => $pegawai->id],
                 [
                     'pendidikan_terakhir' => 'S1/D4',
@@ -144,8 +334,67 @@ class PegawaiSeeder extends Seeder
                     'alamat' => 'Jakarta',
                     'no_telp' => '081234567890',
                     'email' => strtolower(str_replace(' ', '.', $seed['nama'])) . '@example.com',
+                    'foto_path' => $seed['foto_path'],
+                    'ktp_file_path' => $seed['ktp_file_path'],
+                    'kk_file_path' => $seed['kk_file_path'],
+                    'buku_nikah_file_path' => $seed['buku_nikah_file_path'],
                 ]
             );
+
+            Keluarga::query()->where('pegawai_pribadi_id', $pegawaiPribadi->id)->delete();
+            foreach ($seed['keluarga'] as $anggotaKeluarga) {
+                Keluarga::query()->create([
+                    'pegawai_pribadi_id' => $pegawaiPribadi->id,
+                    'nama' => $anggotaKeluarga['nama'],
+                    'hubungan' => $anggotaKeluarga['hubungan'],
+                    'tanggal_lahir' => $anggotaKeluarga['tanggal_lahir'],
+                    'pekerjaan' => $anggotaKeluarga['pekerjaan'],
+                ]);
+            }
+
+            StrPegawai::query()->where('pegawai_id', $pegawai->id)->delete();
+            foreach ($seed['str'] as $str) {
+                StrPegawai::query()->create([
+                    'pegawai_id' => $pegawai->id,
+                    'nomor_str' => $str['nomor_str'],
+                    'tanggal_terbit' => $str['tanggal_terbit'],
+                    'tanggal_kadaluarsa' => $str['tanggal_kadaluarsa'],
+                    'sk_file_path' => $str['sk_file_path'],
+                ]);
+            }
+
+            Sip::query()->where('pegawai_id', $pegawai->id)->delete();
+            foreach ($seed['sip'] as $sip) {
+                Sip::query()->create([
+                    'pegawai_id' => $pegawai->id,
+                    'jenis_sip_id' => $jenisSip->id,
+                    'nomor_sip' => $sip['nomor_sip'],
+                    'tanggal_terbit' => $sip['tanggal_terbit'],
+                    'tanggal_kadaluarsa' => $sip['tanggal_kadaluarsa'],
+                    'sk_file_path' => $sip['sk_file_path'],
+                ]);
+            }
+
+            PenugasanKlinis::query()->where('pegawai_id', $pegawai->id)->delete();
+            foreach ($seed['penugasan_klinis'] as $penugasan) {
+                PenugasanKlinis::query()->create([
+                    'pegawai_id' => $pegawai->id,
+                    'nomor_surat' => $penugasan['nomor_surat'],
+                    'tgl_mulai' => $penugasan['tgl_mulai'],
+                    'tgl_kadaluarsa' => $penugasan['tgl_kadaluarsa'],
+                    'dokumen_file_path' => $penugasan['dokumen_file_path'],
+                ]);
+            }
+
+            NotificationModel::query()->where('user_id', $user->id)->delete();
+            foreach ($seed['notifications'] as $notification) {
+                NotificationModel::query()->create([
+                    'user_id' => $user->id,
+                    'title' => $notification['title'],
+                    'message' => $notification['message'],
+                    'is_read' => $notification['is_read'],
+                ]);
+            }
 
             ProfesiPegawai::query()->updateOrCreate(
                 [

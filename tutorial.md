@@ -326,3 +326,156 @@ Saat bikin fitur endpoint baru, minimal siapkan:
 6. Test di [tests/Feature/Api](tests/Feature/Api)
 
 Dengan pola ini, endpoint tetap bersih, aman, dan gampang di-maintain.
+
+## 10. Implementasi Endpoint GET /api/dashboard
+
+Target endpoint:
+
+1. Method: GET
+2. URL: /api/dashboard
+3. Wajib token JWT
+4. Return utama: Selamat datang (nama role)
+
+### 10.1 Langkah 1 - Tambah route
+
+File yang diubah:
+[routes/api.php](routes/api.php)
+
+Tambahkan import controller:
+
+	 use App\Http\Controllers\Api\DashboardController;
+
+Tambahkan route endpoint dashboard:
+
+	 Route::middleware([
+		  JwtAuthMiddleware::class,
+		  RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+	 ])->get('/dashboard', [DashboardController::class, 'show']);
+
+Kenapa pakai middleware itu:
+
+1. JwtAuthMiddleware untuk memastikan request membawa token valid.
+2. RoleMiddleware untuk batasi role yang boleh akses dashboard.
+
+### 10.2 Langkah 2 - Buat controller dashboard
+
+File baru:
+[app/Http/Controllers/Api/DashboardController.php](app/Http/Controllers/Api/DashboardController.php)
+
+Isi pentingnya:
+
+1. Ambil claims JWT dari _jwt_claims.
+2. Ambil nilai role dari claims.
+3. Tentukan return per role lewat array konfigurasi.
+4. Return JSON:
+	- success true
+	- message "Selamat datang (role)"
+	- data role dan data dashboard
+
+### 10.3 Lokasi konfigurasi return masing-masing role
+
+Tempat utamanya ada di file:
+[app/Http/Controllers/Api/DashboardController.php](app/Http/Controllers/Api/DashboardController.php)
+
+Cari blok ini:
+
+	 // Konfigurasi return per role: ubah isi array ini sesuai kebutuhan output masing-masing role.
+	 $dashboardByRole = [
+		  'admin' => [...],
+		  'pegawai' => [...],
+		  'hrd' => [...],
+		  'direktur' => [...],
+	 ];
+
+Kalau mau ubah return per role, edit isi tiap key role tersebut.
+
+Contoh ubah pesan welcome:
+
+	 'admin' => [
+		  'welcome' => 'Selamat datang admin super',
+		  'summary' => [...],
+	 ]
+
+### 10.4 Cara atur return kalau data diambil dari database
+
+Supaya rapi, best practice tetap:
+
+1. Query database di Repository.
+2. Logic gabung data di Service.
+3. Controller hanya menyusun response JSON.
+
+Alur yang disarankan:
+
+1. Controller kirim role dan identitas user ke service.
+2. Service tentukan data apa saja berdasarkan role.
+3. Service panggil repository untuk ambil data DB.
+4. Service return payload siap tampil.
+5. Controller kirim ke response data.
+
+Contoh konsep service (pseudo):
+
+	 public function getDashboard(string $role, array $claims): array
+	 {
+		  return match ($role) {
+			   'admin' => [
+					 'welcome' => 'Selamat datang admin',
+					 'summary' => [
+						  'total_pegawai' => $this->pegawaiRepository->countAll(),
+						  'total_unit' => $this->unitKerjaRepository->countAll(),
+					 ],
+			   ],
+			   'pegawai' => [
+					 'welcome' => 'Selamat datang pegawai',
+					 'summary' => [
+						  'profil' => $this->pegawaiRepository->findByNik((string) ($claims['sub'] ?? '')),
+						  'jadwal_diklat' => $this->diklatRepository->getUpcomingByPegawaiId((int) ($claims['pegawai_id'] ?? 0)),
+					 ],
+			   ],
+			   default => [
+					 'welcome' => 'Access denied.',
+					 'summary' => [],
+			   ],
+		  };
+	 }
+
+### 10.5 Cara menentukan data apa saja yang mau ditampilkan
+
+Gunakan checklist ini per role:
+
+1. Role ini butuh lihat data ringkasan apa.
+2. Data itu sumbernya tabel mana.
+3. Perlu detail penuh atau cukup agregasi.
+4. Data sensitif mana yang harus disembunyikan.
+5. Batas jumlah data di dashboard (hindari query berat).
+6. Kapan perlu cache agar response cepat.
+
+Contoh struktur output dashboard yang aman dan jelas:
+
+	 {
+		  "success": true,
+		  "message": "Selamat datang admin",
+		  "data": {
+			   "role": "admin",
+			   "dashboard": {
+					 "total_pegawai": 123,
+					 "total_unit": 8,
+					 "notifikasi": 5
+			   }
+		  }
+	 }
+
+### 10.6 Uji endpoint dashboard
+
+Request:
+
+	 GET /api/dashboard
+
+Header wajib:
+
+	 Authorization: Bearer <token_jwt>
+
+Expected:
+
+1. Token valid + role valid -> success true dan message "Selamat datang (role)".
+2. Token tidak valid -> status 401.
+3. Role tidak diizinkan -> status 403.
