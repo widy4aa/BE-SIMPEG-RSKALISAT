@@ -48,7 +48,7 @@ class User extends Authenticatable
 
     public function perubahanData()
     {
-        return $this->hasMany(PerubahanData::class);
+        return $this->hasMany(PerubahanData::class, 'by_user');
     }
 
     public function logActivities()

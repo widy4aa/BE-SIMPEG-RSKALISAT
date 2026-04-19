@@ -12,16 +12,26 @@ class PerubahanData extends Model
     protected $table = 'perubahan_data';
 
     protected $fillable = [
-        'user_id',
-        'table_name',
-        'record_id',
-        'field_name',
-        'old_value',
-        'new_value',
+        'by_user',
+        'fitur',
+        'status',
+        'note',
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'by_user');
+    }
+
+    public function details()
+    {
+        return $this->hasMany(DetailPerubahanData::class, 'id_perubahan_data');
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'status' => 'string',
+        ];
     }
 }

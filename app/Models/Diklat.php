@@ -15,6 +15,7 @@ class Diklat extends Model
     protected $fillable = [
         'jenis_diklat_id',
         'kategori_diklat_id',
+        'created_by',
         'nama_kegiatan',
         'status_kelayakan',
         'status_validasi',
@@ -42,6 +43,11 @@ class Diklat extends Model
     public function kategoriDiklat()
     {
         return $this->belongsTo(KategoriDiklat::class);
+    }
+
+    public function createdByPegawai()
+    {
+        return $this->belongsTo(Pegawai::class, 'created_by');
     }
 
     public function jadwalPeserta()

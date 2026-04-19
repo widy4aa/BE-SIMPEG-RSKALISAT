@@ -16,6 +16,8 @@ class DatabaseSeeder extends Seeder
             PegawaiSeeder::class,
             DiklatPegawaiBudiSeeder::class,
             PegawaiNotificationSeeder::class,
+            PegawaiActionNotificationSeeder::class,
+            BudiProfileChangeRequestSeeder::class,
         ]);
     }
 }

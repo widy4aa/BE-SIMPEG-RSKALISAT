@@ -3,38 +3,51 @@
 namespace App\Services\Dashboard;
 
 use App\Repositories\Dashboard\PegawaiDashboardRepository;
-use App\Models\StrPegawai;
-use Carbon\Carbon;
-use Illuminate\Support\Collection;
+use App\Services\Notification\NotificationActionSyncService;
 
 class PegawaiService
 {
-    public function __construct(private readonly PegawaiDashboardRepository $pegawaiDashboardRepository)
-    {
+    public function __construct(
+        private readonly PegawaiDashboardRepository $pegawaiDashboardRepository,
+        private readonly NotificationActionSyncService $notificationActionSyncService,
+    ) {
     }
 
     public function build(int $userId): array
     {
+        // Sinkronisasi ringan aksi dashboard agar list_aksi berasal dari notifikasi action.
+        $this->notificationActionSyncService->syncDashboardActionsByUserId($userId);
+
         $pegawai = $this->pegawaiDashboardRepository->findPegawaiDashboardByUserId($userId);
 
         $unitKerjaAktif = $pegawai?->unitKerjaPegawai
             ?->firstWhere('is_current', true)
             ?? $pegawai?->unitKerjaPegawai?->first();
 
-        $strTerbaru = $pegawai?->strs->first();
-        $statusStr = $this->cekMasaBerlakuStr($strTerbaru);
-        $statusKeluarga = $this->cekStatusDataKeluarga(
-            keluarga: $pegawai?->pribadi?->keluarga ?? collect(),
-            bukuNikahFilePath: (string) ($pegawai?->pribadi?->buku_nikah_file_path ?? '')
-        );
         $listNotifikasi = $this->pegawaiDashboardRepository
-            ->getUnreadNotificationsByUserId($userId)
+            ->getUnreadInfoNotificationsByUserId($userId)
             ->map(function ($notification) {
                 return [
                     'id' => (int) $notification->id,
                     'title' => (string) ($notification->title ?? ''),
                     'message' => (string) ($notification->message ?? ''),
                     'is_read' => (bool) $notification->is_read,
+                    'created_at' => optional($notification->created_at)?->toDateTimeString(),
+                ];
+            })
+            ->values()
+            ->all();
+        $listAksi = $this->pegawaiDashboardRepository
+            ->getActiveActionNotificationsByUserId($userId)
+            ->map(function ($notification) {
+                return [
+                    'id' => (int) $notification->id,
+                    'action_code' => (string) ($notification->action_code ?? ''),
+                    'title' => (string) ($notification->title ?? ''),
+                    'message' => (string) ($notification->message ?? ''),
+                    'action_payload' => (array) ($notification->action_payload ?? []),
+                    'is_read' => (bool) $notification->is_read,
+                    'is_resolved' => (bool) $notification->is_resolved,
                     'created_at' => optional($notification->created_at)?->toDateTimeString(),
                 ];
             })
@@ -70,69 +83,8 @@ class PegawaiService
                 'jumlah_diklat_dijadwalkan_belum_selesai' => (int) ($pegawai?->jumlah_diklat_belum_selesai ?? 0),
                 'list_jadwal_diklat_mendatang' => $listJadwalDiklatMendatang,
                 'list_notifikasi' => $listNotifikasi,
-                'list_aksi' => [
-                    'status_str' => $statusStr,
-                    'status_data_keluarga' => $statusKeluarga,
-                ],
+                'list_aksi' => $listAksi,
             ],
-        ];
-    }
-
-    private function cekMasaBerlakuStr(?StrPegawai $str): array
-    {
-        if ($str === null || $str->tanggal_kadaluarsa === null) {
-            return [
-                'status_lengkap' => false,
-                'sisa_hari' => null,
-                'keterangan' => ['STR belum tersedia'],
-            ];
-        }
-
-        $hariIni = Carbon::today();
-        $tanggalKadaluarsa = Carbon::parse($str->tanggal_kadaluarsa)->startOfDay();
-        $sisaHari = $hariIni->diffInDays($tanggalKadaluarsa, false);
-
-        return [
-            'status_lengkap' => true,
-            'sisa_hari' => $sisaHari,
-            'keterangan' => $sisaHari >= 0
-                ? ['STR aktif']
-                : ['STR sudah kadaluarsa'],
-        ];
-    }
-
-    private function cekStatusDataKeluarga(Collection $keluarga, string $bukuNikahFilePath): array
-    {
-        $keterangan = [];
-        $isLengkap = true;
-
-        if ($bukuNikahFilePath === '') {
-            $isLengkap = false;
-            $keterangan[] = 'bukti pernikahan belum ada';
-        }
-
-        if ($keluarga->isEmpty()) {
-            $isLengkap = false;
-            $keterangan[] = 'data keluarga belum ada';
-        }
-
-        foreach ($keluarga as $anggotaKeluarga) {
-            $isItemLengkap = filled($anggotaKeluarga->nama)
-                && filled($anggotaKeluarga->hubungan)
-                && filled($anggotaKeluarga->tanggal_lahir)
-                && filled($anggotaKeluarga->pekerjaan);
-
-            if (! $isItemLengkap) {
-                $isLengkap = false;
-                $keterangan[] = (string) ($anggotaKeluarga->nama ?: 'nama keluarga kosong');
-            }
-        }
-
-        $keterangan = array_values(array_unique($keterangan));
-
-        return [
-            'status_lengkap' => $isLengkap,
-            'keterangan' => $isLengkap ? ['data lengkap'] : $keterangan,
         ];
     }
 }

@@ -76,6 +76,7 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 [
                     'jenis_diklat_id' => $jenisDiklat->id,
                     'kategori_diklat_id' => $kategoriDiklat->id,
+                    'created_by' => $pegawaiBudi->id,
                     'status_kelayakan' => 'layak',
                     'status_validasi' => 'valid',
                     'penyelenggara' => 'Bagian SDM RS Kalisat',

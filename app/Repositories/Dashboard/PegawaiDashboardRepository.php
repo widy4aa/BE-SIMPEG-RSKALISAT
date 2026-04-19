@@ -26,11 +26,22 @@ class PegawaiDashboardRepository
             ->first();
     }
 
-    public function getUnreadNotificationsByUserId(int $userId): Collection
+    public function getUnreadInfoNotificationsByUserId(int $userId): Collection
     {
         return NotificationModel::query()
             ->where('user_id', $userId)
+            ->where('type', 'info')
             ->where('is_read', false)
+            ->orderByDesc('created_at')
+            ->get();
+    }
+
+    public function getActiveActionNotificationsByUserId(int $userId): Collection
+    {
+        return NotificationModel::query()
+            ->where('user_id', $userId)
+            ->where('type', 'action')
+            ->where('is_resolved', false)
             ->orderByDesc('created_at')
             ->get();
     }

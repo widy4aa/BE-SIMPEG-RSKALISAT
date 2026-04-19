@@ -21,9 +21,12 @@ BAB III Endpoint Untuk Semua Role Login
 2. [Cek Role Login](#3-cek-role-login)
 3. [Dashboard](#4-dashboard)
 4. [Response Dashboard Untuk Role Pegawai](#response-dashboard-untuk-role-pegawai)
-5. [Notifikasi (Mark As Read)](#5-notifikasi-mark-as-read)
-6. [Tandai 1 Notifikasi Sudah Dibaca](#51-tandai-1-notifikasi-sudah-dibaca)
-7. [Tandai Semua Notifikasi Sudah Dibaca](#52-tandai-semua-notifikasi-sudah-dibaca)
+5. [Profile](#5-profile)
+6. [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
+7. [Ajukan Perubahan Profile](#6-ajukan-perubahan-profile)
+8. [Notifikasi (Mark As Read)](#7-notifikasi-mark-as-read)
+9. [Tandai 1 Notifikasi Sudah Dibaca](#71-tandai-1-notifikasi-sudah-dibaca)
+10. [Tandai Semua Notifikasi Sudah Dibaca](#72-tandai-semua-notifikasi-sudah-dibaca)
 
 BAB IV Endpoint Per Role
 
@@ -33,7 +36,14 @@ BAB IV Endpoint Per Role
 4. [HRD](#hrd)
 5. [Direktur](#direktur)
 
-BAB V Data Uji dan Simulasi
+BAB V Endpoint Admin Approval Change Request
+
+1. [List Change Request](#8-list-change-request-admin)
+2. [Detail Change Request](#9-detail-change-request-admin)
+3. [Accept Change Request](#10-accept-change-request-admin)
+4. [Reject Change Request](#11-reject-change-request-admin)
+
+BAB VI Data Uji dan Simulasi
 
 1. [Akun Seeder Untuk Uji Login](#akun-seeder-untuk-uji-login)
 2. [Quick Test via cURL](#quick-test-via-curl)
@@ -269,21 +279,24 @@ Contoh response `200 OK`:
           "created_at": "2026-04-17 10:00:00"
         }
       ],
-      "list_aksi": {
-        "status_str": {
-          "status_lengkap": true,
-          "sisa_hari": 100,
-          "keterangan": [
-            "STR aktif"
-          ]
-        },
-        "status_data_keluarga": {
-          "status_lengkap": true,
-          "keterangan": [
-            "data lengkap"
-          ]
+      "list_aksi": [
+        {
+          "id": 10,
+          "action_code": "str_will_expire",
+          "title": "STR akan segera kadaluarsa",
+          "message": "STR Anda akan kadaluarsa dalam waktu dekat. Segera lakukan perpanjangan.",
+          "action_payload": {
+            "status_lengkap": true,
+            "sisa_hari": 20,
+            "keterangan": [
+              "STR aktif"
+            ]
+          },
+          "is_read": false,
+          "is_resolved": false,
+          "created_at": "2026-04-18 09:30:00"
         }
-      }
+      ]
     }
   }
 }
@@ -295,8 +308,8 @@ Keterangan field dashboard pegawai:
 - `jumlah_diklat_dijadwalkan_belum_selesai`: jumlah diklat dengan status `belum terlaksana` atau `sedang terlaksana`.
 - `list_jadwal_diklat_mendatang`: list diklat yang statusnya `belum terlaksana`.
 - `list_notifikasi`: hanya menampilkan notifikasi milik user login dengan `is_read = false` (belum dibaca).
-- `list_aksi.status_str`: informasi sisa masa berlaku STR.
-- `list_aksi.status_data_keluarga`: status kelengkapan data keluarga.
+- `list_aksi`: daftar notifikasi bertipe `action` yang belum `is_resolved`.
+- `list_aksi.action_payload`: detail data aksi, misalnya status STR atau kelengkapan keluarga.
 
 Contoh response `401 Unauthorized` (token tidak valid/tidak ada):
 
@@ -316,9 +329,136 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 }
 ```
 
-### 5. Notifikasi (Mark As Read)
+### 5. Profile
 
-#### 5.1 Tandai 1 Notifikasi Sudah Dibaca
+- Method: `GET`
+- URL: `/api/profile`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+Contoh header:
+
+```http
+Authorization: Bearer <jwt_token>
+```
+
+#### Response Profile Untuk Role Pegawai
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Selamat datang pegawai",
+  "data": {
+    "role": "pegawai",
+    "profile": {
+      "label": "Profile pegawai",
+      "nip": "198901012010011001",
+      "nik": "3174010101010001",
+      "nama": "Budi Santoso",
+      "jenis_pegawai": "PNS",
+      "profesi": "Analis SDM",
+      "pendidikan_terakhir": "S1/D4",
+      "unit_kerja": "SDM",
+      "jk": "L",
+      "tanggal_lahir": "1990-01-01",
+      "jabatan_sekarang": "Staf Kepegawaian",
+      "agama": "Islam",
+      "status_kawin": "kawin",
+      "alamat": "Jakarta",
+      "no_telp": "081234567890",
+      "email": "budi.santoso@example.com",
+      "link_photo_profile": "http://127.0.0.1:8000/dokumen/foto/budi-santoso.jpg",
+      "status_pegawai": "aktif",
+      "tgl_masuk": "2020-01-01",
+      "pangkat": "Penata Muda",
+      "golongan_ruang": "III/a",
+      "tmt_cpns": "2020-01-01",
+      "tmt_pns": "2021-01-01",
+      "tmt_pangkat": "2020-01-01",
+      "masa_kerja": "6 tahun 3 bulan",
+      "last_update": "2026-04-19 08:30:00"
+    }
+  }
+}
+```
+
+Keterangan field tambahan:
+
+- `profesi`, `jabatan_sekarang`, `unit_kerja`, `pangkat`, `golongan_ruang`: prioritas data `is_current = true`.
+- `masa_kerja`: hasil hitung dari `tgl_masuk` sampai tanggal sekarang.
+- `last_update`: waktu update terakhir dari data profile utama dan relasi current.
+
+Contoh response `401 Unauthorized` (token tidak valid/tidak ada):
+
+```json
+{
+  "success": false,
+  "message": "Access denied."
+}
+```
+
+Contoh response `403 Forbidden` (role tidak diizinkan):
+
+```json
+{
+  "success": false,
+  "message": "Access denied."
+}
+```
+
+### 6. Ajukan Perubahan Profile
+
+- Method: `PATCH`
+- URL: `/api/profile`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+Request body (contoh):
+
+```json
+{
+  "nama": "Budi Santoso Update",
+  "alamat": "Jl. Mawar No. 10",
+  "no_telp": "081298765432",
+  "note": "Mohon update data profile terbaru"
+}
+```
+
+Catatan:
+
+- Minimal satu field profile harus dikirim.
+- Endpoint ini tidak langsung mengubah tabel master profile.
+- Sistem membuat pengajuan ke tabel `perubahan_data` + `detail_perubahan_data` dengan status `pending`.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Pengajuan perubahan profile berhasil dikirim dan menunggu persetujuan admin.",
+  "data": {
+    "id_perubahan_data": 1,
+    "status": "pending",
+    "fitur": "profile",
+    "jumlah_detail": 3
+  }
+}
+```
+
+Contoh response `422 Unprocessable Entity`:
+
+```json
+{
+  "success": false,
+  "message": "Tidak ada perubahan data yang bisa diajukan."
+}
+```
+
+### 7. Notifikasi (Mark As Read)
+
+#### 7.1 Tandai 1 Notifikasi Sudah Dibaca
 
 - Method: `PATCH`
 - URL: `/api/notifications/{id}/read`
@@ -342,7 +482,7 @@ Contoh response `404 Not Found`:
 }
 ```
 
-#### 5.2 Tandai Semua Notifikasi Sudah Dibaca
+#### 7.2 Tandai Semua Notifikasi Sudah Dibaca
 
 - Method: `PATCH`
 - URL: `/api/notifications/read-all`
@@ -367,8 +507,14 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/profile`
+  - `PATCH /api/profile`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
+  - `GET /api/admin/change-requests`
+  - `GET /api/admin/change-requests/{id}`
+  - `PATCH /api/admin/change-requests/{id}/accept`
+  - `PATCH /api/admin/change-requests/{id}/reject`
 - Catatan dashboard:
   - `message`: `Selamat datang admin`
   - `data.dashboard.label`: `Dashboard admin`
@@ -378,6 +524,8 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/profile`
+  - `PATCH /api/profile`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -393,6 +541,8 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/profile`
+  - `PATCH /api/profile`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -404,11 +554,167 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/profile`
+  - `PATCH /api/profile`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
   - `message`: `Selamat datang direktur`
   - `data.dashboard.label`: `Dashboard direktur`
+
+## Endpoint Admin Approval Change Request
+
+### 8. List Change Request (Admin)
+
+- Method: `GET`
+- URL: `/api/admin/change-requests`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+- Query opsional:
+  - `status`: `pending` | `approved` | `rejected`
+  - `fitur`: contoh `profile`
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Daftar pengajuan perubahan data berhasil diambil.",
+  "data": [
+    {
+      "id": 1,
+      "by_user": {
+        "id": 4,
+        "username": "3174010101010001",
+        "role": "pegawai",
+        "nama": "Budi Santoso"
+      },
+      "fitur": "profile",
+      "status": "pending",
+      "note": "Pengajuan dari profile update",
+      "jumlah_detail": 5,
+      "created_at": "2026-04-19 09:00:00",
+      "updated_at": "2026-04-19 09:00:00"
+    }
+  ]
+}
+```
+
+### 9. Detail Change Request (Admin)
+
+- Method: `GET`
+- URL: `/api/admin/change-requests/{id}`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Detail pengajuan perubahan data berhasil diambil.",
+  "data": {
+    "id": 1,
+    "fitur": "profile",
+    "status": "pending",
+    "details": [
+      {
+        "id": 10,
+        "target_table": "pegawai_pribadi",
+        "kolom": "alamat",
+        "old_value": "Alamat lama",
+        "value": "Alamat baru"
+      }
+    ]
+  }
+}
+```
+
+Contoh response `404 Not Found`:
+
+```json
+{
+  "success": false,
+  "message": "Pengajuan perubahan data tidak ditemukan."
+}
+```
+
+### 10. Accept Change Request (Admin)
+
+- Method: `PATCH`
+- URL: `/api/admin/change-requests/{id}/accept`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Request body opsional:
+
+```json
+{
+  "note": "Data sudah valid dan bisa diterapkan"
+}
+```
+
+Perilaku:
+
+- Hanya bisa untuk status `pending`.
+- Untuk fitur `profile`, detail perubahan akan diaplikasikan ke tabel `pegawai` dan `pegawai_pribadi`.
+- Status pengajuan berubah menjadi `approved`.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Pengajuan perubahan data berhasil disetujui.",
+  "data": {
+    "id": 1,
+    "status": "approved"
+  }
+}
+```
+
+Contoh response `422 Unprocessable Entity`:
+
+```json
+{
+  "success": false,
+  "message": "Pengajuan sudah diproses sebelumnya."
+}
+```
+
+### 11. Reject Change Request (Admin)
+
+- Method: `PATCH`
+- URL: `/api/admin/change-requests/{id}/reject`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Request body opsional:
+
+```json
+{
+  "note": "Dokumen pendukung belum sesuai"
+}
+```
+
+Perilaku:
+
+- Hanya bisa untuk status `pending`.
+- Tidak mengubah data pada tabel master profile.
+- Status pengajuan berubah menjadi `rejected`.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Pengajuan perubahan data berhasil ditolak.",
+  "data": {
+    "id": 1,
+    "status": "rejected"
+  }
+}
+```
 
 ## Akun Seeder Untuk Uji Login
 
@@ -447,6 +753,22 @@ curl http://127.0.0.1:8000/api/dashboard \
   -H "Authorization: Bearer <jwt_token>"
 ```
 
+Profile pegawai (ganti token pegawai):
+
+```bash
+curl http://127.0.0.1:8000/api/profile \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Ajukan perubahan profile (ganti token):
+
+```bash
+curl -X PATCH http://127.0.0.1:8000/api/profile \
+  -H "Authorization: Bearer <jwt_token>" \
+  -H "Content-Type: application/json" \
+  -d "{\"alamat\":\"Jl. Mawar No. 10\",\"no_telp\":\"081298765432\",\"note\":\"Mohon update\"}"
+```
+
 Tandai 1 notifikasi sudah dibaca (ganti id dan token):
 
 ```bash
@@ -459,4 +781,29 @@ Tandai semua notifikasi sudah dibaca:
 ```bash
 curl -X PATCH http://127.0.0.1:8000/api/notifications/read-all \
   -H "Authorization: Bearer <jwt_token>"
+```
+
+List change request admin:
+
+```bash
+curl http://127.0.0.1:8000/api/admin/change-requests \
+  -H "Authorization: Bearer <jwt_token_admin>"
+```
+
+Accept change request admin:
+
+```bash
+curl -X PATCH http://127.0.0.1:8000/api/admin/change-requests/1/accept \
+  -H "Authorization: Bearer <jwt_token_admin>" \
+  -H "Content-Type: application/json" \
+  -d "{\"note\":\"Data valid\"}"
+```
+
+Reject change request admin:
+
+```bash
+curl -X PATCH http://127.0.0.1:8000/api/admin/change-requests/1/reject \
+  -H "Authorization: Bearer <jwt_token_admin>" \
+  -H "Content-Type: application/json" \
+  -d "{\"note\":\"Perlu revisi\"}"
 ```

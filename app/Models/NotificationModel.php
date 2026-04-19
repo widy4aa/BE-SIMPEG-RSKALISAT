@@ -13,6 +13,11 @@ class NotificationModel extends Model
 
     protected $fillable = [
         'user_id',
+        'type',
+        'action_code',
+        'action_payload',
+        'is_resolved',
+        'unique_key',
         'title',
         'message',
         'is_read',
@@ -22,6 +27,8 @@ class NotificationModel extends Model
     {
         return [
             'is_read' => 'boolean',
+            'is_resolved' => 'boolean',
+            'action_payload' => 'array',
         ];
     }
 
