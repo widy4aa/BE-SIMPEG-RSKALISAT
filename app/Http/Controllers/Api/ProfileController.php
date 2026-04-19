@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Profile\UploadKtpFileRequest;
 use App\Http\Requests\Profile\UploadProfilePictureRequest;
 use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Services\Profile\ProfileService;
@@ -95,6 +96,30 @@ class ProfileController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Foto profile berhasil diupdate.',
+            'data' => $result,
+        ]);
+    }
+
+    public function uploadKtp(UploadKtpFileRequest $request): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        try {
+            $result = $this->profileService->updateKtpFile(
+                $userId,
+                $request->file('ktp')
+            );
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'File KTP berhasil diupload.',
             'data' => $result,
         ]);
     }

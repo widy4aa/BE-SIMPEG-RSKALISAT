@@ -50,6 +50,11 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/profil/ktp', [ProfileController::class, 'uploadKtp']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
 ])->group(function () {
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);

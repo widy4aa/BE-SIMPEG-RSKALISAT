@@ -26,6 +26,7 @@ BAB III Endpoint Untuk Semua Role Login
 7. [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
 8. [Ajukan Perubahan Profile](#7-ajukan-perubahan-profile)
 9. [Upload Foto Profile (Tanpa Approval)](#8-upload-foto-profile-tanpa-approval)
+10. [Upload File KTP (Tanpa Approval)](#81-upload-file-ktp-tanpa-approval)
 10. [Notifikasi (Mark As Read)](#9-notifikasi-mark-as-read)
 11. [Tandai 1 Notifikasi Sudah Dibaca](#91-tandai-1-notifikasi-sudah-dibaca)
 12. [Tandai Semua Notifikasi Sudah Dibaca](#92-tandai-semua-notifikasi-sudah-dibaca)
@@ -552,6 +553,52 @@ Contoh response `200 OK`:
 }
 ```
 
+#### 8.1 Upload File KTP (Tanpa Approval)
+
+- Method: `POST`
+- URL: `/api/profil/ktp`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+- Content-Type: `multipart/form-data`
+
+Request form-data:
+
+- `ktp`: file PDF, max 2MB
+
+Perilaku:
+
+- Langsung update `pegawai_pribadi.ktp_file_path`.
+- Menyimpan file ke folder `public/dokumen/ktp`.
+- Tidak membuat pengajuan `perubahan_data` (tanpa approval admin).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "File KTP berhasil diupload.",
+  "data": {
+    "ktp_file_path": "dokumen/ktp/ktp-4-1713500000.pdf",
+    "link_ktp_file": "http://127.0.0.1:8000/dokumen/ktp/ktp-4-1713500000.pdf",
+    "updated_at": "2026-04-19 12:45:00"
+  }
+}
+```
+
+Contoh response `422 Unprocessable Entity`:
+
+```json
+{
+  "success": false,
+  "message": "Validasi gagal.",
+  "errors": {
+    "ktp": [
+      "The ktp field must be a file of type: pdf."
+    ]
+  }
+}
+```
+
 Contoh response `422 Unprocessable Entity`:
 
 ```json
@@ -622,6 +669,7 @@ Contoh response `200 OK`:
   - `PATCH /api/profile`
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
+  - `POST /api/profil/ktp`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
   - `GET /api/admin/change-requests`
@@ -642,6 +690,7 @@ Contoh response `200 OK`:
   - `PATCH /api/profile`
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
+  - `POST /api/profil/ktp`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -662,6 +711,7 @@ Contoh response `200 OK`:
   - `PATCH /api/profile`
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
+  - `POST /api/profil/ktp`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -678,6 +728,7 @@ Contoh response `200 OK`:
   - `PATCH /api/profile`
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
+  - `POST /api/profil/ktp`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -904,6 +955,14 @@ Upload foto profile (endpoint utama):
 curl -X POST http://127.0.0.1:8000/api/profil/profil-picture \
   -H "Authorization: Bearer <jwt_token>" \
   -F "foto=@C:/path/foto-profile.jpg"
+```
+
+Upload file KTP (PDF):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/profil/ktp \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "ktp=@C:/path/ktp.pdf"
 ```
 
 Tandai 1 notifikasi sudah dibaca (ganti id dan token):

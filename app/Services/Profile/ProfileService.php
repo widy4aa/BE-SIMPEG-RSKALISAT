@@ -3,10 +3,9 @@
 namespace App\Services\Profile;
 
 use App\Models\JenisPegawai;
-use App\Models\PegawaiPribadi;
 use App\Models\Profesi;
 use App\Models\PerubahanData;
-use App\Models\User;
+use App\Repositories\Profile\PegawaiProfileRepository;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +18,7 @@ class ProfileService
         private readonly PegawaiService $pegawaiService,
         private readonly HrdService $hrdService,
         private readonly DirekturService $direkturService,
+        private readonly PegawaiProfileRepository $pegawaiProfileRepository,
     ) {
     }
 
@@ -104,11 +104,7 @@ class ProfileService
 
     public function submitProfileUpdateWithAgreement(int $byUser, array $payload, ?string $note = null): PerubahanData
     {
-        $user = User::query()
-            ->with([
-                'pegawai.pribadi',
-            ])
-            ->find($byUser);
+        $user = $this->pegawaiProfileRepository->findUserWithPegawaiPribadiById($byUser);
 
         if ($user === null || $user->pegawai === null) {
             throw new InvalidArgumentException('Data pegawai untuk user login tidak ditemukan.');
@@ -181,9 +177,7 @@ class ProfileService
             throw new InvalidArgumentException('File foto wajib diupload.');
         }
 
-        $user = User::query()
-            ->with(['pegawai.pribadi'])
-            ->find($byUser);
+        $user = $this->pegawaiProfileRepository->findUserWithPegawaiPribadiById($byUser);
 
         if ($user === null || $user->pegawai === null) {
             throw new InvalidArgumentException('Data pegawai untuk user login tidak ditemukan.');
@@ -193,9 +187,7 @@ class ProfileService
         $pribadi = $pegawai->pribadi;
 
         if ($pribadi === null) {
-            $pribadi = PegawaiPribadi::query()->create([
-                'pegawai_id' => $pegawai->id,
-            ]);
+            $pribadi = $this->pegawaiProfileRepository->createPegawaiPribadi((int) $pegawai->id);
         }
 
         $folder = public_path('dokumen/foto');
@@ -222,11 +214,67 @@ class ProfileService
         }
 
         $pribadi->foto_path = $newPath;
-        $pribadi->save();
+        $this->pegawaiProfileRepository->savePegawaiPribadi($pribadi);
 
         return [
             'foto_path' => $newPath,
             'link_photo_profile' => url('/'.$newPath),
+            'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
+        ];
+    }
+
+    public function updateKtpFile(int $byUser, ?UploadedFile $file): array
+    {
+        if ($byUser <= 0) {
+            throw new InvalidArgumentException('User login tidak valid.');
+        }
+
+        if ($file === null) {
+            throw new InvalidArgumentException('File KTP wajib diupload.');
+        }
+
+        $user = $this->pegawaiProfileRepository->findUserWithPegawaiPribadiById($byUser);
+
+        if ($user === null || $user->pegawai === null) {
+            throw new InvalidArgumentException('Data pegawai untuk user login tidak ditemukan.');
+        }
+
+        $pegawai = $user->pegawai;
+        $pribadi = $pegawai->pribadi;
+
+        if ($pribadi === null) {
+            $pribadi = $this->pegawaiProfileRepository->createPegawaiPribadi((int) $pegawai->id);
+        }
+
+        $folder = public_path('dokumen/ktp');
+        if (! is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+
+        $filename = sprintf(
+            'ktp-%d-%d.%s',
+            (int) $pegawai->id,
+            time(),
+            $file->getClientOriginalExtension()
+        );
+
+        $file->move($folder, $filename);
+        $newPath = 'dokumen/ktp/'.$filename;
+
+        $oldPath = trim((string) ($pribadi->ktp_file_path ?? ''));
+        if ($oldPath !== '' && ! str_starts_with($oldPath, 'http://') && ! str_starts_with($oldPath, 'https://')) {
+            $oldAbsolutePath = public_path(ltrim($oldPath, '/'));
+            if (is_file($oldAbsolutePath)) {
+                @unlink($oldAbsolutePath);
+            }
+        }
+
+        $pribadi->ktp_file_path = $newPath;
+        $this->pegawaiProfileRepository->savePegawaiPribadi($pribadi);
+
+        return [
+            'ktp_file_path' => $newPath,
+            'link_ktp_file' => url('/'.$newPath),
             'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
         ];
     }

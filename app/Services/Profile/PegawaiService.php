@@ -2,28 +2,19 @@
 
 namespace App\Services\Profile;
 
-use App\Models\User;
+use App\Repositories\Profile\PegawaiProfileRepository;
 use Illuminate\Support\Carbon;
 
 class PegawaiService
 {
+    public function __construct(
+        private readonly PegawaiProfileRepository $profileRepository,
+    ) {
+    }
+
     public function build(int $userId): array
     {
-        $user = User::query()
-            ->with([
-                'pegawai.jenisPegawai',
-                'pegawai.profesi',
-                'pegawai.pangkat',
-                'pegawai.golonganRuang',
-                'pegawai.pribadi',
-                'pegawai.profesiPegawai.profesi',
-                'pegawai.jabatanPegawai.jabatan',
-                'pegawai.unitKerjaPegawai.unitKerja',
-                'pegawai.pangkatPegawai.pangkat',
-                'pegawai.golonganRuangPegawai.golonganRuang',
-                'perubahanData',
-            ])
-            ->find($userId);
+        $user = $this->profileRepository->findUserWithPegawaiProfileRelations($userId);
 
         $pegawai = $user?->pegawai;
 
@@ -57,10 +48,7 @@ class PegawaiService
             $currentGolonganRuang?->updated_at,
         ])->filter()->max();
 
-        $latestChangeRequest = $user?->perubahanData
-            ?->where('fitur', 'profile')
-            ?->sortByDesc('id')
-            ?->first();
+        $latestChangeRequest = $this->profileRepository->findLatestProfileChangeRequestByUserId($userId);
 
         return [
             'welcome' => 'Selamat datang pegawai',
@@ -82,6 +70,7 @@ class PegawaiService
                 'no_telp' => (string) ($pegawai?->pribadi?->no_telp ?? ''),
                 'email' => (string) ($pegawai?->pribadi?->email ?? ''),
                 'link_photo_profile' => $this->buildPhotoProfileUrl((string) ($pegawai?->pribadi?->foto_path ?? '')),
+                'ktp_file_path' => (string) ($pegawai?->pribadi?->ktp_file_path ?? ''),
                 'status_pegawai' => (string) ($pegawai?->status_pegawai ?? ''),
                 'tgl_masuk' => optional($pegawai?->tgl_masuk)?->toDateString(),
                 'pangkat' => (string) ($currentPangkat?->pangkat?->nama ?? $pegawai?->pangkat?->nama ?? ''),
