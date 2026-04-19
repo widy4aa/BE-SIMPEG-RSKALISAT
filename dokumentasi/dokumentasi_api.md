@@ -583,7 +583,7 @@ Contoh response `200 OK`:
 
 Request form-data:
 
-- `ktp`: file PDF, max 2MB
+- `ktp`: file PDF (`application/pdf`), max 2MB
 
 Perilaku:
 
@@ -613,21 +613,8 @@ Contoh response `422 Unprocessable Entity`:
   "message": "Validasi gagal.",
   "errors": {
     "ktp": [
-      "The ktp field must be a file of type: pdf."
-    ]
-  }
-}
-```
-
-Contoh response `422 Unprocessable Entity`:
-
-```json
-{
-  "success": false,
-  "message": "Validasi gagal.",
-  "errors": {
-    "foto": [
-      "The foto field is required."
+      "The ktp field must be a file of type: pdf.",
+      "The ktp field must be a file of type: application/pdf."
     ]
   }
 }
