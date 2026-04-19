@@ -1,11 +1,71 @@
 Table users {
   id int [pk, increment]
-  username varchar
+  username varchar [unique, not null]
   password varchar [not null]
   role enum [not null, note: 'admin, direktur, hrd, pegawai']
   is_active boolean [default: true]
   created_at timestamp
   updated_at timestamp
+}
+
+Table password_reset_tokens {
+  email varchar [pk]
+  token varchar [not null]
+  created_at timestamp
+}
+
+Table sessions {
+  id varchar [pk]
+  user_id int [ref: > users.id, null]
+  ip_address varchar [null]
+  user_agent text [null]
+  payload text [not null]
+  last_activity int [not null]
+}
+
+Table cache {
+  key varchar [pk]
+  value text [not null]
+  expiration bigint [not null]
+}
+
+Table cache_locks {
+  key varchar [pk]
+  owner varchar [not null]
+  expiration bigint [not null]
+}
+
+Table jobs {
+  id int [pk, increment]
+  queue varchar [not null]
+  payload text [not null]
+  attempts int [not null]
+  reserved_at int [null]
+  available_at int [not null]
+  created_at int [not null]
+}
+
+Table job_batches {
+  id varchar [pk]
+  name varchar [not null]
+  total_jobs int [not null]
+  pending_jobs int [not null]
+  failed_jobs int [not null]
+  failed_job_ids text [not null]
+  options text [null]
+  cancelled_at int [null]
+  created_at int [not null]
+  finished_at int [null]
+}
+
+Table failed_jobs {
+  id int [pk, increment]
+  uuid varchar [unique, not null]
+  connection text [not null]
+  queue text [not null]
+  payload text [not null]
+  exception text [not null]
+  failed_at timestamp [not null]
 }
 
 Table pegawai {
@@ -259,6 +319,7 @@ Table diklat {
   id int [pk, increment]
   jenis_diklat_id int [ref: > jenis_diklat.id]
   kategori_diklat_id int [ref: > kategori_diklat.id]
+  created_by int [ref: > pegawai.id, null]
   nama_kegiatan varchar
   status_kelayakan enum [not null, note: 'layak, tidak layak']
   status_validasi enum [not null, note: 'valid, tidak valid']
@@ -288,22 +349,44 @@ Table list_jadwal_diklat {
 Table notification {
   id int [pk, increment]
   user_id int [ref: > users.id]
+  type varchar [not null, default: 'info']
+  action_code varchar [null]
+  action_payload json [null]
   title varchar
   message text
   is_read boolean [default: false]
+  is_resolved boolean [default: false]
+  unique_key varchar [null]
   created_at timestamp
   updated_at timestamp
+
+  indexes {
+    (user_id, type) [name: 'notification_user_type_idx']
+    (user_id, is_read) [name: 'notification_user_is_read_idx']
+    (user_id, is_resolved) [name: 'notification_user_is_resolved_idx']
+    (user_id, unique_key) [unique, name: 'notification_user_unique_key_unique']
+  }
 }
 
 Table perubahan_data {
   id int [pk, increment]
-  user_id int [ref: > users.id]
-  table_name varchar
-  record_id int
-  field_name varchar
-  old_value text
-  new_value text
+  by_user int [ref: > users.id]
+  fitur varchar [not null]
+  status enum [not null, default: 'pending', note: 'pending, approved, rejected']
+  note text [null]
   created_at timestamp
+  updated_at timestamp
+}
+
+Table detail_perubahan_data {
+  id int [pk, increment]
+  id_perubahan_data int [ref: > perubahan_data.id]
+  target_table varchar [not null]
+  kolom varchar [not null]
+  value text [null]
+  old_value text [null]
+  created_at timestamp
+  updated_at timestamp
 }
 
 Table log_activity {
@@ -311,6 +394,7 @@ Table log_activity {
   user_id int [ref: > users.id]
   activity varchar
   created_at timestamp
+  updated_at timestamp
 }
 
 
