@@ -21,6 +21,7 @@ class PegawaiService
                 'pegawai.unitKerjaPegawai.unitKerja',
                 'pegawai.pangkatPegawai.pangkat',
                 'pegawai.golonganRuangPegawai.golonganRuang',
+                'perubahanData',
             ])
             ->find($userId);
 
@@ -56,6 +57,11 @@ class PegawaiService
             $currentGolonganRuang?->updated_at,
         ])->filter()->max();
 
+        $latestChangeRequest = $user?->perubahanData
+            ?->where('fitur', 'profile')
+            ?->sortByDesc('id')
+            ?->first();
+
         return [
             'welcome' => 'Selamat datang pegawai',
             'summary' => [
@@ -84,7 +90,12 @@ class PegawaiService
                 'tmt_pns' => optional($pegawai?->tmt_pns)?->toDateString(),
                 'tmt_pangkat' => optional($currentPangkat?->started_at ?? $pegawai?->tmt_pangkat_akhir)?->toDateString(),
                 'masa_kerja' => $this->calculateMasaKerja($pegawai?->tgl_masuk),
-                'last_update' => optional($lastUpdate)->toDateTimeString(),
+                'status_perubahan' => [
+                    'fitur' => (string) ($latestChangeRequest?->fitur ?? ''),
+                    'status' => (string) ($latestChangeRequest?->status ?? ''),
+                    'note' => (string) ($latestChangeRequest?->note ?? ''),
+                    'last_update' => optional($lastUpdate)->toDateTimeString(),
+                ],
             ],
         ];
     }
