@@ -427,6 +427,11 @@ Catatan field `catatan`:
 - Untuk role `pegawai`, `catatan` berada di setiap item `riwayat_diklat`.
 - Untuk role `admin`, `hrd`, dan `direktur`, `catatan` juga berada di setiap item list sesuai role.
 
+Catatan field `status`:
+
+- Status hitung by tanggal (`mendatang`, `berlangsung`, `selesai`) saat ini diterapkan pada item role `pegawai`.
+- Item role `admin`, `hrd`, dan `direktur` saat ini belum menggunakan field `status`.
+
 ### 6. Profile
 
 - Method: `GET`

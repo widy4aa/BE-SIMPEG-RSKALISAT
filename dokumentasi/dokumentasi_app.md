@@ -736,6 +736,7 @@ Keterangan tambahan:
 
 1. Role `pegawai` mengambil field detail dari data database.
 2. Role `admin`, `hrd`, dan `direktur` saat ini masih dummy, namun detail item juga sudah mengembalikan field `catatan`.
+3. Field `status` by tanggal saat ini digunakan pada detail item role `pegawai`.
 
 Aturan `status` by tanggal:
 
