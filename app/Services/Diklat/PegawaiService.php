@@ -3,6 +3,7 @@
 namespace App\Services\Diklat;
 
 use App\Repositories\Diklat\PegawaiDiklatRepository;
+use Carbon\Carbon;
 
 class PegawaiService
 {
@@ -21,6 +22,8 @@ class PegawaiService
 
         $riwayat = $riwayatDiklat->map(function ($jadwal): array {
             $diklat = $jadwal->diklat;
+            $tanggalMulai = $diklat?->tanggal_mulai;
+            $tanggalSelesai = $diklat?->tanggal_selesai;
 
             return [
                 'id' => (int) ($diklat?->id ?? $jadwal->id),
@@ -28,8 +31,9 @@ class PegawaiService
                 'kategori' => (string) ($diklat?->kategoriDiklat?->nama ?? ''),
                 'jenis' => (string) ($diklat?->jenisDiklat?->nama ?? ''),
                 'pelaksana' => (string) ($diklat?->penyelenggara ?? ''),
-                'tanggal_mulai' => optional($diklat?->tanggal_mulai)?->toDateString(),
-                'tanggal_selesai' => optional($diklat?->tanggal_selesai)?->toDateString(),
+                'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
+                'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
+                'status' => $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai),
                 'tempat' => (string) ($diklat?->tempat ?? ''),
                 'waktu' => optional($diklat?->waktu)?->format('H:i:s'),
                 'created_by' => (string) ($diklat?->createdByPegawai?->nama ?? ''),
@@ -53,5 +57,28 @@ class PegawaiService
                 'catatan' => 'Data diklat diambil dari database untuk role pegawai.',
             ],
         ];
+    }
+
+    private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
+    {
+        $today = Carbon::today();
+
+        $mulai = $tanggalMulai instanceof Carbon
+            ? $tanggalMulai->copy()->startOfDay()
+            : ($tanggalMulai ? Carbon::parse($tanggalMulai)->startOfDay() : null);
+
+        $selesai = $tanggalSelesai instanceof Carbon
+            ? $tanggalSelesai->copy()->startOfDay()
+            : ($tanggalSelesai ? Carbon::parse($tanggalSelesai)->startOfDay() : null);
+
+        if ($mulai !== null && $today->lt($mulai)) {
+            return 'mendatang';
+        }
+
+        if ($selesai !== null && $today->gt($selesai)) {
+            return 'selesai';
+        }
+
+        return 'berlangsung';
     }
 }

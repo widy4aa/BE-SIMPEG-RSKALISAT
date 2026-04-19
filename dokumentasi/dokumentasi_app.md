@@ -722,13 +722,20 @@ Field detail item diklat yang digunakan:
 4. `pelaksana`
 5. `tanggal_mulai`
 6. `tanggal_selesai`
-7. `tempat`
-8. `waktu`
-9. `created_by`
-10. `jp`
-11. `total_biaya`
-12. `jenis_biaya`
-13. `jenis_pelaksana`
+7. `status` (hasil perhitungan by tanggal)
+8. `tempat`
+9. `waktu`
+10. `created_by`
+11. `jp`
+12. `total_biaya`
+13. `jenis_biaya`
+14. `jenis_pelaksana`
+
+Aturan `status` by tanggal:
+
+1. `mendatang`: hari ini sebelum `tanggal_mulai`
+2. `berlangsung`: hari ini di antara `tanggal_mulai` dan `tanggal_selesai`
+3. `selesai`: hari ini setelah `tanggal_selesai`
 
 ### 10.2 File Yang Dipakai
 

@@ -375,6 +375,7 @@ Contoh response role `pegawai`:
           "pelaksana": "RS Kalisat",
           "tanggal_mulai": "2025-11-15",
           "tanggal_selesai": "2025-11-17",
+          "status": "selesai",
           "tempat": "Aula Utama",
           "waktu": "08:00 - 16:00",
           "created_by": "Admin SIMPEG",
@@ -397,6 +398,7 @@ Keterangan field `riwayat_diklat` (role `pegawai`):
 - `pelaksana`: penyelenggara diklat.
 - `tanggal_mulai`: tanggal mulai format `Y-m-d`.
 - `tanggal_selesai`: tanggal selesai format `Y-m-d`.
+- `status`: status berdasarkan tanggal (`mendatang`, `berlangsung`, `selesai`).
 - `tempat`: lokasi diklat.
 - `waktu`: jam/waktu pelaksanaan.
 - `created_by`: nama pembuat data.
@@ -404,6 +406,12 @@ Keterangan field `riwayat_diklat` (role `pegawai`):
 - `total_biaya`: nominal total biaya.
 - `jenis_biaya`: referensi jenis biaya.
 - `jenis_pelaksana`: `internal` atau `external`.
+
+Aturan hitung `status`:
+
+- `mendatang`: hari ini < `tanggal_mulai`
+- `berlangsung`: hari ini di antara `tanggal_mulai` dan `tanggal_selesai`
+- `selesai`: hari ini > `tanggal_selesai`
 
 Catatan bentuk payload:
 
