@@ -432,7 +432,12 @@ Contoh response `200 OK`:
       "tmt_pns": "2021-01-01",
       "tmt_pangkat": "2020-01-01",
       "masa_kerja": "6 tahun 3 bulan",
-      "last_update": "2026-04-19 08:30:00"
+      "status_perubahan": {
+        "fitur": "profile",
+        "status": "pending",
+        "note": "Mohon update data profile terbaru",
+        "last_update": "2026-04-19 08:30:00"
+      }
     }
   }
 }
@@ -442,7 +447,11 @@ Keterangan field tambahan:
 
 - `profesi`, `jabatan_sekarang`, `unit_kerja`, `pangkat`, `golongan_ruang`: prioritas data `is_current = true`.
 - `masa_kerja`: hasil hitung dari `tgl_masuk` sampai tanggal sekarang.
-- `last_update`: waktu update terakhir dari data profile utama dan relasi current.
+- `status_perubahan`: ringkasan perubahan profile terbaru milik user.
+- `status_perubahan.fitur`: fitur pengajuan perubahan terbaru.
+- `status_perubahan.status`: status pengajuan (`pending`/`approved`/`rejected`).
+- `status_perubahan.note`: catatan pada pengajuan terbaru.
+- `status_perubahan.last_update`: waktu update terakhir dari data profile utama dan relasi current.
 
 Contoh response `401 Unauthorized` (token tidak valid/tidak ada):
 

@@ -520,7 +520,11 @@ Field profile pegawai yang dikembalikan:
 22. `tmt_pns`
 23. `tmt_pangkat`
 24. `masa_kerja` (hasil kalkulasi dari `tgl_masuk`)
-25. `last_update`
+25. `status_perubahan`
+	1. `fitur` (fitur change request terbaru, contoh `profile`)
+	2. `status` (status change request terbaru: `pending`/`approved`/`rejected`)
+	3. `note` (catatan change request terbaru)
+	4. `last_update` (waktu update terakhir data profile utama dan relasi current)
 
 ### 8.2 File Yang Dipakai
 
