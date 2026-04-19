@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Profile\UploadProfilePictureRequest;
 use App\Http\Requests\Profile\UpdateProfileRequest;
 use App\Services\Profile\ProfileService;
 use Illuminate\Http\JsonResponse;
@@ -71,6 +72,30 @@ class ProfileController extends Controller
                 'fitur' => (string) $agreement->fitur,
                 'jumlah_detail' => (int) $agreement->details->count(),
             ],
+        ]);
+    }
+
+    public function updateProfilePicture(UploadProfilePictureRequest $request): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        try {
+            $result = $this->profileService->updateProfilePicture(
+                $userId,
+                $request->file('foto')
+            );
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Foto profile berhasil diupdate.',
+            'data' => $result,
         ]);
     }
 }

@@ -53,6 +53,18 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#93-kode-yang-dipakai)
 	4. [Flowchart](#94-flowchart)
 	5. [Class Diagram](#95-class-diagram)
+10. [Bab 10 - Fitur Diklat API (Dummy per Role)](#bab-10---fitur-diklat-api-dummy-per-role)
+	1. [Penjelasan fitur](#101-penjelasan-fitur)
+	2. [File yang dipakai](#102-file-yang-dipakai)
+	3. [Kode yang dipakai](#103-kode-yang-dipakai)
+	4. [Flowchart](#104-flowchart)
+	5. [Class Diagram](#105-class-diagram)
+11. [Bab 11 - Fitur Upload Foto Profile (Tanpa Approval)](#bab-11---fitur-upload-foto-profile-tanpa-approval)
+	1. [Penjelasan fitur](#111-penjelasan-fitur)
+	2. [File yang dipakai](#112-file-yang-dipakai)
+	3. [Kode yang dipakai](#113-kode-yang-dipakai)
+	4. [Flowchart](#114-flowchart)
+	5. [Class Diagram](#115-class-diagram)
 
 ---
 
@@ -681,4 +693,171 @@ classDiagram
 	PerubahanData --> DetailPerubahanData : hasMany
 	ChangeRequestAdminService --> Pegawai : apply field profile
 	ChangeRequestAdminService --> PegawaiPribadi : apply field profile
+```
+
+---
+
+## Bab 10 - Fitur Diklat API (Dummy per Role)
+
+### 10.1 Penjelasan Fitur
+
+Endpoint `GET /api/diklat` menampilkan data diklat berdasarkan role login.
+
+Pada implementasi saat ini, data yang dikembalikan masih dummy namun struktur antar role sudah dibedakan:
+
+1. `admin`: ringkasan total program dan list diklat institusi.
+2. `pegawai`: ringkasan riwayat pribadi dan list riwayat diklat pegawai.
+3. `hrd`: ringkasan usulan dan list usulan diklat per unit.
+4. `direktur`: ringkasan anggaran dan list keputusan terbaru.
+
+### 10.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/DiklatController.php`
+3. `app/Services/Diklat/DiklatService.php`
+4. `app/Services/Diklat/AdminService.php`
+5. `app/Services/Diklat/PegawaiService.php`
+6. `app/Services/Diklat/HrdService.php`
+7. `app/Services/Diklat/DirekturService.php`
+
+### 10.3 Kode Yang Dipakai
+
+```php
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/diklat', [DiklatController::class, 'index']);
+```
+
+```php
+$payload = $this->diklatService->getPayloadByRole($role, $userId);
+
+return response()->json([
+	'success' => true,
+	'message' => $payload['welcome'],
+	'data' => [
+		'role' => $role,
+		'diklat' => $payload['summary'],
+	],
+]);
+```
+
+### 10.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[GET api diklat] --> B[JwtAuthMiddleware]
+	B --> C[RoleMiddleware]
+	C --> D[DiklatController index]
+	D --> E[DiklatService by role]
+	E --> F{Role user}
+	F -- admin --> G[AdminService dummy]
+	F -- pegawai --> H[PegawaiService dummy]
+	F -- hrd --> I[HrdService dummy]
+	F -- direktur --> J[DirekturService dummy]
+	G --> K[Return diklat payload]
+	H --> K
+	I --> K
+	J --> K
+```
+
+### 10.5 Class Diagram
+
+```mermaid
+classDiagram
+	class DiklatController
+	class DiklatService
+	class AdminService
+	class PegawaiService
+	class HrdService
+	class DirekturService
+
+	DiklatController --> DiklatService : getPayloadByRole
+	DiklatService --> AdminService : role admin
+	DiklatService --> PegawaiService : role pegawai
+	DiklatService --> HrdService : role hrd
+	DiklatService --> DirekturService : role direktur
+```
+
+---
+
+## Bab 11 - Fitur Upload Foto Profile (Tanpa Approval)
+
+### 11.1 Penjelasan Fitur
+
+Endpoint upload foto profile dipakai untuk update foto user login secara langsung tanpa melalui alur persetujuan admin.
+
+Endpoint yang tersedia:
+
+1. `POST /api/profil/profil-picture`
+2. `POST /api/profile/profile-picture` (alias)
+
+Karakteristik fitur:
+
+1. Wajib upload file form-data dengan key `foto`.
+2. Validasi file: `image`, ekstensi `jpg/jpeg/png/webp`, maksimal 2MB.
+3. File disimpan ke folder publik `public/dokumen/foto`.
+4. Kolom `pegawai_pribadi.foto_path` diperbarui langsung.
+5. Foto lama lokal dihapus jika ada.
+6. Tidak membuat record `perubahan_data`.
+
+### 11.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/ProfileController.php`
+3. `app/Http/Requests/Profile/UploadProfilePictureRequest.php`
+4. `app/Services/Profile/ProfileService.php`
+5. `app/Models/PegawaiPribadi.php`
+
+### 11.3 Kode Yang Dipakai
+
+```php
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/profil/profil-picture', [ProfileController::class, 'updateProfilePicture']);
+```
+
+```php
+public function rules(): array
+{
+	return [
+		'foto' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+	];
+}
+```
+
+```php
+$folder = public_path('dokumen/foto');
+$file->move($folder, $filename);
+$pribadi->foto_path = 'dokumen/foto/'.$filename;
+$pribadi->save();
+```
+
+### 11.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[POST api profil profil-picture] --> B[JwtAuthMiddleware]
+	B --> C[RoleMiddleware]
+	C --> D[UploadProfilePictureRequest validate]
+	D --> E[ProfileController updateProfilePicture]
+	E --> F[ProfileService updateProfilePicture]
+	F --> G[Simpan file ke public dokumen foto]
+	G --> H[Update pegawai_pribadi.foto_path]
+	H --> I[Return link photo profile]
+```
+
+### 11.5 Class Diagram
+
+```mermaid
+classDiagram
+	class ProfileController
+	class UploadProfilePictureRequest
+	class ProfileService
+	class PegawaiPribadi
+
+	ProfileController --> UploadProfilePictureRequest : validate file
+	ProfileController --> ProfileService : updateProfilePicture
+	ProfileService --> PegawaiPribadi : update foto_path
 ```

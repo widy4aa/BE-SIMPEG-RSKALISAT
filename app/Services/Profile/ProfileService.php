@@ -3,10 +3,12 @@
 namespace App\Services\Profile;
 
 use App\Models\JenisPegawai;
+use App\Models\PegawaiPribadi;
 use App\Models\Profesi;
 use App\Models\PerubahanData;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -167,6 +169,66 @@ class ProfileService
             note: $note,
             details: $details,
         );
+    }
+
+    public function updateProfilePicture(int $byUser, ?UploadedFile $file): array
+    {
+        if ($byUser <= 0) {
+            throw new InvalidArgumentException('User login tidak valid.');
+        }
+
+        if ($file === null) {
+            throw new InvalidArgumentException('File foto wajib diupload.');
+        }
+
+        $user = User::query()
+            ->with(['pegawai.pribadi'])
+            ->find($byUser);
+
+        if ($user === null || $user->pegawai === null) {
+            throw new InvalidArgumentException('Data pegawai untuk user login tidak ditemukan.');
+        }
+
+        $pegawai = $user->pegawai;
+        $pribadi = $pegawai->pribadi;
+
+        if ($pribadi === null) {
+            $pribadi = PegawaiPribadi::query()->create([
+                'pegawai_id' => $pegawai->id,
+            ]);
+        }
+
+        $folder = public_path('dokumen/foto');
+        if (! is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+
+        $filename = sprintf(
+            'profile-%d-%d.%s',
+            (int) $pegawai->id,
+            time(),
+            $file->getClientOriginalExtension()
+        );
+
+        $file->move($folder, $filename);
+        $newPath = 'dokumen/foto/'.$filename;
+
+        $oldPath = trim((string) ($pribadi->foto_path ?? ''));
+        if ($oldPath !== '' && ! str_starts_with($oldPath, 'http://') && ! str_starts_with($oldPath, 'https://')) {
+            $oldAbsolutePath = public_path(ltrim($oldPath, '/'));
+            if (is_file($oldAbsolutePath)) {
+                @unlink($oldAbsolutePath);
+            }
+        }
+
+        $pribadi->foto_path = $newPath;
+        $pribadi->save();
+
+        return [
+            'foto_path' => $newPath,
+            'link_photo_profile' => url('/'.$newPath),
+            'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
+        ];
     }
 
     private function appendDetailIfChanged(array &$details, string $targetTable, string $kolom, mixed $oldValue, array $payload, string $payloadKey): void

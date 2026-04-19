@@ -20,13 +20,15 @@ BAB III Endpoint Untuk Semua Role Login
 1. [Endpoint Untuk Semua Role Login](#endpoint-untuk-semua-role-login)
 2. [Cek Role Login](#3-cek-role-login)
 3. [Dashboard](#4-dashboard)
-4. [Response Dashboard Untuk Role Pegawai](#response-dashboard-untuk-role-pegawai)
-5. [Profile](#5-profile)
-6. [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
-7. [Ajukan Perubahan Profile](#6-ajukan-perubahan-profile)
-8. [Notifikasi (Mark As Read)](#7-notifikasi-mark-as-read)
-9. [Tandai 1 Notifikasi Sudah Dibaca](#71-tandai-1-notifikasi-sudah-dibaca)
-10. [Tandai Semua Notifikasi Sudah Dibaca](#72-tandai-semua-notifikasi-sudah-dibaca)
+4. [Diklat](#5-diklat)
+5. [Response Diklat Per Role (Dummy)](#response-diklat-per-role-dummy)
+6. [Profile](#6-profile)
+7. [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
+8. [Ajukan Perubahan Profile](#7-ajukan-perubahan-profile)
+9. [Upload Foto Profile (Tanpa Approval)](#8-upload-foto-profile-tanpa-approval)
+10. [Notifikasi (Mark As Read)](#9-notifikasi-mark-as-read)
+11. [Tandai 1 Notifikasi Sudah Dibaca](#91-tandai-1-notifikasi-sudah-dibaca)
+12. [Tandai Semua Notifikasi Sudah Dibaca](#92-tandai-semua-notifikasi-sudah-dibaca)
 
 BAB IV Endpoint Per Role
 
@@ -38,10 +40,10 @@ BAB IV Endpoint Per Role
 
 BAB V Endpoint Admin Approval Change Request
 
-1. [List Change Request](#8-list-change-request-admin)
-2. [Detail Change Request](#9-detail-change-request-admin)
-3. [Accept Change Request](#10-accept-change-request-admin)
-4. [Reject Change Request](#11-reject-change-request-admin)
+1. [List Change Request](#10-list-change-request-admin)
+2. [Detail Change Request](#11-detail-change-request-admin)
+3. [Accept Change Request](#12-accept-change-request-admin)
+4. [Reject Change Request](#13-reject-change-request-admin)
 
 BAB VI Data Uji dan Simulasi
 
@@ -329,7 +331,59 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 }
 ```
 
-### 5. Profile
+### 5. Diklat
+
+- Method: `GET`
+- URL: `/api/diklat`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+Contoh header:
+
+```http
+Authorization: Bearer <jwt_token>
+```
+
+#### Response Diklat Per Role (Dummy)
+
+Contoh response role `pegawai`:
+
+```json
+{
+  "success": true,
+  "message": "Daftar diklat pegawai berhasil diambil.",
+  "data": {
+    "role": "pegawai",
+    "diklat": {
+      "label": "Diklat pegawai",
+      "ringkasan": {
+        "total_riwayat": 6,
+        "selesai": 4,
+        "akan_datang": 2
+      },
+      "riwayat_diklat": [
+        {
+          "id": 201,
+          "nama": "Pelatihan Komunikasi Efektif",
+          "jenis": "softskill",
+          "tanggal": "2025-11-15",
+          "status": "selesai"
+        }
+      ],
+      "catatan": "Data diklat masih dummy untuk role pegawai."
+    }
+  }
+}
+```
+
+Catatan bentuk payload:
+
+- `admin`: `ringkasan` + `list_diklat`
+- `pegawai`: `ringkasan` + `riwayat_diklat`
+- `hrd`: `ringkasan` + `list_usulan`
+- `direktur`: `ringkasan` + `keputusan_terbaru`
+
+### 6. Profile
 
 - Method: `GET`
 - URL: `/api/profile`
@@ -408,7 +462,7 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 }
 ```
 
-### 6. Ajukan Perubahan Profile
+### 7. Ajukan Perubahan Profile
 
 - Method: `PATCH`
 - URL: `/api/profile`
@@ -456,9 +510,56 @@ Contoh response `422 Unprocessable Entity`:
 }
 ```
 
-### 7. Notifikasi (Mark As Read)
+### 8. Upload Foto Profile (Tanpa Approval)
 
-#### 7.1 Tandai 1 Notifikasi Sudah Dibaca
+- Method: `POST`
+- URL utama: `/api/profil/profil-picture`
+- URL alias: `/api/profile/profile-picture`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+- Content-Type: `multipart/form-data`
+
+Request form-data:
+
+- `foto`: file image (`jpg/jpeg/png/webp`), max 2MB
+
+Perilaku:
+
+- Langsung update `pegawai_pribadi.foto_path`.
+- Menyimpan file ke folder `public/dokumen/foto`.
+- Tidak membuat pengajuan `perubahan_data` (tanpa approval admin).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Foto profile berhasil diupdate.",
+  "data": {
+    "foto_path": "dokumen/foto/profile-4-1713500000.jpg",
+    "link_photo_profile": "http://127.0.0.1:8000/dokumen/foto/profile-4-1713500000.jpg",
+    "updated_at": "2026-04-19 12:30:00"
+  }
+}
+```
+
+Contoh response `422 Unprocessable Entity`:
+
+```json
+{
+  "success": false,
+  "message": "Validasi gagal.",
+  "errors": {
+    "foto": [
+      "The foto field is required."
+    ]
+  }
+}
+```
+
+### 9. Notifikasi (Mark As Read)
+
+#### 9.1 Tandai 1 Notifikasi Sudah Dibaca
 
 - Method: `PATCH`
 - URL: `/api/notifications/{id}/read`
@@ -482,7 +583,7 @@ Contoh response `404 Not Found`:
 }
 ```
 
-#### 7.2 Tandai Semua Notifikasi Sudah Dibaca
+#### 9.2 Tandai Semua Notifikasi Sudah Dibaca
 
 - Method: `PATCH`
 - URL: `/api/notifications/read-all`
@@ -507,8 +608,11 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/diklat`
   - `GET /api/profile`
   - `PATCH /api/profile`
+  - `POST /api/profil/profil-picture`
+  - `POST /api/profile/profile-picture`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
   - `GET /api/admin/change-requests`
@@ -524,8 +628,11 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/diklat`
   - `GET /api/profile`
   - `PATCH /api/profile`
+  - `POST /api/profil/profil-picture`
+  - `POST /api/profile/profile-picture`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -541,8 +648,11 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/diklat`
   - `GET /api/profile`
   - `PATCH /api/profile`
+  - `POST /api/profil/profil-picture`
+  - `POST /api/profile/profile-picture`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -554,8 +664,11 @@ Contoh response `200 OK`:
 - Endpoint utama:
   - `GET /api/role`
   - `GET /api/dashboard`
+  - `GET /api/diklat`
   - `GET /api/profile`
   - `PATCH /api/profile`
+  - `POST /api/profil/profil-picture`
+  - `POST /api/profile/profile-picture`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -564,7 +677,7 @@ Contoh response `200 OK`:
 
 ## Endpoint Admin Approval Change Request
 
-### 8. List Change Request (Admin)
+### 10. List Change Request (Admin)
 
 - Method: `GET`
 - URL: `/api/admin/change-requests`
@@ -600,7 +713,7 @@ Contoh response `200 OK`:
 }
 ```
 
-### 9. Detail Change Request (Admin)
+### 11. Detail Change Request (Admin)
 
 - Method: `GET`
 - URL: `/api/admin/change-requests/{id}`
@@ -639,7 +752,7 @@ Contoh response `404 Not Found`:
 }
 ```
 
-### 10. Accept Change Request (Admin)
+### 12. Accept Change Request (Admin)
 
 - Method: `PATCH`
 - URL: `/api/admin/change-requests/{id}/accept`
@@ -682,7 +795,7 @@ Contoh response `422 Unprocessable Entity`:
 }
 ```
 
-### 11. Reject Change Request (Admin)
+### 13. Reject Change Request (Admin)
 
 - Method: `PATCH`
 - URL: `/api/admin/change-requests/{id}/reject`
@@ -753,6 +866,13 @@ curl http://127.0.0.1:8000/api/dashboard \
   -H "Authorization: Bearer <jwt_token>"
 ```
 
+Diklat (ganti token sesuai role):
+
+```bash
+curl http://127.0.0.1:8000/api/diklat \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
 Profile pegawai (ganti token pegawai):
 
 ```bash
@@ -767,6 +887,14 @@ curl -X PATCH http://127.0.0.1:8000/api/profile \
   -H "Authorization: Bearer <jwt_token>" \
   -H "Content-Type: application/json" \
   -d "{\"alamat\":\"Jl. Mawar No. 10\",\"no_telp\":\"081298765432\",\"note\":\"Mohon update\"}"
+```
+
+Upload foto profile (endpoint utama):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/profil/profil-picture \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "foto=@C:/path/foto-profile.jpg"
 ```
 
 Tandai 1 notifikasi sudah dibaca (ganti id dan token):

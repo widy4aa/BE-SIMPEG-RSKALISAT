@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChangeRequestAdminController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DiklatController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RoleController;
@@ -25,12 +26,27 @@ Route::middleware([
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/diklat', [DiklatController::class, 'index']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/profile', [ProfileController::class, 'show']);
 
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->patch('/profile', [ProfileController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/profil/profil-picture', [ProfileController::class, 'updateProfilePicture']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/profile/profile-picture', [ProfileController::class, 'updateProfilePicture']);
 
 Route::middleware([
     JwtAuthMiddleware::class,
