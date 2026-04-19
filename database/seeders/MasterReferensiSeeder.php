@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\JenisDiklat;
+use App\Models\JenisBiaya;
 use App\Models\JenisPegawai;
 use App\Models\JenisSip;
 use App\Models\KategoriDiklat;
@@ -67,6 +68,10 @@ class MasterReferensiSeeder extends Seeder
 
         foreach (['Struktural', 'Fungsional', 'Teknis', 'Akred'] as $nama) {
             KategoriDiklat::query()->firstOrCreate(['nama' => $nama]);
+        }
+
+        foreach (['APBD', 'BLUD', 'Mandiri', 'Hibah', 'Lainnya'] as $nama) {
+            JenisBiaya::query()->firstOrCreate(['nama' => $nama]);
         }
     }
 }

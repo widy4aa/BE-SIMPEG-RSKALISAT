@@ -24,6 +24,9 @@ class Diklat extends Model
         'tanggal_selesai',
         'tempat',
         'waktu',
+        'jp',
+        'total_biaya',
+        'jenis_biaya_id',
     ];
 
     protected function casts(): array
@@ -32,6 +35,8 @@ class Diklat extends Model
             'tanggal_mulai' => 'date',
             'tanggal_selesai' => 'date',
             'waktu' => 'datetime:H:i:s',
+            'jp' => 'integer',
+            'total_biaya' => 'decimal:2',
         ];
     }
 
@@ -43,6 +48,11 @@ class Diklat extends Model
     public function kategoriDiklat()
     {
         return $this->belongsTo(KategoriDiklat::class);
+    }
+
+    public function jenisBiaya()
+    {
+        return $this->belongsTo(JenisBiaya::class);
     }
 
     public function createdByPegawai()

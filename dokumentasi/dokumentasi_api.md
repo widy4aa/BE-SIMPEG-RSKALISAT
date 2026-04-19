@@ -496,6 +496,26 @@ Catatan:
 - Endpoint ini tidak langsung mengubah tabel master profile.
 - Sistem membuat pengajuan ke tabel `perubahan_data` + `detail_perubahan_data` dengan status `pending`.
 
+Daftar field yang bisa diubah:
+
+- `nip`
+- `nik`
+- `nama`
+- `profesi`
+- `jenis_pegawai`
+- `jenis_kelamin`
+- `tanggal_lahir`
+- `agama`
+- `status_kawin`
+- `alamat`
+- `no_telp`
+- `email`
+- `status_pegawai`
+- `tgl_masuk`
+- `tmt_cpns`
+- `tmt_pns`
+- `note` (opsional, sebagai catatan pengajuan)
+
 Contoh response `200 OK`:
 
 ```json

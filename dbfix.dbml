@@ -315,6 +315,13 @@ Table kategori_diklat {
   updated_at timestamp
 }
 
+Table jenis_biaya {
+  id int [pk, increment]
+  nama varchar [not null]
+  created_at timestamp
+  updated_at timestamp
+}
+
 Table diklat {
   id int [pk, increment]
   jenis_diklat_id int [ref: > jenis_diklat.id]
@@ -328,6 +335,9 @@ Table diklat {
   tanggal_selesai date
   tempat varchar
   waktu time
+  jp int [null]
+  total_biaya decimal [null]
+  jenis_biaya_id int [ref: > jenis_biaya.id, null]
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp
