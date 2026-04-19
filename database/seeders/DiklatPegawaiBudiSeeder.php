@@ -39,7 +39,8 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'jenis_biaya' => 'BLUD',
                 'jenis_pelaksanaan' => 'internal',
                 'catatan' => 'Program orientasi kompetensi manajemen SDM dasar.',
-                'laporan_file_path' => null,
+                'sertif_file_path' => null,
+                'no_sertif' => null,
                 'uploaded_at' => null,
             ],
             [
@@ -54,7 +55,8 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'jenis_biaya' => 'Mandiri',
                 'jenis_pelaksanaan' => 'internal',
                 'catatan' => 'Workshop satu hari untuk peningkatan layanan frontliner.',
-                'laporan_file_path' => null,
+                'sertif_file_path' => null,
+                'no_sertif' => null,
                 'uploaded_at' => null,
             ],
             [
@@ -69,7 +71,8 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'jenis_biaya' => 'APBD',
                 'jenis_pelaksanaan' => 'external',
                 'catatan' => 'Fokus digitalisasi administrasi kepegawaian berbasis sistem.',
-                'laporan_file_path' => null,
+                'sertif_file_path' => null,
+                'no_sertif' => null,
                 'uploaded_at' => null,
             ],
             [
@@ -84,7 +87,8 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'jenis_biaya' => 'Hibah',
                 'jenis_pelaksanaan' => 'external',
                 'catatan' => 'Materi audit dan tindak lanjut mutu internal SDM.',
-                'laporan_file_path' => 'dokumen/laporan-diklat/budi-audit-internal.pdf',
+                'sertif_file_path' => 'dokumen/sertif-diklat/budi-audit-internal.pdf',
+                'no_sertif' => 'SERTIF/SDM/2026/0001',
                 'uploaded_at' => now()->subDays(35),
             ],
         ];
@@ -124,7 +128,8 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 ],
                 [
                     'status_diklat' => $seed['status_diklat'],
-                    'laporan_file_path' => $seed['laporan_file_path'],
+                    'sertif_file_path' => $seed['sertif_file_path'],
+                    'no_sertif' => $seed['no_sertif'],
                     'uploaded_at' => $seed['uploaded_at'],
                 ]
             );

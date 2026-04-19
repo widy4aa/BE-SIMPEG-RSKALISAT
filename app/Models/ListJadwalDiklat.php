@@ -15,7 +15,8 @@ class ListJadwalDiklat extends Model
     protected $fillable = [
         'diklat_id',
         'pegawai_id',
-        'laporan_file_path',
+        'sertif_file_path',
+        'no_sertif',
         'uploaded_at',
         'status_diklat',
     ];

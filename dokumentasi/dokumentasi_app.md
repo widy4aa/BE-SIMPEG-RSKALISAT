@@ -731,6 +731,8 @@ Field detail item diklat yang digunakan:
 13. `jenis_biaya`
 14. `jenis_pelaksana`
 15. `catatan`
+16. `sertif_file_path`
+17. `no_sertif`
 
 Keterangan tambahan:
 

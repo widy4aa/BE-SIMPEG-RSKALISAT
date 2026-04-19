@@ -349,7 +349,8 @@ Table list_jadwal_diklat {
   id int [pk, increment]
   diklat_id int [ref: > diklat.id]
   pegawai_id int [ref: > pegawai.id]
-  laporan_file_path varchar [null, note: 'path file laporan diklat']
+  sertif_file_path varchar [null, note: 'path file sertifikat diklat']
+  no_sertif varchar [null, note: 'nomor sertifikat diklat']
   uploaded_at timestamp
   status_diklat enum [not null, note: 'belum terlaksana, sedang terlaksana, sudah terlaksana']
   created_at timestamp

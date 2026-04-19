@@ -383,7 +383,9 @@ Contoh response role `pegawai`:
           "total_biaya": 250000,
           "jenis_biaya": "Mandiri",
           "jenis_pelaksana": "internal",
-          "catatan": "Workshop peningkatan komunikasi lintas unit."
+          "catatan": "Workshop peningkatan komunikasi lintas unit.",
+          "sertif_file_path": "dokumen/sertif-diklat/budi-audit-internal.pdf",
+          "no_sertif": "SERTIF/SDM/2026/0001"
         }
       ]
     }
@@ -408,6 +410,8 @@ Keterangan field `riwayat_diklat` (role `pegawai`):
 - `jenis_biaya`: referensi jenis biaya.
 - `jenis_pelaksana`: `internal` atau `external`.
 - `catatan`: catatan tambahan diklat.
+- `sertif_file_path`: path file sertifikat diklat.
+- `no_sertif`: nomor sertifikat diklat.
 
 Aturan hitung `status`:
 

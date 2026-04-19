@@ -42,6 +42,8 @@ class PegawaiService
                 'jenis_biaya' => (string) ($diklat?->jenisBiaya?->nama ?? ''),
                 'jenis_pelaksana' => (string) ($diklat?->jenis_pelaksanaan ?? ''),
                 'catatan' => (string) ($diklat?->catatan ?? ''),
+                'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
+                'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
             ];
         })->values()->all();
 
