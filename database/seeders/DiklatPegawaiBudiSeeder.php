@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Diklat;
 use App\Models\JenisDiklat;
+use App\Models\JenisBiaya;
 use App\Models\KategoriDiklat;
 use App\Models\ListJadwalDiklat;
 use App\Models\Pegawai;
@@ -33,6 +34,10 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'tanggal_selesai' => '2026-06-12',
                 'tempat' => 'Aula RS Kalisat',
                 'waktu' => '08:00:00',
+                'jp' => 24,
+                'total_biaya' => 3500000,
+                'jenis_biaya' => 'BLUD',
+                'jenis_pelaksanaan' => 'internal',
                 'laporan_file_path' => null,
                 'uploaded_at' => null,
             ],
@@ -43,6 +48,10 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'tanggal_selesai' => '2026-07-05',
                 'tempat' => 'Ruang Diklat Lt.2',
                 'waktu' => '09:00:00',
+                'jp' => 8,
+                'total_biaya' => 1750000,
+                'jenis_biaya' => 'Mandiri',
+                'jenis_pelaksanaan' => 'internal',
                 'laporan_file_path' => null,
                 'uploaded_at' => null,
             ],
@@ -53,6 +62,10 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'tanggal_selesai' => '2026-04-20',
                 'tempat' => 'Lab Komputer SDM',
                 'waktu' => '08:30:00',
+                'jp' => 40,
+                'total_biaya' => 5250000,
+                'jenis_biaya' => 'APBD',
+                'jenis_pelaksanaan' => 'external',
                 'laporan_file_path' => null,
                 'uploaded_at' => null,
             ],
@@ -63,12 +76,20 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'tanggal_selesai' => '2026-03-03',
                 'tempat' => 'Balai Diklat Kabupaten',
                 'waktu' => '08:00:00',
+                'jp' => 20,
+                'total_biaya' => 2800000,
+                'jenis_biaya' => 'Hibah',
+                'jenis_pelaksanaan' => 'external',
                 'laporan_file_path' => 'dokumen/laporan-diklat/budi-audit-internal.pdf',
                 'uploaded_at' => now()->subDays(35),
             ],
         ];
 
         foreach ($diklatSeeds as $seed) {
+            $jenisBiaya = JenisBiaya::query()->firstOrCreate([
+                'nama' => $seed['jenis_biaya'],
+            ]);
+
             $diklat = Diklat::query()->updateOrCreate(
                 [
                     'nama_kegiatan' => $seed['nama_kegiatan'],
@@ -84,6 +105,10 @@ class DiklatPegawaiBudiSeeder extends Seeder
                     'tanggal_selesai' => $seed['tanggal_selesai'],
                     'tempat' => $seed['tempat'],
                     'waktu' => $seed['waktu'],
+                    'jp' => $seed['jp'],
+                    'total_biaya' => $seed['total_biaya'],
+                    'jenis_biaya_id' => $jenisBiaya->id,
+                    'jenis_pelaksanaan' => $seed['jenis_pelaksanaan'],
                 ]
             );
 

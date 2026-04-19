@@ -21,7 +21,7 @@ BAB III Endpoint Untuk Semua Role Login
 2. [Cek Role Login](#3-cek-role-login)
 3. [Dashboard](#4-dashboard)
 4. [Diklat](#5-diklat)
-5. [Response Diklat Per Role (Dummy)](#response-diklat-per-role-dummy)
+5. [Response Diklat Per Role](#response-diklat-per-role)
 6. [Profile](#6-profile)
 7. [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
 8. [Ajukan Perubahan Profile](#7-ajukan-perubahan-profile)
@@ -345,7 +345,12 @@ Contoh header:
 Authorization: Bearer <jwt_token>
 ```
 
-#### Response Diklat Per Role (Dummy)
+#### Response Diklat Per Role
+
+Keterangan implementasi saat ini:
+
+- Role `pegawai`: data diambil dari database melalui repository.
+- Role `admin`, `hrd`, `direktur`: payload ringkasan tetap dibedakan per role.
 
 Contoh response role `pegawai`:
 
@@ -364,18 +369,41 @@ Contoh response role `pegawai`:
       },
       "riwayat_diklat": [
         {
-          "id": 201,
           "nama": "Pelatihan Komunikasi Efektif",
-          "jenis": "softskill",
-          "tanggal": "2025-11-15",
-          "status": "selesai"
+          "kategori": "Soft Skill",
+          "jenis": "Workshop",
+          "pelaksana": "RS Kalisat",
+          "tanggal_mulai": "2025-11-15",
+          "tanggal_selesai": "2025-11-17",
+          "tempat": "Aula Utama",
+          "waktu": "08:00 - 16:00",
+          "created_by": "Admin SIMPEG",
+          "jp": 24,
+          "total_biaya": 250000,
+          "jenis_biaya": "Mandiri",
+          "jenis_pelaksana": "internal"
         }
-      ],
-      "catatan": "Data diklat masih dummy untuk role pegawai."
+      ]
     }
   }
 }
 ```
+
+Keterangan field `riwayat_diklat` (role `pegawai`):
+
+- `nama`: nama diklat.
+- `kategori`: kategori diklat.
+- `jenis`: jenis diklat.
+- `pelaksana`: penyelenggara diklat.
+- `tanggal_mulai`: tanggal mulai format `Y-m-d`.
+- `tanggal_selesai`: tanggal selesai format `Y-m-d`.
+- `tempat`: lokasi diklat.
+- `waktu`: jam/waktu pelaksanaan.
+- `created_by`: nama pembuat data.
+- `jp`: jumlah jam pelatihan.
+- `total_biaya`: nominal total biaya.
+- `jenis_biaya`: referensi jenis biaya.
+- `jenis_pelaksana`: `internal` atau `external`.
 
 Catatan bentuk payload:
 

@@ -338,6 +338,7 @@ Table diklat {
   jp int [null]
   total_biaya decimal [null]
   jenis_biaya_id int [ref: > jenis_biaya.id, null]
+  jenis_pelaksanaan enum [null, note: 'internal, external']
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp

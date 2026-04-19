@@ -53,7 +53,7 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#93-kode-yang-dipakai)
 	4. [Flowchart](#94-flowchart)
 	5. [Class Diagram](#95-class-diagram)
-10. [Bab 10 - Fitur Diklat API (Dummy per Role)](#bab-10---fitur-diklat-api-dummy-per-role)
+10. [Bab 10 - Fitur Diklat API](#bab-10---fitur-diklat-api)
 	1. [Penjelasan fitur](#101-penjelasan-fitur)
 	2. [File yang dipakai](#102-file-yang-dipakai)
 	3. [Kode yang dipakai](#103-kode-yang-dipakai)
@@ -701,18 +701,34 @@ classDiagram
 
 ---
 
-## Bab 10 - Fitur Diklat API (Dummy per Role)
+## Bab 10 - Fitur Diklat API
 
 ### 10.1 Penjelasan Fitur
 
 Endpoint `GET /api/diklat` menampilkan data diklat berdasarkan role login.
 
-Pada implementasi saat ini, data yang dikembalikan masih dummy namun struktur antar role sudah dibedakan:
+Pada implementasi saat ini, struktur payload antar role sudah dibedakan dan untuk role `pegawai` data sudah diambil dari database melalui repository.
 
 1. `admin`: ringkasan total program dan list diklat institusi.
-2. `pegawai`: ringkasan riwayat pribadi dan list riwayat diklat pegawai.
+2. `pegawai`: ringkasan riwayat pribadi dan list riwayat diklat pegawai dari tabel `list_jadwal_diklat` + relasi `diklat`.
 3. `hrd`: ringkasan usulan dan list usulan diklat per unit.
 4. `direktur`: ringkasan anggaran dan list keputusan terbaru.
+
+Field detail item diklat yang digunakan:
+
+1. `nama`
+2. `kategori`
+3. `jenis`
+4. `pelaksana`
+5. `tanggal_mulai`
+6. `tanggal_selesai`
+7. `tempat`
+8. `waktu`
+9. `created_by`
+10. `jp`
+11. `total_biaya`
+12. `jenis_biaya`
+13. `jenis_pelaksana`
 
 ### 10.2 File Yang Dipakai
 
@@ -723,6 +739,12 @@ Pada implementasi saat ini, data yang dikembalikan masih dummy namun struktur an
 5. `app/Services/Diklat/PegawaiService.php`
 6. `app/Services/Diklat/HrdService.php`
 7. `app/Services/Diklat/DirekturService.php`
+8. `app/Repositories/Diklat/PegawaiDiklatRepository.php`
+9. `app/Models/Diklat.php`
+10. `app/Models/ListJadwalDiklat.php`
+11. `app/Models/JenisDiklat.php`
+12. `app/Models/KategoriDiklat.php`
+13. `app/Models/JenisBiaya.php`
 
 ### 10.3 Kode Yang Dipakai
 
@@ -756,11 +778,12 @@ flowchart TD
 	D --> E[DiklatService by role]
 	E --> F{Role user}
 	F -- admin --> G[AdminService dummy]
-	F -- pegawai --> H[PegawaiService dummy]
+	F -- pegawai --> H[PegawaiService via repository]
 	F -- hrd --> I[HrdService dummy]
 	F -- direktur --> J[DirekturService dummy]
+	H --> H1[PegawaiDiklatRepository query DB]
 	G --> K[Return diklat payload]
-	H --> K
+	H1 --> K
 	I --> K
 	J --> K
 ```
@@ -773,12 +796,14 @@ classDiagram
 	class DiklatService
 	class AdminService
 	class PegawaiService
+	class PegawaiDiklatRepository
 	class HrdService
 	class DirekturService
 
 	DiklatController --> DiklatService : getPayloadByRole
 	DiklatService --> AdminService : role admin
 	DiklatService --> PegawaiService : role pegawai
+	PegawaiService --> PegawaiDiklatRepository : load riwayat dari DB
 	DiklatService --> HrdService : role hrd
 	DiklatService --> DirekturService : role direktur
 ```

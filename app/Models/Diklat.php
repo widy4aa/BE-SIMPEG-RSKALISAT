@@ -27,6 +27,7 @@ class Diklat extends Model
         'jp',
         'total_biaya',
         'jenis_biaya_id',
+        'jenis_pelaksanaan',
     ];
 
     protected function casts(): array
@@ -37,6 +38,7 @@ class Diklat extends Model
             'waktu' => 'datetime:H:i:s',
             'jp' => 'integer',
             'total_biaya' => 'decimal:2',
+            'jenis_pelaksanaan' => 'string',
         ];
     }
 
