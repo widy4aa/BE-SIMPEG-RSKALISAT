@@ -31,6 +31,7 @@ class HrdService
                         'total_biaya' => 6500000,
                         'jenis_biaya' => 'Mandiri',
                         'jenis_pelaksana' => 'external',
+                        'catatan' => 'Usulan pelatihan teknis implementasi modul coding SIMRS.',
                     ],
                     [
                         'id' => 302,
@@ -47,6 +48,7 @@ class HrdService
                         'total_biaya' => 1500000,
                         'jenis_biaya' => 'BLUD',
                         'jenis_pelaksana' => 'internal',
+                        'catatan' => 'Penguatan budaya layanan prima untuk seluruh unit layanan.',
                     ],
                 ],
                 'catatan' => 'Data diklat masih dummy untuk role hrd.',

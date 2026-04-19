@@ -28,6 +28,7 @@ class Diklat extends Model
         'total_biaya',
         'jenis_biaya_id',
         'jenis_pelaksanaan',
+        'catatan',
     ];
 
     protected function casts(): array
@@ -39,6 +40,7 @@ class Diklat extends Model
             'jp' => 'integer',
             'total_biaya' => 'decimal:2',
             'jenis_pelaksanaan' => 'string',
+            'catatan' => 'string',
         ];
     }
 

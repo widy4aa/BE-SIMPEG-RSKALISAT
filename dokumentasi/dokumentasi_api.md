@@ -382,7 +382,8 @@ Contoh response role `pegawai`:
           "jp": 24,
           "total_biaya": 250000,
           "jenis_biaya": "Mandiri",
-          "jenis_pelaksana": "internal"
+          "jenis_pelaksana": "internal",
+          "catatan": "Workshop peningkatan komunikasi lintas unit."
         }
       ]
     }
@@ -406,6 +407,7 @@ Keterangan field `riwayat_diklat` (role `pegawai`):
 - `total_biaya`: nominal total biaya.
 - `jenis_biaya`: referensi jenis biaya.
 - `jenis_pelaksana`: `internal` atau `external`.
+- `catatan`: catatan tambahan diklat.
 
 Aturan hitung `status`:
 
@@ -419,6 +421,11 @@ Catatan bentuk payload:
 - `pegawai`: `ringkasan` + `riwayat_diklat`
 - `hrd`: `ringkasan` + `list_usulan`
 - `direktur`: `ringkasan` + `keputusan_terbaru`
+
+Catatan field `catatan`:
+
+- Untuk role `pegawai`, `catatan` berada di setiap item `riwayat_diklat`.
+- Untuk role `admin`, `hrd`, dan `direktur`, `catatan` juga berada di setiap item list sesuai role.
 
 ### 6. Profile
 

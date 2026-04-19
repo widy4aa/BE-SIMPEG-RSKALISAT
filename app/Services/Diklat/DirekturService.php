@@ -32,6 +32,7 @@ class DirekturService
                         'total_biaya' => 55000000,
                         'jenis_biaya' => 'APBD',
                         'jenis_pelaksana' => 'external',
+                        'catatan' => 'Program prioritas peningkatan kompetensi kepemimpinan struktural.',
                     ],
                     [
                         'id' => 402,
@@ -48,6 +49,7 @@ class DirekturService
                         'total_biaya' => 35000000,
                         'jenis_biaya' => 'Hibah',
                         'jenis_pelaksana' => 'external',
+                        'catatan' => 'Penguatan mitigasi risiko klinis untuk mendukung akreditasi.',
                     ],
                 ],
                 'catatan' => 'Data diklat masih dummy untuk role direktur.',

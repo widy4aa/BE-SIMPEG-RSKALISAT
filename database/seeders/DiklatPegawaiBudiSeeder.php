@@ -38,6 +38,7 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'total_biaya' => 3500000,
                 'jenis_biaya' => 'BLUD',
                 'jenis_pelaksanaan' => 'internal',
+                'catatan' => 'Program orientasi kompetensi manajemen SDM dasar.',
                 'laporan_file_path' => null,
                 'uploaded_at' => null,
             ],
@@ -52,6 +53,7 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'total_biaya' => 1750000,
                 'jenis_biaya' => 'Mandiri',
                 'jenis_pelaksanaan' => 'internal',
+                'catatan' => 'Workshop satu hari untuk peningkatan layanan frontliner.',
                 'laporan_file_path' => null,
                 'uploaded_at' => null,
             ],
@@ -66,6 +68,7 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'total_biaya' => 5250000,
                 'jenis_biaya' => 'APBD',
                 'jenis_pelaksanaan' => 'external',
+                'catatan' => 'Fokus digitalisasi administrasi kepegawaian berbasis sistem.',
                 'laporan_file_path' => null,
                 'uploaded_at' => null,
             ],
@@ -80,6 +83,7 @@ class DiklatPegawaiBudiSeeder extends Seeder
                 'total_biaya' => 2800000,
                 'jenis_biaya' => 'Hibah',
                 'jenis_pelaksanaan' => 'external',
+                'catatan' => 'Materi audit dan tindak lanjut mutu internal SDM.',
                 'laporan_file_path' => 'dokumen/laporan-diklat/budi-audit-internal.pdf',
                 'uploaded_at' => now()->subDays(35),
             ],
@@ -109,6 +113,7 @@ class DiklatPegawaiBudiSeeder extends Seeder
                     'total_biaya' => $seed['total_biaya'],
                     'jenis_biaya_id' => $jenisBiaya->id,
                     'jenis_pelaksanaan' => $seed['jenis_pelaksanaan'],
+                    'catatan' => $seed['catatan'],
                 ]
             );
 

@@ -730,6 +730,12 @@ Field detail item diklat yang digunakan:
 12. `total_biaya`
 13. `jenis_biaya`
 14. `jenis_pelaksana`
+15. `catatan`
+
+Keterangan tambahan:
+
+1. Role `pegawai` mengambil field detail dari data database.
+2. Role `admin`, `hrd`, dan `direktur` saat ini masih dummy, namun detail item juga sudah mengembalikan field `catatan`.
 
 Aturan `status` by tanggal:
 

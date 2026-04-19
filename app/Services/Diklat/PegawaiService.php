@@ -41,6 +41,7 @@ class PegawaiService
                 'total_biaya' => $diklat?->total_biaya,
                 'jenis_biaya' => (string) ($diklat?->jenisBiaya?->nama ?? ''),
                 'jenis_pelaksana' => (string) ($diklat?->jenis_pelaksanaan ?? ''),
+                'catatan' => (string) ($diklat?->catatan ?? ''),
             ];
         })->values()->all();
 
