@@ -206,6 +206,7 @@ return new class extends Migration
             $table->string('nomor_str')->nullable();
             $table->date('tanggal_terbit')->nullable();
             $table->date('tanggal_kadaluarsa')->nullable();
+            $table->boolean('is_current')->default(false);
             $table->string('sk_file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -218,6 +219,7 @@ return new class extends Migration
             $table->string('nomor_sip')->nullable();
             $table->date('tanggal_terbit')->nullable();
             $table->date('tanggal_kadaluarsa')->nullable();
+            $table->boolean('is_current')->default(false);
             $table->string('sk_file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -229,6 +231,7 @@ return new class extends Migration
             $table->string('nomor_surat')->nullable();
             $table->date('tgl_mulai')->nullable();
             $table->date('tgl_kadaluarsa')->nullable();
+            $table->boolean('is_current')->default(false);
             $table->string('dokumen_file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();

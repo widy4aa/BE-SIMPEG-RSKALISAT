@@ -18,6 +18,7 @@ class Sip extends Model
         'nomor_sip',
         'tanggal_terbit',
         'tanggal_kadaluarsa',
+        'is_current',
         'sk_file_path',
     ];
 
@@ -26,6 +27,7 @@ class Sip extends Model
         return [
             'tanggal_terbit' => 'date',
             'tanggal_kadaluarsa' => 'date',
+            'is_current' => 'boolean',
         ];
     }
 

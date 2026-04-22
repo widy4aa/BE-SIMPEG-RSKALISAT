@@ -17,6 +17,7 @@ class StrPegawai extends Model
         'nomor_str',
         'tanggal_terbit',
         'tanggal_kadaluarsa',
+        'is_current',
         'sk_file_path',
     ];
 
@@ -25,6 +26,7 @@ class StrPegawai extends Model
         return [
             'tanggal_terbit' => 'date',
             'tanggal_kadaluarsa' => 'date',
+            'is_current' => 'boolean',
         ];
     }
 

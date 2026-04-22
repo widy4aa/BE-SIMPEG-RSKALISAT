@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DiklatController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\RiwayatKarirController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
@@ -47,6 +48,46 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/profile', [ProfileController::class, 'show']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/pendidikan', [RiwayatKarirController::class, 'pendidikan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/jabatan', [RiwayatKarirController::class, 'jabatan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/jabatan', [RiwayatKarirController::class, 'storeJabatan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'updateJabatan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'destroyJabatan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/pendidikan', [RiwayatKarirController::class, 'storePendidikan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/pendidikan/{id}', [RiwayatKarirController::class, 'updatePendidikan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/pendidikan/{id}', [RiwayatKarirController::class, 'destroyPendidikan']);
 
 Route::middleware([
     JwtAuthMiddleware::class,

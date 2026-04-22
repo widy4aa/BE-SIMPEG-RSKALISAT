@@ -17,6 +17,7 @@ class PenugasanKlinis extends Model
         'nomor_surat',
         'tgl_mulai',
         'tgl_kadaluarsa',
+        'is_current',
         'dokumen_file_path',
     ];
 
@@ -25,6 +26,7 @@ class PenugasanKlinis extends Model
         return [
             'tgl_mulai' => 'date',
             'tgl_kadaluarsa' => 'date',
+            'is_current' => 'boolean',
         ];
     }
 

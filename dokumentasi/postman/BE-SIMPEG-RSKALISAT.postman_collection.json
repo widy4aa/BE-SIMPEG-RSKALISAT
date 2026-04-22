@@ -537,6 +537,307 @@
               ]
             }
           }
+        },
+        {
+          "name": "Get Riwayat Pendidikan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Riwayat Pendidikan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "jenjang",
+                  "value": "S1",
+                  "type": "text"
+                },
+                {
+                  "key": "institusi",
+                  "value": "Universitas Jember",
+                  "type": "text"
+                },
+                {
+                  "key": "jurusan",
+                  "value": "Teknik Informatika",
+                  "type": "text"
+                },
+                {
+                  "key": "tahun_lulus",
+                  "value": "2012",
+                  "type": "text"
+                },
+                {
+                  "key": "nomor_ijazah",
+                  "value": "IJZ-2012-001",
+                  "type": "text"
+                },
+                {
+                  "key": "ijazah",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Riwayat Pendidikan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "_method",
+                  "value": "PATCH",
+                  "type": "text"
+                },
+                {
+                  "key": "institusi",
+                  "value": "Universitas Jember Update",
+                  "type": "text"
+                },
+                {
+                  "key": "ijazah",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Riwayat Pendidikan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Riwayat Jabatan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Riwayat Jabatan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_jabatan\": \"Perawat\",\n  \"is_current\": true,\n  \"tmt_mulai\": \"2020-01-01\",\n  \"tmt_selesai\": \"2025-01-01\",\n  \"note\": \"Kenaikan jabatan reguler\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Riwayat Jabatan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama_jabatan\": \"Kepala Perawat\",\n  \"is_current\": false,\n  \"tmt_selesai\": \"2026-01-01\",\n  \"note\": \"Promosi jabatan\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan",
+                "1"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Riwayat Jabatan",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan/1",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan",
+                "1"
+              ]
+            }
+          }
         }
       ]
     },

@@ -65,6 +65,12 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#113-kode-yang-dipakai)
 	4. [Flowchart](#114-flowchart)
 	5. [Class Diagram](#115-class-diagram)
+12. [Bab 12 - Fitur Riwayat Karir Pendidikan API](#bab-12---fitur-riwayat-karir-pendidikan-api)
+	1. [Penjelasan fitur](#121-penjelasan-fitur)
+	2. [File yang dipakai](#122-file-yang-dipakai)
+	3. [Kode yang dipakai](#123-kode-yang-dipakai)
+	4. [Flowchart](#124-flowchart)
+	5. [Class Diagram](#125-class-diagram)
 
 ---
 
@@ -947,4 +953,204 @@ classDiagram
 	ProfileController --> UploadProfilePictureRequest : validate file
 	ProfileController --> ProfileService : updateProfilePicture
 	ProfileService --> PegawaiPribadi : update foto_path
+```
+
+---
+
+## Bab 12 - Fitur Riwayat Karir Pendidikan API
+
+### 12.1 Penjelasan Fitur
+
+Endpoint `GET /api/riwayat-karir/pendidikan` dipakai untuk menampilkan riwayat pendidikan milik user yang sedang login, diurutkan berdasarkan `tahun_lulus` menurun.
+
+Endpoint `POST /api/riwayat-karir/pendidikan` dipakai untuk menambahkan data riwayat pendidikan baru milik user yang sedang login beserta dokumen ijazahnya.
+
+Endpoint `PATCH /api/riwayat-karir/pendidikan/{id}` dipakai untuk mengubah data riwayat pendidikan yang sudah ada milik user yang sedang login.
+
+Endpoint `DELETE /api/riwayat-karir/pendidikan/{id}` dipakai untuk menghapus data riwayat pendidikan beserta lampiran dokumen aslinya dari user yang sedang login.
+
+Karakteristik fitur:
+
+1. `GET` mengambil list pendidikan melalui `PendidikanRepository` dan melampirkan link_ijazah secara dinamis.
+2. `POST` dan `PATCH` menerima `multipart/form-data` (untuk PATCH gunakan `_method=PATCH`).
+3. Validasi input via `StorePendidikanRequest` (POST) dan `UpdatePendidikanRequest` (PATCH).
+4. Jika file `ijazah` diupload, file akan disimpan ke `public/dokumen/ijazah` dan dicatat ke `ijazah_file_path` di tabel terkait. Jika pada `PATCH` sudah ada file lama, file lama akan dihapus dari *storage* lokal.
+5. `DELETE` akan menghapus fisik file dari server jika data tersebut memilikinya, kemudian menghapus datanya dari database.
+
+### 12.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/RiwayatKarirController.php`
+3. `app/Http/Requests/RiwayatKarir/StorePendidikanRequest.php`
+4. `app/Http/Requests/RiwayatKarir/UpdatePendidikanRequest.php`
+5. `app/Services/RiwayatKarir/PendidikanService.php`
+6. `app/Repositories/RiwayatKarir/PendidikanRepository.php`
+
+### 12.3 Kode Yang Dipakai
+
+```php
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/pendidikan', [RiwayatKarirController::class, 'pendidikan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/pendidikan', [RiwayatKarirController::class, 'storePendidikan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/pendidikan/{id}', [RiwayatKarirController::class, 'updatePendidikan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/pendidikan/{id}', [RiwayatKarirController::class, 'destroyPendidikan']);
+```
+
+```php
+$result = $this->pendidikanService->updateByIdAndUserId(
+	id: $id,
+	userId: $userId,
+	payload: $request->validated(),
+	ijazahFile: $request->file('ijazah')
+);
+```
+
+### 12.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[POST/PATCH/DELETE api/riwayat-karir/pendidikan] --> B[Controller Route]
+	B --> C{Method?}
+	C -- POST/PATCH --> D[FormRequest Validate]
+	D --> E[PendidikanService create/update]
+	E --> F{Ada file ijazah?}
+	F -- Ya --> G[Simpan file ke public/dokumen/ijazah]
+	F -- Tidak --> H[Lanjut]
+	G --> H
+	H --> I[PendidikanRepository simpan/update ke DB]
+	I --> J[Return data]
+	C -- DELETE --> K[PendidikanService delete]
+	K --> L{Ada file ijazah lama?}
+	L -- Ya --> M[Hapus fisik file]
+	L -- Tidak --> N[Lanjut]
+	M --> N
+	N --> O[PendidikanRepository hapus dari DB]
+	O --> J
+```
+
+### 12.5 Class Diagram
+
+```mermaid
+classDiagram
+	class RiwayatKarirController
+	class StorePendidikanRequest
+	class UpdatePendidikanRequest
+	class PendidikanService
+	class PendidikanRepository
+
+	RiwayatKarirController --> StorePendidikanRequest : validate (POST)
+	RiwayatKarirController --> UpdatePendidikanRequest : validate (PATCH)
+	RiwayatKarirController --> PendidikanService : get/create/update/delete
+	PendidikanService --> PendidikanRepository : query/insert/update/delete
+```
+
+---
+
+## Bab 13 - Fitur Riwayat Karir Jabatan API
+
+### 13.1 Penjelasan Fitur
+
+Endpoint CRUD riwayat jabatan memungkinkan user untuk:
+1. `GET /api/riwayat-karir/jabatan` - Menampilkan daftar riwayat jabatannya secara urut berdasarkan tanggal mulai.
+2. `POST /api/riwayat-karir/jabatan` - Menambahkan riwayat jabatan baru beserta unggahan file SK (Surat Keputusan).
+3. `PATCH /api/riwayat-karir/jabatan/{id}` - Mengupdate riwayat jabatan berdasarkan ID `jabatan_pegawai`.
+4. `DELETE /api/riwayat-karir/jabatan/{id}` - Menghapus riwayat jabatan beserta file SK-nya.
+
+Karakteristik fitur:
+1. Data jabatan diambil dari relasi tabel `jabatan_pegawai` dan `jabatan`.
+2. File SK disimpan di tabel `jabatan` (`sk_file_path`) dan disimpan secara fisik di folder `public/dokumen/jabatan`.
+3. Pada saat penambahan data (`POST`), *Service* akan selalu membuat *record* `Jabatan` baru dan menghubungkannya dengan *record* `JabatanPegawai` baru. Hal ini diperlukan agar setiap jabatan yang ditambahkan memiliki data `sk_file_path` secara *independent* untuk pegawai tersebut.
+4. Pada saat *update* atau *delete*, file SK lama akan otomatis dihapus (`unlink`) dari server.
+
+### 13.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/RiwayatKarirController.php`
+3. `app/Services/RiwayatKarir/JabatanService.php`
+4. `app/Repositories/RiwayatKarir/JabatanRepository.php`
+5. `app/Http/Requests/RiwayatKarir/StoreJabatanRequest.php`
+6. `app/Http/Requests/RiwayatKarir/UpdateJabatanRequest.php`
+
+### 13.3 Kode Yang Dipakai
+
+```php
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/jabatan', [RiwayatKarirController::class, 'jabatan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/jabatan', [RiwayatKarirController::class, 'storeJabatan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'updateJabatan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'destroyJabatan']);
+```
+
+```php
+$payload = $this->jabatanService->getByUserId($userId);
+$result = $this->jabatanService->createByUserId(...);
+$result = $this->jabatanService->updateByIdAndUserId(...);
+$this->jabatanService->deleteByIdAndUserId($id, $userId);
+```
+
+### 13.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[GET/POST/PATCH/DELETE api/riwayat-karir/jabatan] --> B[Controller Route]
+	B --> C{Method?}
+	C -- GET --> D[JabatanService getByUserId]
+	D --> E[JabatanRepository findPegawaiByUserIdWithJabatan]
+	C -- POST/PATCH --> F[FormRequest Validate]
+	F --> G[JabatanService create/update]
+	G --> H{Ada file SK?}
+	H -- Ya --> I[Simpan ke public/dokumen/jabatan]
+	H -- Tidak --> J[Lanjut]
+	I --> J
+	J --> K[JabatanRepository create/update Jabatan & Pivot]
+	C -- DELETE --> L[JabatanService delete]
+	L --> M{Ada file SK lama?}
+	M -- Ya --> N[Hapus fisik file]
+	M -- Tidak --> O[Lanjut]
+	N --> O
+	O --> P[JabatanRepository delete Jabatan & Pivot]
+```
+
+### 13.5 Class Diagram
+
+```mermaid
+classDiagram
+	class RiwayatKarirController
+	class JabatanService
+	class JabatanRepository
+	class StoreJabatanRequest
+	class UpdateJabatanRequest
+
+	RiwayatKarirController --> StoreJabatanRequest : validate (POST)
+	RiwayatKarirController --> UpdateJabatanRequest : validate (PATCH)
+	RiwayatKarirController --> JabatanService : get/create/update/delete
+	JabatanService --> JabatanRepository : query/insert/update/delete
 ```

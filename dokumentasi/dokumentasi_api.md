@@ -32,6 +32,8 @@ BAB III Endpoint Untuk Semua Role Login
 13. [List Notifikasi](#91-list-notifikasi)
 14. [Tandai 1 Notifikasi Sudah Dibaca](#92-tandai-1-notifikasi-sudah-dibaca)
 15. [Tandai Semua Notifikasi Sudah Dibaca](#93-tandai-semua-notifikasi-sudah-dibaca)
+16. [Riwayat Karir Pendidikan](#10-riwayat-karir-pendidikan)
+17. [Riwayat Karir Jabatan](#11-riwayat-karir-jabatan)
 
 BAB IV Endpoint Per Role
 
@@ -938,6 +940,228 @@ Contoh response `200 OK`:
 }
 ```
 
+### 10. Riwayat Karir Pendidikan
+
+- Method: `GET` dan `POST`
+- URL: `/api/riwayat-karir/pendidikan`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+#### GET Riwayat Pendidikan
+
+Mengambil data riwayat pendidikan milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Data riwayat pendidikan berhasil diambil.",
+  "data": {
+    "label": "Riwayat pendidikan",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "jenjang": "S1",
+        "institusi": "Universitas Jember",
+        "jurusan": "Teknik Informatika",
+        "tahun_lulus": 2012,
+        "nomor_ijazah": "IJZ-2012-001",
+        "link_ijazah": "http://127.0.0.1:8000/dokumen/ijazah/ijazah-4-1713500000.pdf"
+      }
+    ]
+  }
+}
+```
+
+#### POST Riwayat Pendidikan
+
+Menambahkan data riwayat pendidikan baru untuk user yang sedang login.
+Request menggunakan `multipart/form-data`.
+
+Field request:
+- `jenjang` (required, string, max:50)
+- `institusi` (required, string, max:255)
+- `jurusan` (required, string, max:255)
+- `tahun_lulus` (required, integer, min:1900, max:2100)
+- `nomor_ijazah` (nullable, string, max:100)
+- `ijazah` (nullable, file: pdf/jpg/jpeg/png/webp, max 5MB)
+
+Contoh response `201 Created`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat pendidikan berhasil ditambahkan.",
+  "data": {
+    "id": 2,
+    "jenjang": "S2",
+    "institusi": "Universitas Indonesia",
+    "jurusan": "Ilmu Komputer",
+    "tahun_lulus": 2015,
+    "nomor_ijazah": "IJZ-S2-2015",
+    "link_ijazah": "http://127.0.0.1:8000/dokumen/ijazah/ijazah-4-1713500001.pdf"
+  }
+}
+```
+
+#### PATCH Riwayat Pendidikan
+
+Mengubah data riwayat pendidikan milik user yang sedang login.
+Request menggunakan `multipart/form-data` dengan field tambahan `_method=PATCH` jika ada file yang diunggah.
+
+Field request:
+- `jenjang` (sometimes, string, max:50)
+- `institusi` (sometimes, string, max:255)
+- `jurusan` (sometimes, string, max:255)
+- `tahun_lulus` (sometimes, integer, min:1900, max:2100)
+- `nomor_ijazah` (nullable, string, max:100)
+- `ijazah` (nullable, file: pdf/jpg/jpeg/png/webp, max 5MB)
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat pendidikan berhasil diupdate.",
+  "data": {
+    "id": 2,
+    "jenjang": "S2",
+    "institusi": "Universitas Indonesia Update",
+    "jurusan": "Ilmu Komputer",
+    "tahun_lulus": 2016,
+    "nomor_ijazah": "IJZ-S2-2016",
+    "link_ijazah": "http://127.0.0.1:8000/dokumen/ijazah/ijazah-4-1713500001.pdf"
+  }
+}
+```
+
+#### DELETE Riwayat Pendidikan
+
+Menghapus data riwayat pendidikan beserta file ijazahnya (jika ada) milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat pendidikan berhasil dihapus."
+}
+```
+
+### 11. Riwayat Karir Jabatan
+
+- Method: `GET`
+- URL: `/api/riwayat-karir/jabatan`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+#### GET Riwayat Jabatan
+
+Mengambil data riwayat jabatan milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Data riwayat jabatan berhasil diambil.",
+  "data": {
+    "label": "Riwayat jabatan",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "nama_jabatan": "Perawat",
+        "is_current": true,
+        "tmt_mulai": "2020-01-01",
+        "tmt_selesai": "2025-01-01",
+        "link_sk": "http://127.0.0.1:8000/dokumen/jabatan/sk-jabatan-1-123456789.pdf",
+        "note": "Kenaikan jabatan reguler"
+      }
+    ]
+  }
+}
+```
+
+#### POST Riwayat Jabatan
+
+Menambahkan data riwayat jabatan baru untuk user yang sedang login beserta lampiran SK.
+
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `nama_jabatan` | String | Ya | Nama jabatan |
+| `is_current` | Boolean (0/1) | Ya | Apakah jabatan ini masih dijabat? |
+| `tmt_mulai` | Date | Tidak | Tanggal mulai menjabat (Format: YYYY-MM-DD) |
+| `tmt_selesai` | Date | Tidak | Tanggal selesai menjabat |
+| `sk_jabatan` | File | Tidak | File SK jabatan (max 5MB, format pdf/jpg/png) |
+| `note` | String | Tidak | Catatan tambahan |
+
+Contoh response `201 Created`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat jabatan berhasil ditambahkan.",
+  "data": {
+    "id": 2,
+    "nama_jabatan": "Perawat Madya",
+    "is_current": true,
+    "tmt_mulai": "2024-01-01",
+    "tmt_selesai": null,
+    "link_sk": "http://127.0.0.1:8000/dokumen/jabatan/sk-jabatan-2-123456789.pdf",
+    "note": "Promosi"
+  }
+}
+```
+
+#### Contoh Request PATCH Riwayat Jabatan
+
+```http
+PATCH /api/riwayat-karir/jabatan/1 HTTP/1.1
+Host: example.com
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+
+{
+  "nama_jabatan": "Kepala Perawat",
+  "is_current": false,
+  "tmt_selesai": "2026-01-01",
+  "note": "Promosi jabatan"
+}
+```
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat jabatan berhasil diupdate.",
+  "data": {
+    "id": 1,
+    "nama_jabatan": "Kepala Perawat",
+    "is_current": false,
+    "tmt_mulai": "2020-01-01",
+    "tmt_selesai": "2026-01-01",
+    "note": "Promosi jabatan"
+  }
+}
+```
+
+#### DELETE Riwayat Jabatan
+
+Menghapus riwayat jabatan beserta file SK-nya (jika ada) milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat jabatan berhasil dihapus."
+}
+```
+
 ## Endpoint Per Role
 
 ### Admin
@@ -955,6 +1179,14 @@ Contoh response `200 OK`:
   - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
+  - `GET /api/riwayat-karir/pendidikan`
+  - `POST /api/riwayat-karir/pendidikan`
+  - `PATCH /api/riwayat-karir/pendidikan/{id}`
+  - `DELETE /api/riwayat-karir/pendidikan/{id}`
+  - `GET /api/riwayat-karir/jabatan`
+  - `POST /api/riwayat-karir/jabatan`
+  - `PATCH /api/riwayat-karir/jabatan/{id}`
+  - `DELETE /api/riwayat-karir/jabatan/{id}`
   - `GET /api/admin/change-requests`
   - `GET /api/admin/change-requests/{id}`
   - `PATCH /api/admin/change-requests/{id}/accept`
@@ -978,6 +1210,14 @@ Contoh response `200 OK`:
   - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
+  - `GET /api/riwayat-karir/pendidikan`
+  - `POST /api/riwayat-karir/pendidikan`
+  - `PATCH /api/riwayat-karir/pendidikan/{id}`
+  - `DELETE /api/riwayat-karir/pendidikan/{id}`
+  - `GET /api/riwayat-karir/jabatan`
+  - `POST /api/riwayat-karir/jabatan`
+  - `PATCH /api/riwayat-karir/jabatan/{id}`
+  - `DELETE /api/riwayat-karir/jabatan/{id}`
 - Catatan dashboard:
   - `message`: `Selamat datang pegawai`
   - `data.dashboard` menampilkan ringkasan lengkap pegawai:
@@ -1001,6 +1241,14 @@ Contoh response `200 OK`:
   - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
+  - `GET /api/riwayat-karir/pendidikan`
+  - `POST /api/riwayat-karir/pendidikan`
+  - `PATCH /api/riwayat-karir/pendidikan/{id}`
+  - `DELETE /api/riwayat-karir/pendidikan/{id}`
+  - `GET /api/riwayat-karir/jabatan`
+  - `POST /api/riwayat-karir/jabatan`
+  - `PATCH /api/riwayat-karir/jabatan/{id}`
+  - `DELETE /api/riwayat-karir/jabatan/{id}`
 - Catatan dashboard:
   - `message`: `Selamat datang hrd`
   - `data.dashboard.label`: `Dashboard hrd`
@@ -1020,6 +1268,14 @@ Contoh response `200 OK`:
   - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
+  - `GET /api/riwayat-karir/pendidikan`
+  - `POST /api/riwayat-karir/pendidikan`
+  - `PATCH /api/riwayat-karir/pendidikan/{id}`
+  - `DELETE /api/riwayat-karir/pendidikan/{id}`
+  - `GET /api/riwayat-karir/jabatan`
+  - `POST /api/riwayat-karir/jabatan`
+  - `PATCH /api/riwayat-karir/jabatan/{id}`
+  - `DELETE /api/riwayat-karir/jabatan/{id}`
 - Catatan dashboard:
   - `message`: `Selamat datang direktur`
   - `data.dashboard.label`: `Dashboard direktur`
@@ -1283,6 +1539,73 @@ curl -X PATCH http://127.0.0.1:8000/api/notifications/read-all \
   -H "Authorization: Bearer <jwt_token>"
 ```
 
+Get riwayat pendidikan (ganti token):
+
+```bash
+curl http://127.0.0.1:8000/api/riwayat-karir/pendidikan \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Create riwayat pendidikan (ganti token):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/pendidikan \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "jenjang=S1" \
+  -F "institusi=Universitas Contoh" \
+  -F "jurusan=Teknik Informatika" \
+  -F "tahun_lulus=2020"
+```
+
+Update riwayat pendidikan (ganti token dan id):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/pendidikan/1 \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "_method=PATCH" \
+  -F "institusi=Universitas Contoh Update"
+```
+
+Delete riwayat pendidikan (ganti token dan id):
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/pendidikan/1 \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+List riwayat jabatan (ganti token):
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/riwayat-karir/jabatan \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Tambah riwayat jabatan (ganti token):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/jabatan \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nama_jabatan=Perawat" \
+  -F "is_current=1" \
+  -F "sk_jabatan=@/path/to/sk.pdf"
+```
+
+Update riwayat jabatan (ganti token dan id):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/jabatan/1 \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "_method=PATCH" \
+  -F "nama_jabatan=Kepala Perawat"
+```
+
+Delete riwayat jabatan (ganti token dan id):
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/jabatan/1 \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
 List change request admin:
 
 ```bash
@@ -1343,6 +1666,8 @@ Folder dan request yang tersedia:
   - `Upload Foto Profile (Alias)`
   - `Upload KTP`
   - `Upload KK`
+  - `Get Riwayat Pendidikan`
+  - `Create Riwayat Pendidikan`
 3. `03. Notifikasi`
   - `List Notifikasi`
   - `Tandai 1 Notifikasi Dibaca`
