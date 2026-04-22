@@ -153,6 +153,7 @@ class ProfileService
         $this->appendDetailIfChanged($details, 'pegawai_pribadi', 'status_perkawinan', $pribadi?->status_perkawinan, $payload, 'status_kawin');
         $this->appendDetailIfChanged($details, 'pegawai_pribadi', 'alamat', $pribadi?->alamat, $payload, 'alamat');
         $this->appendDetailIfChanged($details, 'pegawai_pribadi', 'no_telp', $pribadi?->no_telp, $payload, 'no_telp');
+        $this->appendDetailIfChanged($details, 'pegawai_pribadi', 'no_kk', $pribadi?->no_kk, $payload, 'no_kk');
         $this->appendDetailIfChanged($details, 'pegawai_pribadi', 'email', $pribadi?->email, $payload, 'email');
 
         if (empty($details)) {
@@ -275,6 +276,63 @@ class ProfileService
         return [
             'ktp_file_path' => $newPath,
             'link_ktp_file' => url('/'.$newPath),
+            'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
+        ];
+    }
+
+    public function updateKkFile(int $byUser, ?UploadedFile $file): array
+    {
+        if ($byUser <= 0) {
+            throw new InvalidArgumentException('User login tidak valid.');
+        }
+
+        if ($file === null) {
+            throw new InvalidArgumentException('File KK wajib diupload.');
+        }
+
+        $user = $this->pegawaiProfileRepository->findUserWithPegawaiPribadiById($byUser);
+
+        if ($user === null || $user->pegawai === null) {
+            throw new InvalidArgumentException('Data pegawai untuk user login tidak ditemukan.');
+        }
+
+        $pegawai = $user->pegawai;
+        $pribadi = $pegawai->pribadi;
+
+        if ($pribadi === null) {
+            $pribadi = $this->pegawaiProfileRepository->createPegawaiPribadi((int) $pegawai->id);
+        }
+
+        $folder = public_path('dokumen/kk');
+        if (! is_dir($folder)) {
+            mkdir($folder, 0755, true);
+        }
+
+        $filename = sprintf(
+            'kk-%d-%d.%s',
+            (int) $pegawai->id,
+            time(),
+            $file->getClientOriginalExtension()
+        );
+
+        $file->move($folder, $filename);
+        $newPath = 'dokumen/kk/'.$filename;
+
+        $oldPath = trim((string) ($pribadi->kk_file_path ?? ''));
+        if ($oldPath !== '' && ! str_starts_with($oldPath, 'http://') && ! str_starts_with($oldPath, 'https://')) {
+            $oldAbsolutePath = public_path(ltrim($oldPath, '/'));
+            if (is_file($oldAbsolutePath)) {
+                @unlink($oldAbsolutePath);
+            }
+        }
+
+        $pribadi->kk_file_path = $newPath;
+        $pribadi->link_kk = url('/'.$newPath);
+        $this->pegawaiProfileRepository->savePegawaiPribadi($pribadi);
+
+        return [
+            'kk_file_path' => $newPath,
+            'link_kk' => (string) ($pribadi->link_kk ?? ''),
             'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
         ];
     }

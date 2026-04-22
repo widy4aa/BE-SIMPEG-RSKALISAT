@@ -13,6 +13,20 @@ class NotificationController extends Controller
     {
     }
 
+    public function index(Request $request): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        $result = $this->notificationService->listByUserId($userId);
+
+        return response()->json([
+            'success' => $result['success'],
+            'message' => $result['message'],
+            'data' => $result['data'],
+        ], $result['status']);
+    }
+
     public function markAsRead(Request $request, int $id): JsonResponse
     {
         $claims = $request->input('_jwt_claims', []);

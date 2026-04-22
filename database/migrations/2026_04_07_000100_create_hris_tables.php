@@ -99,6 +99,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pegawai_id')->unique()->constrained('pegawai')->cascadeOnDelete();
             $table->enum('pendidikan_terakhir', ['SMA/SMK Sederajat', 'D3', 'S1/D4', 'S2', 'S3'])->nullable();
+            $table->string('no_kk')->nullable();
             $table->date('tanggal_lahir')->nullable();
             $table->enum('jenis_kelamin', ['L', 'P'])->nullable();
             $table->string('agama')->nullable();
@@ -106,6 +107,7 @@ return new class extends Migration
             $table->text('alamat')->nullable();
             $table->string('no_telp')->nullable();
             $table->string('email')->nullable();
+            $table->string('link_kk')->nullable();
             $table->string('foto_path')->nullable();
             $table->string('ktp_file_path')->nullable();
             $table->string('kk_file_path')->nullable();

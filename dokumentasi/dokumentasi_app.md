@@ -243,8 +243,8 @@ Endpoint `GET /api/dashboard` memberikan payload dashboard berdasarkan role. Unt
 
 1. Ringkasan data pegawai (nama, nip, jabatan, unit kerja, dll).
 2. Ringkasan diklat (selesai/belum selesai).
-3. `list_notifikasi` dari notifikasi `type=info` yang unread.
-4. `list_aksi` dari notifikasi `type=action` yang belum resolved.
+3. `list_aksi` dari notifikasi `type=action` yang belum resolved.
+4. Notifikasi info dipisah ke endpoint `GET /api/notifications`.
 
 ### 4.2 File Yang Dipakai
 
@@ -277,7 +277,6 @@ public function show(Request $request): JsonResponse
 ```php
 $this->notificationActionSyncService->syncDashboardActionsByUserId($userId);
 $aksi = $this->repository->getActiveActionNotificationsForUser($userId);
-$notifikasi = $this->repository->getUnreadInfoNotificationsForUser($userId);
 ```
 
 ### 4.4 Flowchart
@@ -292,7 +291,7 @@ flowchart TD
 	F -- Tidak --> G[Service role lain]
 	F -- Ya --> H[PegawaiService build]
 	H --> I[Sync action notification]
-	I --> J[Repo ambil summary + notifikasi + aksi]
+	I --> J[Repo ambil summary + aksi]
 	J --> K[Return payload dashboard]
 ```
 
@@ -324,15 +323,17 @@ classDiagram
 
 ### 5.1 Penjelasan Fitur
 
-Fitur notifikasi read dipakai untuk:
+Fitur notifikasi dipakai untuk:
 
-1. Menandai 1 notifikasi sebagai read.
-2. Menandai seluruh notifikasi unread user sebagai read.
+1. Mengambil list notifikasi info unread milik user login.
+2. Menandai 1 notifikasi sebagai read.
+3. Menandai seluruh notifikasi unread user sebagai read.
 
 Catatan route aktif saat ini:
 
-1. `PATCH /api/notifications/{id}/read`
-2. `PATCH /api/notifications/read-all`
+1. `GET /api/notifications`
+2. `PATCH /api/notifications/{id}/read`
+3. `PATCH /api/notifications/read-all`
 
 ### 5.2 File Yang Dipakai
 
@@ -346,6 +347,7 @@ Catatan route aktif saat ini:
 
 ```php
 Route::middleware(['jwt.auth'])->group(function () {
+	Route::get('/notifications', [NotificationController::class, 'index']);
 	Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 	Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 });
@@ -383,7 +385,7 @@ classDiagram
     class NotificationRepository
     class NotificationModel
 
-    NotificationController --> NotificationService : markAsRead/markAllAsRead
+	NotificationController --> NotificationService : index/markAsRead/markAllAsRead
     NotificationService --> NotificationRepository : query/update
     NotificationRepository --> NotificationModel : persist
 ```
@@ -511,16 +513,18 @@ Field profile pegawai yang dikembalikan:
 13. `alamat`
 14. `no_telp`
 15. `email`
-16. `link_photo_profile`
-17. `status_pegawai`
-18. `tgl_masuk`
-19. `pangkat` (prioritas relasi `pangkat_pegawai` dengan `is_current=true`)
-20. `golongan_ruang` (prioritas relasi `golongan_ruang_pegawai` dengan `is_current=true`)
-21. `tmt_cpns`
-22. `tmt_pns`
-23. `tmt_pangkat`
-24. `masa_kerja` (hasil kalkulasi dari `tgl_masuk`)
-25. `status_perubahan`
+16. `no_kk`
+17. `link_kk`
+18. `link_photo_profile`
+19. `status_pegawai`
+20. `tgl_masuk`
+21. `pangkat` (prioritas relasi `pangkat_pegawai` dengan `is_current=true`)
+22. `golongan_ruang` (prioritas relasi `golongan_ruang_pegawai` dengan `is_current=true`)
+23. `tmt_cpns`
+24. `tmt_pns`
+25. `tmt_pangkat`
+26. `masa_kerja` (hasil kalkulasi dari `tgl_masuk`)
+27. `status_perubahan`
 	1. `fitur` (fitur change request terbaru, contoh `profile`)
 	2. `status` (status change request terbaru: `pending`/`approved`/`rejected`)
 	3. `note` (catatan change request terbaru)
@@ -868,6 +872,8 @@ Endpoint yang tersedia:
 
 1. `POST /api/profil/profil-picture`
 2. `POST /api/profile/profile-picture` (alias)
+3. `POST /api/profil/ktp` (upload dokumen KTP)
+4. `POST /api/profile/kk` (upload dokumen KK)
 
 Karakteristik fitur:
 
@@ -876,15 +882,19 @@ Karakteristik fitur:
 3. File disimpan ke folder publik `public/dokumen/foto`.
 4. Kolom `pegawai_pribadi.foto_path` diperbarui langsung.
 5. Foto lama lokal dihapus jika ada.
-6. Tidak membuat record `perubahan_data`.
+6. Endpoint KTP menyimpan file PDF ke `public/dokumen/ktp` dan mengisi `pegawai_pribadi.ktp_file_path`.
+7. Endpoint KK menyimpan file PDF ke `public/dokumen/kk`, mengisi `pegawai_pribadi.kk_file_path`, dan `pegawai_pribadi.link_kk`.
+8. Semua endpoint upload dokumen profile tidak membuat record `perubahan_data`.
 
 ### 11.2 File Yang Dipakai
 
 1. `routes/api.php`
 2. `app/Http/Controllers/Api/ProfileController.php`
 3. `app/Http/Requests/Profile/UploadProfilePictureRequest.php`
-4. `app/Services/Profile/ProfileService.php`
-5. `app/Models/PegawaiPribadi.php`
+4. `app/Http/Requests/Profile/UploadKtpFileRequest.php`
+5. `app/Http/Requests/Profile/UploadKkFileRequest.php`
+6. `app/Services/Profile/ProfileService.php`
+7. `app/Models/PegawaiPribadi.php`
 
 ### 11.3 Kode Yang Dipakai
 

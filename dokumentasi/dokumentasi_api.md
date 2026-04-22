@@ -27,9 +27,11 @@ BAB III Endpoint Untuk Semua Role Login
 8. [Ajukan Perubahan Profile](#7-ajukan-perubahan-profile)
 9. [Upload Foto Profile (Tanpa Approval)](#8-upload-foto-profile-tanpa-approval)
 10. [Upload File KTP (Tanpa Approval)](#81-upload-file-ktp-tanpa-approval)
-10. [Notifikasi (Mark As Read)](#9-notifikasi-mark-as-read)
-11. [Tandai 1 Notifikasi Sudah Dibaca](#91-tandai-1-notifikasi-sudah-dibaca)
-12. [Tandai Semua Notifikasi Sudah Dibaca](#92-tandai-semua-notifikasi-sudah-dibaca)
+11. [Upload File KK (Tanpa Approval)](#82-upload-file-kk-tanpa-approval)
+12. [Notifikasi](#9-notifikasi)
+13. [List Notifikasi](#91-list-notifikasi)
+14. [Tandai 1 Notifikasi Sudah Dibaca](#92-tandai-1-notifikasi-sudah-dibaca)
+15. [Tandai Semua Notifikasi Sudah Dibaca](#93-tandai-semua-notifikasi-sudah-dibaca)
 
 BAB IV Endpoint Per Role
 
@@ -278,15 +280,6 @@ Contoh response `200 OK`:
           "waktu": "08:00:00"
         }
       ],
-      "list_notifikasi": [
-        {
-          "id": 1,
-          "title": "Jadwal Diklat Mendatang",
-          "message": "Anda memiliki jadwal diklat yang belum terlaksana. Silakan cek detail jadwal.",
-          "is_read": false,
-          "created_at": "2026-04-17 10:00:00"
-        }
-      ],
       "list_aksi": [
         {
           "id": 10,
@@ -315,7 +308,6 @@ Keterangan field dashboard pegawai:
 - `jumlah_diklat_selesai`: jumlah diklat dengan status `sudah terlaksana`.
 - `jumlah_diklat_dijadwalkan_belum_selesai`: jumlah diklat dengan status `belum terlaksana` atau `sedang terlaksana`.
 - `list_jadwal_diklat_mendatang`: list diklat yang statusnya `belum terlaksana`.
-- `list_notifikasi`: hanya menampilkan notifikasi milik user login dengan `is_read = false` (belum dibaca).
 - `list_aksi`: daftar notifikasi bertipe `action` yang belum `is_resolved`.
 - `list_aksi.action_payload`: detail data aksi, misalnya status STR atau kelengkapan keluarga.
 
@@ -645,6 +637,8 @@ Contoh response `200 OK`:
       "alamat": "Jakarta",
       "no_telp": "081234567890",
       "email": "budi.santoso@example.com",
+      "no_kk": "3506123456789012",
+      "link_kk": "http://127.0.0.1:8000/dokumen/kk/kk-4-1713500000.pdf",
       "link_photo_profile": "http://127.0.0.1:8000/dokumen/foto/budi-santoso.jpg",
       "status_pegawai": "aktif",
       "tgl_masuk": "2020-01-01",
@@ -730,6 +724,7 @@ Daftar field yang bisa diubah:
 - `status_kawin`
 - `alamat`
 - `no_telp`
+- `no_kk`
 - `email`
 - `status_pegawai`
 - `tgl_masuk`
@@ -841,9 +836,67 @@ Contoh response `422 Unprocessable Entity`:
 }
 ```
 
-### 9. Notifikasi (Mark As Read)
+#### 8.2 Upload File KK (Tanpa Approval)
 
-#### 9.1 Tandai 1 Notifikasi Sudah Dibaca
+- Method: `POST`
+- URL: `/api/profile/kk`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+- Content-Type: `multipart/form-data`
+
+Request form-data:
+
+- `kk`: file PDF (`application/pdf`), max 2MB
+
+Perilaku:
+
+- Langsung update `pegawai_pribadi.kk_file_path` dan `pegawai_pribadi.link_kk`.
+- Menyimpan file ke folder `public/dokumen/kk`.
+- Tidak membuat pengajuan `perubahan_data` (tanpa approval admin).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "File KK berhasil diupload.",
+  "data": {
+    "kk_file_path": "dokumen/kk/kk-4-1713500000.pdf",
+    "link_kk": "http://127.0.0.1:8000/dokumen/kk/kk-4-1713500000.pdf",
+    "updated_at": "2026-04-22 12:45:00"
+  }
+}
+```
+
+### 9. Notifikasi
+
+#### 9.1 List Notifikasi
+
+- Method: `GET`
+- URL: `/api/notifications`
+- Auth: Wajib Bearer token
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Daftar notifikasi berhasil diambil.",
+  "data": {
+    "notifications": [
+      {
+        "id": 1,
+        "title": "Jadwal Diklat Mendatang",
+        "message": "Anda memiliki jadwal diklat yang belum terlaksana. Silakan cek detail jadwal.",
+        "is_read": false,
+        "created_at": "2026-04-17 10:00:00"
+      }
+    ]
+  }
+}
+```
+
+#### 9.2 Tandai 1 Notifikasi Sudah Dibaca
 
 - Method: `PATCH`
 - URL: `/api/notifications/{id}/read`
@@ -867,7 +920,7 @@ Contoh response `404 Not Found`:
 }
 ```
 
-#### 9.2 Tandai Semua Notifikasi Sudah Dibaca
+#### 9.3 Tandai Semua Notifikasi Sudah Dibaca
 
 - Method: `PATCH`
 - URL: `/api/notifications/read-all`
@@ -898,6 +951,8 @@ Contoh response `200 OK`:
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
   - `POST /api/profil/ktp`
+  - `POST /api/profile/kk`
+  - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
   - `GET /api/admin/change-requests`
@@ -919,6 +974,8 @@ Contoh response `200 OK`:
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
   - `POST /api/profil/ktp`
+  - `POST /api/profile/kk`
+  - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -926,7 +983,7 @@ Contoh response `200 OK`:
   - `data.dashboard` menampilkan ringkasan lengkap pegawai:
     - identitas: `nama`, `nip`, `jabatan`, `jenis_jabatan`, `unit_kerja`
     - diklat: `jumlah_diklat_selesai`, `jumlah_diklat_dijadwalkan_belum_selesai`, `list_jadwal_diklat_mendatang`
-    - notifikasi: `list_notifikasi` (hanya unread milik user login)
+    - notifikasi info: gunakan endpoint terpisah `GET /api/notifications`
     - aksi: `list_aksi.status_str`, `list_aksi.status_data_keluarga`
 
 ### HRD
@@ -940,6 +997,8 @@ Contoh response `200 OK`:
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
   - `POST /api/profil/ktp`
+  - `POST /api/profile/kk`
+  - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -957,6 +1016,8 @@ Contoh response `200 OK`:
   - `POST /api/profil/profil-picture`
   - `POST /api/profile/profile-picture`
   - `POST /api/profil/ktp`
+  - `POST /api/profile/kk`
+  - `GET /api/notifications`
   - `PATCH /api/notifications/{id}/read`
   - `PATCH /api/notifications/read-all`
 - Catatan dashboard:
@@ -1193,6 +1254,21 @@ curl -X POST http://127.0.0.1:8000/api/profil/ktp \
   -F "ktp=@C:/path/ktp.pdf"
 ```
 
+Upload file KK (PDF):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/profile/kk \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "kk=@C:/path/kk.pdf"
+```
+
+List notifikasi:
+
+```bash
+curl http://127.0.0.1:8000/api/notifications \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
 Tandai 1 notifikasi sudah dibaca (ganti id dan token):
 
 ```bash
@@ -1266,7 +1342,9 @@ Folder dan request yang tersedia:
   - `Upload Foto Profile`
   - `Upload Foto Profile (Alias)`
   - `Upload KTP`
+  - `Upload KK`
 3. `03. Notifikasi`
+  - `List Notifikasi`
   - `Tandai 1 Notifikasi Dibaca`
   - `Tandai Semua Notifikasi Dibaca`
 4. `04. Admin Change Request`

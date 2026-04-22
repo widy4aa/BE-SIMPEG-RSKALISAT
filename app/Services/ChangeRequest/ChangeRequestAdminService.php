@@ -151,6 +151,7 @@ class ChangeRequestAdminService
             'status_perkawinan',
             'alamat',
             'no_telp',
+            'no_kk',
             'email',
         ];
 

@@ -24,19 +24,6 @@ class PegawaiService
             ?->firstWhere('is_current', true)
             ?? $pegawai?->unitKerjaPegawai?->first();
 
-        $listNotifikasi = $this->pegawaiDashboardRepository
-            ->getUnreadInfoNotificationsByUserId($userId)
-            ->map(function ($notification) {
-                return [
-                    'id' => (int) $notification->id,
-                    'title' => (string) ($notification->title ?? ''),
-                    'message' => (string) ($notification->message ?? ''),
-                    'is_read' => (bool) $notification->is_read,
-                    'created_at' => optional($notification->created_at)?->toDateTimeString(),
-                ];
-            })
-            ->values()
-            ->all();
         $listAksi = $this->pegawaiDashboardRepository
             ->getActiveActionNotificationsByUserId($userId)
             ->map(function ($notification) {
@@ -82,7 +69,6 @@ class PegawaiService
                 'jumlah_diklat_selesai' => (int) ($pegawai?->jumlah_diklat_selesai ?? 0),
                 'jumlah_diklat_dijadwalkan_belum_selesai' => (int) ($pegawai?->jumlah_diklat_belum_selesai ?? 0),
                 'list_jadwal_diklat_mendatang' => $listJadwalDiklatMendatang,
-                'list_notifikasi' => $listNotifikasi,
                 'list_aksi' => $listAksi,
             ],
         ];

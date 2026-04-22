@@ -70,7 +70,13 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/profile/kk', [ProfileController::class, 'uploadKk']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
 ])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index']);
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
     Route::patch('/notifications/read-all', [NotificationController::class, 'markAllAsRead']);
 });

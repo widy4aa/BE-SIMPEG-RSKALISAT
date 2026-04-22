@@ -69,6 +69,8 @@ class PegawaiService
                 'alamat' => (string) ($pegawai?->pribadi?->alamat ?? ''),
                 'no_telp' => (string) ($pegawai?->pribadi?->no_telp ?? ''),
                 'email' => (string) ($pegawai?->pribadi?->email ?? ''),
+                'no_kk' => (string) ($pegawai?->pribadi?->no_kk ?? ''),
+                'link_kk' => (string) ($pegawai?->pribadi?->link_kk ?? ''),
                 'link_photo_profile' => $this->buildPhotoProfileUrl((string) ($pegawai?->pribadi?->foto_path ?? '')),
                 'ktp_file_path' => (string) ($pegawai?->pribadi?->ktp_file_path ?? ''),
                 'status_pegawai' => (string) ($pegawai?->status_pegawai ?? ''),
