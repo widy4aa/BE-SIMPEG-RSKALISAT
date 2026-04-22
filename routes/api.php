@@ -30,6 +30,21 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':pegawai',
+])->post('/diklat', [DiklatController::class, 'store']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':pegawai',
+])->patch('/diklat/{id}', [DiklatController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':pegawai',
+])->delete('/diklat/{id}', [DiklatController::class, 'destroy']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/profile', [ProfileController::class, 'show']);
 

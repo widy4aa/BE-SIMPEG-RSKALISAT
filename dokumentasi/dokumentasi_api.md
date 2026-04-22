@@ -51,6 +51,11 @@ BAB VI Data Uji dan Simulasi
 1. [Akun Seeder Untuk Uji Login](#akun-seeder-untuk-uji-login)
 2. [Quick Test via cURL](#quick-test-via-curl)
 
+BAB VII Postman
+
+1. [Postman Collection](#postman-collection)
+2. [Daftar Request di Collection](#daftar-request-di-collection)
+
 ## Format Response Standar
 
 ### Sukses
@@ -435,6 +440,170 @@ Catatan field `status`:
 
 - Status hitung by tanggal (`mendatang`, `berlangsung`, `selesai`) saat ini diterapkan pada item role `pegawai`.
 - Item role `admin`, `hrd`, dan `direktur` saat ini belum menggunakan field `status`.
+
+#### Create Diklat Pegawai
+
+- Method: `POST`
+- URL: `/api/diklat`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `pegawai`
+- Content-Type: `multipart/form-data`
+
+Field request:
+
+- `nama_kegiatan` (required)
+- `kategori` (required)
+- `jenis_diklat` (required)
+- `penyelenggara` (required)
+- `lokasi` (required)
+- `tanggal_mulai` (required, date)
+- `tanggal_selesai` (required, date)
+- `no_sertif` (nullable)
+- `upload_sertif` (nullable, file: pdf/jpg/jpeg/png/webp, max 5MB)
+- `jp` (required)
+- `jenis_biaya` (required jika `jenis_pelaksana=internal`)
+- `total_biaya` (required jika `jenis_pelaksana=internal`)
+- `catatan` (nullable)
+- `jenis_pelaksana` (required: `internal|external`)
+
+Aturan bisnis:
+
+- Jika `jenis_pelaksana=internal`:
+  - `status_kelayakan` otomatis `layak`
+  - `status_validasi` otomatis `null`
+- Jika `jenis_pelaksana=external`:
+  - `jenis_biaya` otomatis `null`
+  - `total_biaya` otomatis `null`
+  - `status_kelayakan` otomatis `null`
+  - `status_validasi` otomatis `null`
+
+Contoh response sukses (`201`):
+
+```json
+{
+  "success": true,
+  "message": "Diklat berhasil dibuat.",
+  "data": {
+    "id_diklat": 12,
+    "id_jadwal_diklat": 9,
+    "nama_kegiatan": "Workshop Pelayanan Prima",
+    "kategori": "Teknis",
+    "jenis_diklat": "ASN",
+    "penyelenggara": "RS Kalisat",
+    "lokasi": "Aula RS",
+    "tanggal_mulai": "2026-05-10",
+    "tanggal_selesai": "2026-05-12",
+    "status_diklat": "belum terlaksana",
+    "no_sertif": "SERTIF/SDM/2026/0099",
+    "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",
+    "jp": 24,
+    "jenis_biaya": "BLUD",
+    "total_biaya": "2500000.00",
+    "catatan": "Usulan pelatihan unit SDM",
+    "jenis_pelaksana": "internal",
+    "status_kelayakan": "layak",
+    "status_validasi": null
+  }
+}
+```
+
+#### Edit Diklat Pegawai
+
+- Method: `PATCH`
+- URL: `/api/diklat/{id}`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `pegawai`
+- Content-Type: `multipart/form-data`
+
+Field request (opsional / partial update):
+
+- `nama_kegiatan`
+- `kategori`
+- `jenis_diklat`
+- `penyelenggara`
+- `lokasi`
+- `tanggal_mulai`
+- `tanggal_selesai`
+- `no_sertif`
+- `upload_sertif`
+- `jp`
+- `jenis_biaya`
+- `total_biaya`
+- `catatan`
+- `jenis_pelaksana` (boleh dikirim, tapi tidak boleh beda dengan data awal)
+
+Aturan bisnis edit:
+
+- `jenis_pelaksana` (`internal`/`external`) tidak bisa diubah.
+- Jika diklat `internal` dan `status_validasi = valid`, data tidak bisa diedit.
+- Jika diklat `external` dan `status_kelayakan = layak`, data tidak bisa diedit.
+- Untuk diklat `internal`, `status_kelayakan` dipertahankan `layak`, dan `status_validasi` bisa tetap `valid` atau `tidak valid` sesuai proses verifikasi.
+- Untuk diklat `external`, `jenis_biaya`, `total_biaya`, dan `status_validasi` diset `null`.
+
+Contoh response sukses (`200`):
+
+```json
+{
+  "success": true,
+  "message": "Diklat berhasil diupdate.",
+  "data": {
+    "id_diklat": 12,
+    "id_jadwal_diklat": 9,
+    "nama_kegiatan": "Workshop Pelayanan Prima Update",
+    "kategori": "Teknis",
+    "jenis_diklat": "ASN",
+    "penyelenggara": "RS Kalisat",
+    "lokasi": "Aula RS",
+    "tanggal_mulai": "2026-05-10",
+    "tanggal_selesai": "2026-05-12",
+    "status_diklat": "belum terlaksana",
+    "no_sertif": "SERTIF/SDM/2026/0099",
+    "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",
+    "jp": 24,
+    "jenis_biaya": "BLUD",
+    "total_biaya": "2500000.00",
+    "catatan": "Revisi data diklat",
+    "jenis_pelaksana": "internal",
+    "status_kelayakan": "layak",
+    "status_validasi": null
+  }
+}
+```
+
+#### Delete Diklat Pegawai
+
+- Method: `DELETE`
+- URL: `/api/diklat/{id}`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `pegawai`
+
+Aturan bisnis delete:
+
+- Pegawai boleh menghapus diklat miliknya jika data belum masuk kelayakan dan belum validasi.
+- Jika `status_kelayakan = layak` atau `status_validasi = valid`, maka data tidak bisa dihapus.
+
+Contoh response sukses (`200`):
+
+```json
+{
+  "success": true,
+  "message": "Diklat berhasil dihapus.",
+  "data": {
+    "id_diklat": 12,
+    "id_jadwal_diklat": 9,
+    "deleted": true
+  }
+}
+```
+
+Contoh response gagal (`422`):
+
+```json
+{
+  "success": false,
+  "message": "Diklat tidak bisa dihapus karena sudah masuk kelayakan atau sudah validasi."
+}
+```
 
 ### 6. Profile
 
@@ -1062,3 +1231,56 @@ curl -X PATCH http://127.0.0.1:8000/api/admin/change-requests/1/reject \
   -H "Content-Type: application/json" \
   -d "{\"note\":\"Perlu revisi\"}"
 ```
+
+## Postman Collection
+
+File Postman sudah disiapkan di folder dokumentasi:
+
+- Collection: `dokumentasi/postman/BE-SIMPEG-RSKALISAT.postman_collection.json`
+- Environment local: `dokumentasi/postman/BE-SIMPEG-RSKALISAT.local.postman_environment.json`
+
+Langkah pakai di Postman:
+
+1. Import file collection.
+2. Import file environment.
+3. Pilih environment `BE-SIMPEG-RSKALISAT Local`.
+4. Jalankan request `Login`, lalu copy `access_token` ke variable `token` / `token_admin` / `token_pegawai` sesuai role.
+5. Jalankan request lain sesuai kebutuhan test.
+
+## Daftar Request di Collection
+
+Folder dan request yang tersedia:
+
+1. `01. Umum`
+  - `Health Check`
+  - `Login`
+2. `02. Semua Role`
+  - `Cek Role`
+  - `Dashboard`
+  - `Get Diklat`
+  - `Create Diklat (Pegawai)`
+  - `Update Diklat (Pegawai)`
+  - `Delete Diklat (Pegawai)`
+  - `Get Profile`
+  - `Patch Profile`
+  - `Upload Foto Profile`
+  - `Upload Foto Profile (Alias)`
+  - `Upload KTP`
+3. `03. Notifikasi`
+  - `Tandai 1 Notifikasi Dibaca`
+  - `Tandai Semua Notifikasi Dibaca`
+4. `04. Admin Change Request`
+  - `List Change Requests`
+  - `Detail Change Request`
+  - `Accept Change Request`
+  - `Reject Change Request`
+
+Variable yang digunakan:
+
+- `base_url` (default: `http://127.0.0.1:8000`)
+- `token`
+- `token_admin`
+- `token_pegawai`
+- `notification_id`
+- `change_request_id`
+- `diklat_id`

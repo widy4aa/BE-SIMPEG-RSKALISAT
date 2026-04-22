@@ -707,12 +707,42 @@ classDiagram
 
 Endpoint `GET /api/diklat` menampilkan data diklat berdasarkan role login.
 
+Endpoint `POST /api/diklat` dipakai role `pegawai` untuk membuat data diklat baru.
+
+Endpoint `PATCH /api/diklat/{id}` dipakai role `pegawai` untuk mengubah data diklat miliknya.
+
+Endpoint `DELETE /api/diklat/{id}` dipakai role `pegawai` untuk menghapus data diklat miliknya dengan aturan status tertentu.
+
 Pada implementasi saat ini, struktur payload antar role sudah dibedakan dan untuk role `pegawai` data sudah diambil dari database melalui repository.
 
 1. `admin`: ringkasan total program dan list diklat institusi.
 2. `pegawai`: ringkasan riwayat pribadi dan list riwayat diklat pegawai dari tabel `list_jadwal_diklat` + relasi `diklat`.
 3. `hrd`: ringkasan usulan dan list usulan diklat per unit.
 4. `direktur`: ringkasan anggaran dan list keputusan terbaru.
+
+Aturan bisnis create (`POST /api/diklat`) role `pegawai`:
+
+1. Jika `jenis_pelaksana = internal`:
+	- `status_kelayakan` otomatis `layak`
+	- `status_validasi` otomatis `null`
+2. Jika `jenis_pelaksana = external`:
+	- `jenis_biaya` otomatis `null`
+	- `total_biaya` otomatis `null`
+	- `status_kelayakan` otomatis `null`
+	- `status_validasi` otomatis `null`
+
+Aturan bisnis edit (`PATCH /api/diklat/{id}`) role `pegawai`:
+
+1. `jenis_pelaksana` internal/external tidak bisa diubah.
+2. Diklat `internal` yang `status_validasi = valid` tidak bisa diedit.
+3. Diklat `external` yang `status_kelayakan = layak` tidak bisa diedit.
+4. Diklat `internal` tetap `status_kelayakan = layak`, dengan `status_validasi` bisa `valid` atau `tidak valid`.
+5. Diklat `external` tidak memerlukan validasi, sehingga `status_validasi`, `jenis_biaya`, dan `total_biaya` diset `null`.
+
+Aturan bisnis delete (`DELETE /api/diklat/{id}`) role `pegawai`:
+
+1. Boleh dihapus jika belum masuk kelayakan dan belum validasi.
+2. Tidak boleh dihapus jika `status_kelayakan = layak` atau `status_validasi = valid`.
 
 Field detail item diklat yang digunakan:
 
@@ -756,11 +786,13 @@ Aturan `status` by tanggal:
 6. `app/Services/Diklat/HrdService.php`
 7. `app/Services/Diklat/DirekturService.php`
 8. `app/Repositories/Diklat/PegawaiDiklatRepository.php`
-9. `app/Models/Diklat.php`
-10. `app/Models/ListJadwalDiklat.php`
-11. `app/Models/JenisDiklat.php`
-12. `app/Models/KategoriDiklat.php`
-13. `app/Models/JenisBiaya.php`
+9. `app/Http/Requests/Diklat/StorePegawaiDiklatRequest.php`
+10. `app/Http/Requests/Diklat/UpdatePegawaiDiklatRequest.php`
+11. `app/Models/Diklat.php`
+12. `app/Models/ListJadwalDiklat.php`
+13. `app/Models/JenisDiklat.php`
+14. `app/Models/KategoriDiklat.php`
+15. `app/Models/JenisBiaya.php`
 
 ### 10.3 Kode Yang Dipakai
 
