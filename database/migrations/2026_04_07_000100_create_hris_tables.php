@@ -32,6 +32,7 @@ return new class extends Migration
 
         Schema::create('jabatan', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('unit_kerja_id')->nullable()->constrained('unit_kerja')->nullOnDelete();
             $table->string('nama');
             $table->date('tmt_mulai')->nullable();
             $table->date('tmt_selesai')->nullable();
@@ -156,18 +157,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('golongan_ruang_id')->nullable()->constrained('golongan_ruang')->nullOnDelete();
-            $table->boolean('is_current')->default(false);
-            $table->date('started_at')->nullable();
-            $table->date('ended_at')->nullable();
-            $table->text('note')->nullable();
-            $table->timestamps();
-            $table->softDeletes();
-        });
-
-        Schema::create('unit_kerja_pegawai', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
-            $table->foreignId('unit_kerja_id')->nullable()->constrained('unit_kerja')->nullOnDelete();
             $table->boolean('is_current')->default(false);
             $table->date('started_at')->nullable();
             $table->date('ended_at')->nullable();
@@ -307,7 +296,7 @@ return new class extends Migration
         Schema::dropIfExists('str');
         Schema::dropIfExists('keluarga');
         Schema::dropIfExists('pendidikan');
-        Schema::dropIfExists('unit_kerja_pegawai');
+
         Schema::dropIfExists('golongan_ruang_pegawai');
         Schema::dropIfExists('jabatan_pegawai');
         Schema::dropIfExists('pangkat_pegawai');

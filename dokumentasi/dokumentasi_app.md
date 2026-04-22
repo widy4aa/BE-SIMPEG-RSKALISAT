@@ -71,6 +71,36 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#123-kode-yang-dipakai)
 	4. [Flowchart](#124-flowchart)
 	5. [Class Diagram](#125-class-diagram)
+13. [Bab 13 - Fitur Riwayat Karir Jabatan API](#bab-13---fitur-riwayat-karir-jabatan-api)
+	1. [Penjelasan fitur](#131-penjelasan-fitur)
+	2. [File yang dipakai](#132-file-yang-dipakai)
+	3. [Kode yang dipakai](#133-kode-yang-dipakai)
+	4. [Flowchart](#134-flowchart)
+	5. [Class Diagram](#135-class-diagram)
+14. [Bab 14 - Fitur Riwayat Karir Pangkat API](#bab-14---fitur-riwayat-karir-pangkat-api)
+	1. [Penjelasan fitur](#141-penjelasan-fitur)
+	2. [File yang dipakai](#142-file-yang-dipakai)
+	3. [Kode yang dipakai](#143-kode-yang-dipakai)
+	4. [Flowchart](#144-flowchart)
+	5. [Class Diagram](#145-class-diagram)
+15. [Bab 15 - Fitur Riwayat Karir SIP API](#bab-15---fitur-riwayat-karir-sip-api)
+	1. [Penjelasan fitur](#151-penjelasan-fitur)
+	2. [File yang dipakai](#152-file-yang-dipakai)
+	3. [Kode yang dipakai](#153-kode-yang-dipakai)
+	4. [Flowchart](#154-flowchart)
+	5. [Class Diagram](#155-class-diagram)
+16. [Bab 16 - Fitur Riwayat Karir STR API](#bab-16---fitur-riwayat-karir-str-api)
+	1. [Penjelasan fitur](#161-penjelasan-fitur)
+	2. [File yang dipakai](#162-file-yang-dipakai)
+	3. [Kode yang dipakai](#163-kode-yang-dipakai)
+	4. [Flowchart](#164-flowchart)
+	5. [Class Diagram](#165-class-diagram)
+17. [Bab 17 - Fitur Riwayat Karir Penugasan Klinis API](#bab-17---fitur-riwayat-karir-penugasan-klinis-api)
+	1. [Penjelasan fitur](#171-penjelasan-fitur)
+	2. [File yang dipakai](#172-file-yang-dipakai)
+	3. [Kode yang dipakai](#173-kode-yang-dipakai)
+	4. [Flowchart](#174-flowchart)
+	5. [Class Diagram](#175-class-diagram)
 
 ---
 
@@ -510,7 +540,7 @@ Field profile pegawai yang dikembalikan:
 4. `jenis_pegawai`
 5. `profesi` (prioritas relasi `profesi_pegawai` dengan `is_current=true`)
 6. `pendidikan_terakhir`
-7. `unit_kerja` (prioritas relasi `unit_kerja_pegawai` dengan `is_current=true`)
+7. `unit_kerja` (didapat melalui relasi `jabatan_pegawai` -> `jabatan` -> `unit_kerja` dengan `is_current=true`)
 8. `jk`
 9. `tanggal_lahir`
 10. `jabatan_sekarang` (prioritas relasi `jabatan_pegawai` dengan `is_current=true`)
@@ -1067,7 +1097,7 @@ classDiagram
 Endpoint CRUD riwayat jabatan memungkinkan user untuk:
 1. `GET /api/riwayat-karir/jabatan` - Menampilkan daftar riwayat jabatannya secara urut berdasarkan tanggal mulai.
 2. `POST /api/riwayat-karir/jabatan` - Menambahkan riwayat jabatan baru beserta unggahan file SK (Surat Keputusan).
-3. `PATCH /api/riwayat-karir/jabatan/{id}` - Mengupdate riwayat jabatan berdasarkan ID `jabatan_pegawai`.
+3. `POST / PATCH /api/riwayat-karir/jabatan/{id}` - Mengupdate riwayat jabatan berdasarkan ID `jabatan_pegawai` (gunakan `POST` saat mengirim *multipart/form-data* untuk menghindari limitasi PHP).
 4. `DELETE /api/riwayat-karir/jabatan/{id}` - Menghapus riwayat jabatan beserta file SK-nya.
 
 Karakteristik fitur:
@@ -1102,6 +1132,11 @@ Route::middleware([
 	JwtAuthMiddleware::class,
 	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->patch('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'updateJabatan']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'updateJabatan']);
 
 Route::middleware([
 	JwtAuthMiddleware::class,
@@ -1153,4 +1188,244 @@ classDiagram
 	RiwayatKarirController --> UpdateJabatanRequest : validate (PATCH)
 	RiwayatKarirController --> JabatanService : get/create/update/delete
 	JabatanService --> JabatanRepository : query/insert/update/delete
+```
+
+---
+
+## Bab 14 - Fitur Riwayat Karir Pangkat API
+
+### 14.1 Penjelasan Fitur
+
+Fitur ini memiliki fungsionalitas yang identik dengan Riwayat Jabatan dan Pendidikan, dimana relasi datanya melibatkan master `pangkat` dan pivot `pangkat_pegawai`. Endpoint yang disediakan:
+
+1. `GET /api/riwayat-karir/pangkat`
+2. `POST /api/riwayat-karir/pangkat` (mendukung unggah `sk_pangkat` ke folder `/public/dokumen/pangkat`)
+3. `POST / PATCH /api/riwayat-karir/pangkat/{id}`
+4. `DELETE /api/riwayat-karir/pangkat/{id}`
+
+### 14.2 Penjelasan File dan Code
+
+1. `StorePangkatRequest` & `UpdatePangkatRequest` bertugas memvalidasi input *form-data*, termasuk batas maksimum *file* 5MB.
+2. `PangkatService` mengatur pembuatan *file upload* dan memanggil fungsi ke *repository*.
+3. `PangkatRepository` menangani transaksi untuk tabel `pangkat` dan `pangkat_pegawai`.
+4. Method di `RiwayatKarirController` mengatur penerimaan permintaan dari HTTP dan mengembalikannya sebagai respons JSON terstandarisasi.
+
+### 14.3 Flowchart
+
+```mermaid
+graph TD
+	A[User Request API] --> B{Method?}
+	B -- GET --> C[Ambil data Riwayat Pangkat dari DB]
+	C --> D[Return JSON Array]
+	
+	B -- POST/PATCH --> E[Validasi FormRequest]
+	E --> F{Upload File?}
+	F -- Ya --> G[Simpan di /public/dokumen/pangkat]
+	F -- Tidak --> H[Abaikan]
+	G --> I[PangkatRepository update DB]
+	H --> I
+	I --> J[Return JSON Success]
+	
+	B -- DELETE --> K[Cari PangkatPegawai ID]
+	K --> L{Ada file SK lama?}
+	L -- Ya --> M[Hapus fisik file]
+	L -- Tidak --> N[Lanjut]
+	M --> N
+	N --> O[PangkatRepository delete Pivot & Master]
+```
+
+### 14.4 Class Diagram
+
+```mermaid
+classDiagram
+	class RiwayatKarirController
+	class PangkatService
+	class PangkatRepository
+	class StorePangkatRequest
+	class UpdatePangkatRequest
+
+	RiwayatKarirController --> StorePangkatRequest : validate (POST)
+	RiwayatKarirController --> UpdatePangkatRequest : validate (PATCH)
+	RiwayatKarirController --> PangkatService : get/create/update/delete
+	PangkatService --> PangkatRepository : query/insert/update/delete
+```
+
+---
+
+## Bab 15 - Fitur Riwayat Karir SIP API
+
+### 15.1 Penjelasan Fitur
+
+Fitur ini ditujukan untuk mengelola riwayat SIP (Surat Izin Praktik) tenaga medis. Berbeda dengan Jabatan atau Pangkat, relasi data SIP bersifat langsung (*one-to-many*) dari `pegawai` ke `sip` tanpa memerlukan tabel pivot. Endpoint yang disediakan:
+
+1. `GET /api/riwayat-karir/sip`
+2. `POST /api/riwayat-karir/sip` (mendukung unggah `sk_sip` ke folder `/public/dokumen/sip`)
+3. `POST / PATCH /api/riwayat-karir/sip/{id}`
+4. `DELETE /api/riwayat-karir/sip/{id}`
+
+### 15.2 Penjelasan File dan Code
+
+1. `StoreSipRequest` & `UpdateSipRequest` memvalidasi input *form-data*, termasuk batas maksimum lampiran *file* 5MB.
+2. `SipService` menyimpan logika bisnis untuk menyimpan berkas file secara fisik ke direktori *public* dan mengembalikan *response* seragam.
+3. `SipRepository` mengatur manipulasi langsung terhadap *Model* `Sip` di database.
+4. Method di `RiwayatKarirController` mengatur _request HTTP_ CRUD.
+
+### 15.3 Flowchart
+
+```mermaid
+graph TD
+	A[User Request API] --> B{Method?}
+	B -- GET --> C[Ambil data Riwayat SIP dari DB]
+	C --> D[Return JSON Array]
+	
+	B -- POST/PATCH --> E[Validasi FormRequest]
+	E --> F{Upload File?}
+	F -- Ya --> G[Simpan di /public/dokumen/sip]
+	F -- Tidak --> H[Abaikan]
+	G --> I[SipRepository update DB]
+	H --> I
+	I --> J[Return JSON Success]
+	
+	B -- DELETE --> K[Cari SIP ID]
+	K --> L{Ada file SK lama?}
+	L -- Ya --> M[Hapus fisik file]
+	L -- Tidak --> N[Lanjut]
+	M --> N
+	N --> O[SipRepository delete Sip]
+```
+
+### 15.4 Class Diagram
+
+```mermaid
+classDiagram
+	class RiwayatKarirController
+	class SipService
+	class SipRepository
+	class StoreSipRequest
+	class UpdateSipRequest
+
+	RiwayatKarirController --> StoreSipRequest : validate (POST)
+	RiwayatKarirController --> UpdateSipRequest : validate (PATCH)
+	RiwayatKarirController --> SipService : get/create/update/delete
+	SipService --> SipRepository : query/insert/update/delete
+```
+
+---
+
+## Bab 16 - Fitur Riwayat Karir STR API
+
+### 16.1 Penjelasan Fitur
+
+Fitur ini ditujukan untuk mengelola riwayat STR (Surat Tanda Registrasi) tenaga medis. Sama halnya seperti SIP, relasi datanya bersifat langsung (*one-to-many*) dari `pegawai` ke `str` tanpa memerlukan tabel pivot. Endpoint yang disediakan:
+
+1. `GET /api/riwayat-karir/str`
+2. `POST /api/riwayat-karir/str` (mendukung unggah `sk_str` ke folder `/public/dokumen/str`)
+3. `POST / PATCH /api/riwayat-karir/str/{id}`
+4. `DELETE /api/riwayat-karir/str/{id}`
+
+### 16.2 Penjelasan File dan Code
+
+1. `StoreStrRequest` & `UpdateStrRequest` memvalidasi input *form-data*, termasuk batas maksimum lampiran *file* 5MB.
+2. `StrService` menyimpan logika bisnis untuk menyimpan berkas file secara fisik ke direktori *public* dan mengembalikan *response* seragam.
+3. `StrRepository` mengatur manipulasi langsung terhadap *Model* `StrPegawai` di database.
+4. Method di `RiwayatKarirController` mengatur _request HTTP_ CRUD.
+
+### 16.3 Flowchart
+
+```mermaid
+graph TD
+	A[User Request API] --> B{Method?}
+	B -- GET --> C[Ambil data Riwayat STR dari DB]
+	C --> D[Return JSON Array]
+	
+	B -- POST/PATCH --> E[Validasi FormRequest]
+	E --> F{Upload File?}
+	F -- Ya --> G[Simpan di /public/dokumen/str]
+	F -- Tidak --> H[Abaikan]
+	G --> I[StrRepository update DB]
+	H --> I
+	I --> J[Return JSON Success]
+	
+	B -- DELETE --> K[Cari STR ID]
+	K --> L{Ada file SK lama?}
+	L -- Ya --> M[Hapus fisik file]
+	L -- Tidak --> N[Lanjut]
+	M --> N
+	N --> O[StrRepository delete STR]
+```
+
+### 16.4 Class Diagram
+
+```mermaid
+classDiagram
+	class RiwayatKarirController
+	class StrService
+	class StrRepository
+	class StoreStrRequest
+	class UpdateStrRequest
+
+	RiwayatKarirController --> StoreStrRequest : validate (POST)
+	RiwayatKarirController --> UpdateStrRequest : validate (PATCH)
+	RiwayatKarirController --> StrService : get/create/update/delete
+	StrService --> StrRepository : query/insert/update/delete
+```
+
+---
+
+## Bab 17 - Fitur Riwayat Karir Penugasan Klinis API
+
+### 17.1 Penjelasan Fitur
+
+Fitur ini ditujukan untuk mengelola riwayat penugasan klinis tenaga medis. Relasi datanya juga bersifat langsung (*one-to-many*) dari `pegawai` ke `penugasan_klinis` tanpa memerlukan tabel pivot. Endpoint yang disediakan:
+
+1. `GET /api/riwayat-karir/penugasan-klinis`
+2. `POST /api/riwayat-karir/penugasan-klinis` (mendukung unggah `dokumen_file` ke folder `/public/dokumen/penugasan-klinis`)
+3. `POST / PATCH /api/riwayat-karir/penugasan-klinis/{id}`
+4. `DELETE /api/riwayat-karir/penugasan-klinis/{id}`
+
+### 17.2 Penjelasan File dan Code
+
+1. `StorePenugasanKlinisRequest` & `UpdatePenugasanKlinisRequest` memvalidasi input *form-data*, termasuk batas maksimum lampiran *file* 5MB.
+2. `PenugasanKlinisService` menyimpan logika bisnis untuk menyimpan berkas file secara fisik ke direktori *public* dan mengembalikan *response* seragam.
+3. `PenugasanKlinisRepository` mengatur manipulasi langsung terhadap *Model* `PenugasanKlinis` di database.
+4. Method di `RiwayatKarirController` mengatur _request HTTP_ CRUD.
+
+### 17.3 Flowchart
+
+```mermaid
+graph TD
+	A[User Request API] --> B{Method?}
+	B -- GET --> C[Ambil data Riwayat Penugasan Klinis dari DB]
+	C --> D[Return JSON Array]
+	
+	B -- POST/PATCH --> E[Validasi FormRequest]
+	E --> F{Upload File?}
+	F -- Ya --> G[Simpan di /public/dokumen/penugasan-klinis]
+	F -- Tidak --> H[Abaikan]
+	G --> I[PenugasanKlinisRepository update DB]
+	H --> I
+	I --> J[Return JSON Success]
+	
+	B -- DELETE --> K[Cari PK ID]
+	K --> L{Ada file SK lama?}
+	L -- Ya --> M[Hapus fisik file]
+	L -- Tidak --> N[Lanjut]
+	M --> N
+	N --> O[PenugasanKlinisRepository delete PenugasanKlinis]
+```
+
+### 17.4 Class Diagram
+
+```mermaid
+classDiagram
+	class RiwayatKarirController
+	class PenugasanKlinisService
+	class PenugasanKlinisRepository
+	class StorePenugasanKlinisRequest
+	class UpdatePenugasanKlinisRequest
+
+	RiwayatKarirController --> StorePenugasanKlinisRequest : validate (POST)
+	RiwayatKarirController --> UpdatePenugasanKlinisRequest : validate (PATCH)
+	RiwayatKarirController --> PenugasanKlinisService : get/create/update/delete
+	PenugasanKlinisService --> PenugasanKlinisRepository : query/insert/update/delete
 ```

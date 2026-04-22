@@ -106,17 +106,14 @@ class Pegawai extends Model
         return $this->hasMany(GolonganRuangPegawai::class);
     }
 
-    public function unitKerjaPegawai()
-    {
-        return $this->hasMany(UnitKerjaPegawai::class);
-    }
 
-    public function strs()
+
+    public function str()
     {
         return $this->hasMany(StrPegawai::class);
     }
 
-    public function sips()
+    public function sip()
     {
         return $this->hasMany(Sip::class);
     }

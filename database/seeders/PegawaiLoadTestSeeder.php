@@ -9,7 +9,6 @@ use App\Models\Pegawai;
 use App\Models\PegawaiPribadi;
 use App\Models\Profesi;
 use App\Models\UnitKerja;
-use App\Models\UnitKerjaPegawai;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -27,14 +26,14 @@ class PegawaiLoadTestSeeder extends Seeder
         $unitKerja = UnitKerja::query()->firstOrCreate(['nama' => 'SDM']);
         $jabatan = Jabatan::query()->firstOrCreate(
             ['nama' => 'Staf Kepegawaian'],
-            ['tmt_mulai' => now()->toDateString()]
+            ['tmt_mulai' => now()->toDateString(), 'unit_kerja_id' => $unitKerja->id]
         );
         $jenisPegawai = JenisPegawai::query()->firstOrCreate(['nama' => 'PNS']);
         $profesi = Profesi::query()->firstOrCreate(
             ['nama' => 'Analis SDM'],
             ['kategori_tenaga' => 'Non Kesehatan']
         );
-        $pangkat = Pangkat::query()->firstOrCreate(['nama' => 'Penata Muda']);
+
 
         DB::table('golongan_ruang')->updateOrInsert(['nama' => 'III/a'], [
             'created_at' => now(),
@@ -67,13 +66,21 @@ class PegawaiLoadTestSeeder extends Seeder
                     'jabatan_id' => $jabatan->id,
                     'status_pegawai' => 'aktif',
                     'tgl_masuk' => '2020-01-01',
-                    'pangkat_id' => $pangkat->id,
+                    'pangkat_id' => null, // will update below
                     'golongan_ruang_id' => $golonganRuang?->id,
                     'tmt_cpns' => '2020-01-01',
                     'tmt_pns' => '2021-01-01',
                     'tmt_pangkat_akhir' => '2022-01-01',
                 ]
             );
+
+            $newPangkat = \App\Models\Pangkat::query()->create([
+                'nama' => 'Penata Muda',
+                'pejabat_penetap' => 'Gubernur',
+                'tmt_sk' => '2020-01-01'
+            ]);
+
+            $pegawai->update(['pangkat_id' => $newPangkat->id]);
 
             PegawaiPribadi::query()->updateOrCreate(
                 ['pegawai_id' => $pegawai->id],
@@ -89,13 +96,13 @@ class PegawaiLoadTestSeeder extends Seeder
                 ]
             );
 
-            UnitKerjaPegawai::query()->updateOrCreate(
+            \App\Models\PangkatPegawai::query()->updateOrCreate(
                 [
                     'pegawai_id' => $pegawai->id,
-                    'unit_kerja_id' => $unitKerja->id,
                     'is_current' => true,
                 ],
                 [
+                    'pangkat_id' => $newPangkat->id,
                     'started_at' => '2020-01-01',
                     'note' => 'Data load test',
                 ]

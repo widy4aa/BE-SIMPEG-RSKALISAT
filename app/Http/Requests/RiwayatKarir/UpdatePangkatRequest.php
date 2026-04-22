@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateJabatanRequest extends FormRequest
+class UpdatePangkatRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,12 +16,13 @@ class UpdateJabatanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'unit_kerja_id' => ['sometimes', 'nullable', 'exists:unit_kerja,id'],
-            'nama_jabatan' => ['sometimes', 'required', 'string', 'max:255'],
+            'nama_pangkat' => ['sometimes', 'required', 'string', 'max:255'],
             'is_current' => ['sometimes', 'required', 'boolean'],
-            'tmt_mulai' => ['sometimes', 'nullable', 'date'],
-            'tmt_selesai' => ['sometimes', 'nullable', 'date', 'after_or_equal:tmt_mulai'],
-            'sk_jabatan' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
+            'pejabat_penetap' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'tmt_sk' => ['sometimes', 'nullable', 'date'],
+            'started_at' => ['sometimes', 'nullable', 'date'],
+            'ended_at' => ['sometimes', 'nullable', 'date', 'after_or_equal:started_at'],
+            'sk_pangkat' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
             'note' => ['sometimes', 'nullable', 'string'],
         ];
     }

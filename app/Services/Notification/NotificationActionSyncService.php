@@ -23,7 +23,7 @@ class NotificationActionSyncService
 
         $activeUniqueKeys = [];
 
-        $strTerbaru = $pegawai->strs->first();
+        $strTerbaru = $pegawai->str->first();
 
         if ($strTerbaru === null || $strTerbaru->tanggal_kadaluarsa === null) {
             $activeUniqueKeys[] = 'dashboard.str.missing';

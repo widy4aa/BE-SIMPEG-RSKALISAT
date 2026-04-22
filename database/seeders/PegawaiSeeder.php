@@ -13,15 +13,14 @@ use App\Models\PangkatPegawai;
 use App\Models\Pegawai;
 use App\Models\PegawaiPribadi;
 use App\Models\PenugasanKlinis;
-use App\Models\ProfesiPegawai;
 use App\Models\Profesi;
+use App\Models\ProfesiPegawai;
 use App\Models\Sip;
 use App\Models\StrPegawai;
-use App\Models\UnitKerjaPegawai;
 use App\Models\UnitKerja;
 use App\Models\User;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class PegawaiSeeder extends Seeder
@@ -36,26 +35,25 @@ class PegawaiSeeder extends Seeder
 
         $jabatanAdmin = Jabatan::query()->firstOrCreate(
             ['nama' => 'Administrator Sistem'],
-            ['tmt_mulai' => now()->toDateString()]
+            ['tmt_mulai' => now()->toDateString(), 'unit_kerja_id' => $unitKerja->id]
         );
 
         $jabatanHrd = Jabatan::query()->firstOrCreate(
             ['nama' => 'Staf HRD'],
-            ['tmt_mulai' => now()->toDateString()]
+            ['tmt_mulai' => now()->toDateString(), 'unit_kerja_id' => $unitKerja->id]
         );
 
         $jabatanDirektur = Jabatan::query()->firstOrCreate(
             ['nama' => 'Direktur'],
-            ['tmt_mulai' => now()->toDateString()]
+            ['tmt_mulai' => now()->toDateString(), 'unit_kerja_id' => $unitDireksi->id]
         );
 
         $jabatan = Jabatan::query()->firstOrCreate(
             ['nama' => 'Staf Kepegawaian'],
-            ['tmt_mulai' => now()->toDateString()]
+            ['tmt_mulai' => now()->toDateString(), 'unit_kerja_id' => $unitKerja->id]
         );
 
         $jenisPegawai = JenisPegawai::query()->firstOrCreate(['nama' => 'PNS']);
-        $pangkat = Pangkat::query()->firstOrCreate(['nama' => 'Penata Muda']);
         DB::table('golongan_ruang')->updateOrInsert(['nama' => 'III/a'], [
             'created_at' => now(),
             'updated_at' => now(),
@@ -315,13 +313,21 @@ class PegawaiSeeder extends Seeder
                     'jabatan_id' => $seed['jabatan_id'],
                     'status_pegawai' => 'aktif',
                     'tgl_masuk' => '2020-01-01',
-                    'pangkat_id' => $pangkat->id,
+                    'pangkat_id' => null, // will update below
                     'golongan_ruang_id' => $golonganRuang?->id,
                     'tmt_cpns' => '2020-01-01',
                     'tmt_pns' => '2021-01-01',
                     'tmt_pangkat_akhir' => '2022-01-01',
                 ]
             );
+
+            $newPangkat = \App\Models\Pangkat::query()->create([
+                'nama' => 'Penata Muda',
+                'pejabat_penetap' => 'Gubernur',
+                'tmt_sk' => '2020-01-01'
+            ]);
+
+            $pegawai->update(['pangkat_id' => $newPangkat->id]);
 
             $pegawaiPribadi = PegawaiPribadi::query()->updateOrCreate(
                 ['pegawai_id' => $pegawai->id],
@@ -333,7 +339,7 @@ class PegawaiSeeder extends Seeder
                     'status_perkawinan' => 'kawin',
                     'alamat' => 'Jakarta',
                     'no_telp' => '081234567890',
-                    'email' => strtolower(str_replace(' ', '.', $seed['nama'])) . '@example.com',
+                    'email' => strtolower(str_replace(' ', '.', $seed['nama'])).'@example.com',
                     'foto_path' => $seed['foto_path'],
                     'ktp_file_path' => $seed['ktp_file_path'],
                     'kk_file_path' => $seed['kk_file_path'],
@@ -414,7 +420,7 @@ class PegawaiSeeder extends Seeder
                     'is_current' => true,
                 ],
                 [
-                    'pangkat_id' => $pangkat->id,
+                    'pangkat_id' => $newPangkat->id,
                     'started_at' => '2020-01-01',
                     'note' => 'Data awal dari seeder',
                 ]
@@ -424,18 +430,6 @@ class PegawaiSeeder extends Seeder
                 [
                     'pegawai_id' => $pegawai->id,
                     'jabatan_id' => $seed['jabatan_id'],
-                    'is_current' => true,
-                ],
-                [
-                    'started_at' => '2020-01-01',
-                    'note' => 'Data awal dari seeder',
-                ]
-            );
-
-            UnitKerjaPegawai::query()->updateOrCreate(
-                [
-                    'pegawai_id' => $pegawai->id,
-                    'unit_kerja_id' => $seed['role'] === 'direktur' ? $unitDireksi->id : $unitKerja->id,
                     'is_current' => true,
                 ],
                 [

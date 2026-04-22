@@ -72,7 +72,116 @@ Route::middleware([
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'updateJabatan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->delete('/riwayat-karir/jabatan/{id}', [RiwayatKarirController::class, 'destroyJabatan']);
+
+// Riwayat Pangkat
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/pangkat', [RiwayatKarirController::class, 'pangkat']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/pangkat', [RiwayatKarirController::class, 'storePangkat']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/pangkat/{id}', [RiwayatKarirController::class, 'updatePangkat']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/pangkat/{id}', [RiwayatKarirController::class, 'updatePangkat']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/pangkat/{id}', [RiwayatKarirController::class, 'destroyPangkat']);
+
+// Riwayat SIP
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/sip', [RiwayatKarirController::class, 'sip']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/sip', [RiwayatKarirController::class, 'storeSip']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/sip/{id}', [RiwayatKarirController::class, 'updateSip']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/sip/{id}', [RiwayatKarirController::class, 'updateSip']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/sip/{id}', [RiwayatKarirController::class, 'destroySip']);
+
+// Riwayat STR
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/str', [RiwayatKarirController::class, 'str']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/str', [RiwayatKarirController::class, 'storeStr']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/str/{id}', [RiwayatKarirController::class, 'updateStr']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/str/{id}', [RiwayatKarirController::class, 'updateStr']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/str/{id}', [RiwayatKarirController::class, 'destroyStr']);
+
+// Riwayat Penugasan Klinis
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/riwayat-karir/penugasan-klinis', [RiwayatKarirController::class, 'penugasanKlinis']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/penugasan-klinis', [RiwayatKarirController::class, 'storePenugasanKlinis']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/riwayat-karir/penugasan-klinis/{id}', [RiwayatKarirController::class, 'updatePenugasanKlinis']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/penugasan-klinis/{id}', [RiwayatKarirController::class, 'updatePenugasanKlinis']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/riwayat-karir/penugasan-klinis/{id}', [RiwayatKarirController::class, 'destroyPenugasanKlinis']);
 
 Route::middleware([
     JwtAuthMiddleware::class,
@@ -83,6 +192,11 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->patch('/riwayat-karir/pendidikan/{id}', [RiwayatKarirController::class, 'updatePendidikan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/riwayat-karir/pendidikan/{id}', [RiwayatKarirController::class, 'updatePendidikan']);
 
 Route::middleware([
     JwtAuthMiddleware::class,

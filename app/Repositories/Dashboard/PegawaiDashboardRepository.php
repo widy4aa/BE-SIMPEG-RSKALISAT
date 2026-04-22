@@ -16,7 +16,7 @@ class PegawaiDashboardRepository
                 'jadwalDiklat as jumlah_diklat_belum_selesai' => fn ($query) => $query->whereIn('status_diklat', ['belum terlaksana', 'sedang terlaksana']),
             ])
             ->with([
-                'strs' => fn ($query) => $query->orderByDesc('tanggal_kadaluarsa'),
+                'str' => fn ($query) => $query->orderByDesc('tanggal_kadaluarsa'),
                 'pribadi.keluarga',
                 'jabatan',
                 'jenisPegawai',

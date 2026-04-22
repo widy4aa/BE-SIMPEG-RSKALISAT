@@ -9,7 +9,7 @@ class JabatanRepository
     public function findPegawaiByUserIdWithJabatan(int $userId): ?Pegawai
     {
         return Pegawai::query()
-            ->with(['jabatanPegawai.jabatan'])
+            ->with(['jabatanPegawai.jabatan.unitKerja'])
             ->where('user_id', $userId)
             ->first();
     }
@@ -21,7 +21,7 @@ class JabatanRepository
             ->whereHas('pegawai', function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             })
-            ->with('jabatan')
+            ->with(['jabatan.unitKerja'])
             ->first();
     }
 

@@ -6,7 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class UpdateJabatanRequest extends FormRequest
+class UpdatePenugasanKlinisRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -16,13 +16,11 @@ class UpdateJabatanRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'unit_kerja_id' => ['sometimes', 'nullable', 'exists:unit_kerja,id'],
-            'nama_jabatan' => ['sometimes', 'required', 'string', 'max:255'],
+            'nomor_surat' => ['sometimes', 'required', 'string', 'max:255'],
+            'tgl_mulai' => ['sometimes', 'required', 'date'],
+            'tgl_kadaluarsa' => ['sometimes', 'nullable', 'date', 'after_or_equal:tgl_mulai'],
             'is_current' => ['sometimes', 'required', 'boolean'],
-            'tmt_mulai' => ['sometimes', 'nullable', 'date'],
-            'tmt_selesai' => ['sometimes', 'nullable', 'date', 'after_or_equal:tmt_mulai'],
-            'sk_jabatan' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
-            'note' => ['sometimes', 'nullable', 'string'],
+            'dokumen_file' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
         ];
     }
 

@@ -1,1087 +1,1747 @@
 {
-  "info": {
-    "_postman_id": "f1df9da1-9f91-4dc4-9fe4-ef90a6e8b9dd",
-    "name": "BE-SIMPEG-RSKALISAT API",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Collection untuk test semua endpoint API BE-SIMPEG-RSKALISAT"
-  },
-  "item": [
-    {
-      "name": "01. Umum",
-      "item": [
+    "info": {
+        "_postman_id": "f1df9da1-9f91-4dc4-9fe4-ef90a6e8b9dd",
+        "name": "BE-SIMPEG-RSKALISAT API",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Collection untuk test semua endpoint API BE-SIMPEG-RSKALISAT"
+    },
+    "item": [
         {
-          "name": "Health Check",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "health"
-              ]
-            }
-          }
+            "name": "01. Umum",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/health",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "health"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"nik\": \"3174010101010001\",\n  \"password\": \"password\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "login"
+                            ]
+                        }
+                    }
+                }
+            ]
         },
         {
-          "name": "Login",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nik\": \"3174010101010001\",\n  \"password\": \"password\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
+            "name": "02. Semua Role",
+            "item": [
+                {
+                    "name": "Cek Role",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/role",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "role"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Dashboard",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/dashboard",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dashboard"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Diklat",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/diklat",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "diklat"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Diklat (Pegawai)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_pegawai}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "nama_kegiatan",
+                                    "value": "Workshop Pelayanan Prima",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "kategori",
+                                    "value": "Teknis",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "jenis_diklat",
+                                    "value": "ASN",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "penyelenggara",
+                                    "value": "RS Kalisat",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lokasi",
+                                    "value": "Aula RS Kalisat",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "tanggal_mulai",
+                                    "value": "2026-08-10",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "tanggal_selesai",
+                                    "value": "2026-08-12",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "no_sertif",
+                                    "value": "SERTIF/SDM/2026/0099",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "upload_sertif",
+                                    "type": "file",
+                                    "src": ""
+                                },
+                                {
+                                    "key": "jp",
+                                    "value": "24",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "jenis_biaya",
+                                    "value": "BLUD",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "total_biaya",
+                                    "value": "2500000",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "catatan",
+                                    "value": "Usulan pelatihan unit SDM",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "jenis_pelaksana",
+                                    "value": "internal",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/diklat",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "diklat"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Diklat (Pegawai)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_pegawai}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "nama_kegiatan",
+                                    "value": "Workshop Pelayanan Prima Update",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lokasi",
+                                    "value": "Aula RS Kalisat Lt.2",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "tanggal_mulai",
+                                    "value": "2026-08-11",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "tanggal_selesai",
+                                    "value": "2026-08-13",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "jp",
+                                    "value": "24",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "jenis_biaya",
+                                    "value": "BLUD",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "total_biaya",
+                                    "value": "3000000",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "no_sertif",
+                                    "value": "SERTIF/SDM/2026/0100",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "upload_sertif",
+                                    "type": "file",
+                                    "src": ""
+                                },
+                                {
+                                    "key": "catatan",
+                                    "value": "Revisi data diklat",
+                                    "type": "text"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/diklat/{{diklat_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "diklat",
+                                "{{diklat_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Diklat (Pegawai)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_pegawai}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/diklat/{{diklat_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "diklat",
+                                "{{diklat_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Patch Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"alamat\": \"Jl. Mawar No. 10\",\n  \"no_telp\": \"081298765432\",\n  \"note\": \"Mohon update\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/profile",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Upload Foto Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "foto",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/profil/profil-picture",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profil",
+                                "profil-picture"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Upload Foto Profile (Alias)",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "foto",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/profile/profile-picture",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profile",
+                                "profile-picture"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Upload KTP",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "ktp",
+                                    "type": "file",
+                                    "src": ""
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/profil/ktp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "profil",
+                                "ktp"
+                            ]
+                        }
+                    }
                 }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/login",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "login"
-              ]
-            }
-          }
+            ]
+        },
+        {
+            "name": "03. Notifikasi",
+            "item": [
+                {
+                    "name": "Get Notifikasi",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/notifications",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "notifications"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Tandai 1 Notifikasi Dibaca",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/notifications/{{notification_id}}/read",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "notifications",
+                                "{{notification_id}}",
+                                "read"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Tandai Semua Notifikasi Dibaca",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/notifications/read-all",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "notifications",
+                                "read-all"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "04. Admin Change Request",
+            "item": [
+                {
+                    "name": "List Change Requests",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/change-requests",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "change-requests"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Detail Change Request",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/change-requests/{{change_request_id}}",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "change-requests",
+                                "{{change_request_id}}"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Accept Change Request",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"note\": \"Data valid\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/change-requests/{{change_request_id}}/accept",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "change-requests",
+                                "{{change_request_id}}",
+                                "accept"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Reject Change Request",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PATCH",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"note\": \"Perlu revisi\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/admin/change-requests/{{change_request_id}}/reject",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "admin",
+                                "change-requests",
+                                "{{change_request_id}}",
+                                "reject"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "05. Riwayat Karir",
+            "item": [
+                {
+                    "name": "Pendidikan",
+                    "item": [
+                        {
+                            "name": "GET Riwayat Pendidikan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pendidikan"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "POST Riwayat Pendidikan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "tingkat_pendidikan_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "nama_institusi",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "ijazah_file",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pendidikan"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PATCH Riwayat Pendidikan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nama_institusi",
+                                            "value": "Updated",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pendidikan/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pendidikan",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "DELETE Riwayat Pendidikan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pendidikan/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pendidikan",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Jabatan",
+                    "item": [
+                        {
+                            "name": "GET Riwayat Jabatan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/jabatan",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "jabatan"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "POST Riwayat Jabatan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "jabatan_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "sk_file",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/jabatan",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "jabatan"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PATCH Riwayat Jabatan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "pejabat_penetap",
+                                            "value": "Updated",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/jabatan/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "jabatan",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "DELETE Riwayat Jabatan",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/jabatan/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "jabatan",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Pangkat",
+                    "item": [
+                        {
+                            "name": "GET Riwayat Pangkat",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pangkat",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pangkat"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "POST Riwayat Pangkat",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "pangkat_id",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "is_current",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "sk_pangkat",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pangkat",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pangkat"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PATCH Riwayat Pangkat",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "pejabat_penetap",
+                                            "value": "Updated",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pangkat/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pangkat",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "DELETE Riwayat Pangkat",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/pangkat/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "pangkat",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "SIP",
+                    "item": [
+                        {
+                            "name": "GET Riwayat SIP",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/sip",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "sip"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "POST Riwayat SIP",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nomor_sip",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "tanggal_terbit",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "is_current",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "sk_sip",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/sip",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "sip"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PATCH Riwayat SIP",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nomor_sip",
+                                            "value": "Updated",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/sip/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "sip",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "DELETE Riwayat SIP",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/sip/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "sip",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "STR",
+                    "item": [
+                        {
+                            "name": "GET Riwayat STR",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/str",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "str"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "POST Riwayat STR",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nomor_str",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "tanggal_terbit",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "is_current",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "sk_str",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/str",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "str"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PATCH Riwayat STR",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nomor_str",
+                                            "value": "Updated",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/str/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "str",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "DELETE Riwayat STR",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/str/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "str",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Penugasan Klinis",
+                    "item": [
+                        {
+                            "name": "GET Riwayat Penugasan Klinis",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "penugasan-klinis"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "POST Riwayat Penugasan Klinis",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nomor_surat",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "tgl_mulai",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "is_current",
+                                            "value": "1",
+                                            "type": "text"
+                                        },
+                                        {
+                                            "key": "dokumen_file",
+                                            "type": "file",
+                                            "src": []
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "penugasan-klinis"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PATCH Riwayat Penugasan Klinis",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "formdata",
+                                    "formdata": [
+                                        {
+                                            "key": "nomor_surat",
+                                            "value": "Updated",
+                                            "type": "text"
+                                        }
+                                    ]
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "penugasan-klinis",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "DELETE Riwayat Penugasan Klinis",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "riwayat-karir",
+                                        "penugasan-klinis",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    },
-    {
-      "name": "02. Semua Role",
-      "item": [
+    ],
+    "variable": [
         {
-          "name": "Cek Role",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/role",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "role"
-              ]
-            }
-          }
+            "key": "base_url",
+            "value": "http://127.0.0.1:8000"
         },
         {
-          "name": "Dashboard",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/dashboard",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "dashboard"
-              ]
-            }
-          }
+            "key": "token",
+            "value": ""
         },
         {
-          "name": "Get Diklat",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/diklat",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "diklat"
-              ]
-            }
-          }
+            "key": "token_admin",
+            "value": ""
         },
         {
-          "name": "Create Diklat (Pegawai)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_pegawai}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "nama_kegiatan",
-                  "value": "Workshop Pelayanan Prima",
-                  "type": "text"
-                },
-                {
-                  "key": "kategori",
-                  "value": "Teknis",
-                  "type": "text"
-                },
-                {
-                  "key": "jenis_diklat",
-                  "value": "ASN",
-                  "type": "text"
-                },
-                {
-                  "key": "penyelenggara",
-                  "value": "RS Kalisat",
-                  "type": "text"
-                },
-                {
-                  "key": "lokasi",
-                  "value": "Aula RS Kalisat",
-                  "type": "text"
-                },
-                {
-                  "key": "tanggal_mulai",
-                  "value": "2026-08-10",
-                  "type": "text"
-                },
-                {
-                  "key": "tanggal_selesai",
-                  "value": "2026-08-12",
-                  "type": "text"
-                },
-                {
-                  "key": "no_sertif",
-                  "value": "SERTIF/SDM/2026/0099",
-                  "type": "text"
-                },
-                {
-                  "key": "upload_sertif",
-                  "type": "file",
-                  "src": ""
-                },
-                {
-                  "key": "jp",
-                  "value": "24",
-                  "type": "text"
-                },
-                {
-                  "key": "jenis_biaya",
-                  "value": "BLUD",
-                  "type": "text"
-                },
-                {
-                  "key": "total_biaya",
-                  "value": "2500000",
-                  "type": "text"
-                },
-                {
-                  "key": "catatan",
-                  "value": "Usulan pelatihan unit SDM",
-                  "type": "text"
-                },
-                {
-                  "key": "jenis_pelaksana",
-                  "value": "internal",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/diklat",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "diklat"
-              ]
-            }
-          }
+            "key": "token_pegawai",
+            "value": ""
         },
         {
-          "name": "Update Diklat (Pegawai)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_pegawai}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "nama_kegiatan",
-                  "value": "Workshop Pelayanan Prima Update",
-                  "type": "text"
-                },
-                {
-                  "key": "lokasi",
-                  "value": "Aula RS Kalisat Lt.2",
-                  "type": "text"
-                },
-                {
-                  "key": "tanggal_mulai",
-                  "value": "2026-08-11",
-                  "type": "text"
-                },
-                {
-                  "key": "tanggal_selesai",
-                  "value": "2026-08-13",
-                  "type": "text"
-                },
-                {
-                  "key": "jp",
-                  "value": "24",
-                  "type": "text"
-                },
-                {
-                  "key": "jenis_biaya",
-                  "value": "BLUD",
-                  "type": "text"
-                },
-                {
-                  "key": "total_biaya",
-                  "value": "3000000",
-                  "type": "text"
-                },
-                {
-                  "key": "no_sertif",
-                  "value": "SERTIF/SDM/2026/0100",
-                  "type": "text"
-                },
-                {
-                  "key": "upload_sertif",
-                  "type": "file",
-                  "src": ""
-                },
-                {
-                  "key": "catatan",
-                  "value": "Revisi data diklat",
-                  "type": "text"
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/diklat/{{diklat_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "diklat",
-                "{{diklat_id}}"
-              ]
-            }
-          }
+            "key": "notification_id",
+            "value": "1"
         },
         {
-          "name": "Delete Diklat (Pegawai)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_pegawai}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/diklat/{{diklat_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "diklat",
-                "{{diklat_id}}"
-              ]
-            }
-          }
+            "key": "change_request_id",
+            "value": "1"
         },
         {
-          "name": "Get Profile",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/profile",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "profile"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Patch Profile",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"alamat\": \"Jl. Mawar No. 10\",\n  \"no_telp\": \"081298765432\",\n  \"note\": \"Mohon update\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/profile",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "profile"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Upload Foto Profile",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "foto",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/profil/profil-picture",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "profil",
-                "profil-picture"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Upload Foto Profile (Alias)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "foto",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/profile/profile-picture",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "profile",
-                "profile-picture"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Upload KTP",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "ktp",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/profil/ktp",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "profil",
-                "ktp"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Riwayat Pendidikan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "pendidikan"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Riwayat Pendidikan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "jenjang",
-                  "value": "S1",
-                  "type": "text"
-                },
-                {
-                  "key": "institusi",
-                  "value": "Universitas Jember",
-                  "type": "text"
-                },
-                {
-                  "key": "jurusan",
-                  "value": "Teknik Informatika",
-                  "type": "text"
-                },
-                {
-                  "key": "tahun_lulus",
-                  "value": "2012",
-                  "type": "text"
-                },
-                {
-                  "key": "nomor_ijazah",
-                  "value": "IJZ-2012-001",
-                  "type": "text"
-                },
-                {
-                  "key": "ijazah",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "pendidikan"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Riwayat Pendidikan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "_method",
-                  "value": "PATCH",
-                  "type": "text"
-                },
-                {
-                  "key": "institusi",
-                  "value": "Universitas Jember Update",
-                  "type": "text"
-                },
-                {
-                  "key": "ijazah",
-                  "type": "file",
-                  "src": ""
-                }
-              ]
-            },
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "pendidikan",
-                "1"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Riwayat Pendidikan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "pendidikan",
-                "1"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Riwayat Jabatan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/jabatan",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "jabatan"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Create Riwayat Jabatan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nama_jabatan\": \"Perawat\",\n  \"is_current\": true,\n  \"tmt_mulai\": \"2020-01-01\",\n  \"tmt_selesai\": \"2025-01-01\",\n  \"note\": \"Kenaikan jabatan reguler\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/jabatan",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "jabatan"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Riwayat Jabatan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nama_jabatan\": \"Kepala Perawat\",\n  \"is_current\": false,\n  \"tmt_selesai\": \"2026-01-01\",\n  \"note\": \"Promosi jabatan\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/jabatan/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "jabatan",
-                "1"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Riwayat Jabatan",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/riwayat-karir/jabatan/1",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "riwayat-karir",
-                "jabatan",
-                "1"
-              ]
-            }
-          }
+            "key": "diklat_id",
+            "value": "1"
         }
-      ]
-    },
-    {
-      "name": "03. Notifikasi",
-      "item": [
-        {
-          "name": "Tandai 1 Notifikasi Dibaca",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/notifications/{{notification_id}}/read",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "{{notification_id}}",
-                "read"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Tandai Semua Notifikasi Dibaca",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/notifications/read-all",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "notifications",
-                "read-all"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "04. Admin Change Request",
-      "item": [
-        {
-          "name": "List Change Requests",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_admin}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/admin/change-requests",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "change-requests"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Detail Change Request",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_admin}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/admin/change-requests/{{change_request_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "change-requests",
-                "{{change_request_id}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Accept Change Request",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_admin}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"note\": \"Data valid\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/admin/change-requests/{{change_request_id}}/accept",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "change-requests",
-                "{{change_request_id}}",
-                "accept"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Reject Change Request",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token_admin}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"note\": \"Perlu revisi\"\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{base_url}}/api/admin/change-requests/{{change_request_id}}/reject",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "admin",
-                "change-requests",
-                "{{change_request_id}}",
-                "reject"
-              ]
-            }
-          }
-        }
-      ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "base_url",
-      "value": "http://127.0.0.1:8000"
-    },
-    {
-      "key": "token",
-      "value": ""
-    },
-    {
-      "key": "token_admin",
-      "value": ""
-    },
-    {
-      "key": "token_pegawai",
-      "value": ""
-    },
-    {
-      "key": "notification_id",
-      "value": "1"
-    },
-    {
-      "key": "change_request_id",
-      "value": "1"
-    },
-    {
-      "key": "diklat_id",
-      "value": "1"
-    }
-  ]
+    ]
 }

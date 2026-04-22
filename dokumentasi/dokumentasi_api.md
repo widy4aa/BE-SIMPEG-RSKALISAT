@@ -1006,12 +1006,12 @@ Contoh response `201 Created`:
 }
 ```
 
-#### PATCH Riwayat Pendidikan
+#### POST / PATCH Riwayat Pendidikan (Update)
 
-Mengubah data riwayat pendidikan milik user yang sedang login.
-Request menggunakan `multipart/form-data` dengan field tambahan `_method=PATCH` jika ada file yang diunggah.
+Mengubah data riwayat pendidikan milik user yang sedang login berdasarkan `{id}`.
+Untuk menghindari limitasi *multipart/form-data* di PHP, Anda dapat menggunakan *method* **`POST`** (tanpa perlu `_method=PATCH`).
 
-Field request:
+Field request (*multipart/form-data*):
 - `jenjang` (sometimes, string, max:50)
 - `institusi` (sometimes, string, max:255)
 - `jurusan` (sometimes, string, max:255)
@@ -1073,12 +1073,14 @@ Contoh response `200 OK`:
     "items": [
       {
         "id": 1,
-        "nama_jabatan": "Perawat",
-        "is_current": true,
+        "unit_kerja_id": 1,
+        "unit_kerja_nama": "SDM",
+        "nama_jabatan": "Perawat Pelaksana",
+        "is_current": false,
         "tmt_mulai": "2020-01-01",
-        "tmt_selesai": "2025-01-01",
+        "tmt_selesai": "2023-12-31",
         "link_sk": "http://127.0.0.1:8000/dokumen/jabatan/sk-jabatan-1-123456789.pdf",
-        "note": "Kenaikan jabatan reguler"
+        "note": "Awal masuk"
       }
     ]
   }
@@ -1091,6 +1093,7 @@ Menambahkan data riwayat jabatan baru untuk user yang sedang login beserta lampi
 
 | Parameter | Tipe | Wajib | Keterangan |
 | :--- | :--- | :--- | :--- |
+| `unit_kerja_id` | Integer | Tidak | ID Unit Kerja (dari tabel unit_kerja) |
 | `nama_jabatan` | String | Ya | Nama jabatan |
 | `is_current` | Boolean (0/1) | Ya | Apakah jabatan ini masih dijabat? |
 | `tmt_mulai` | Date | Tidak | Tanggal mulai menjabat (Format: YYYY-MM-DD) |
@@ -1106,6 +1109,8 @@ Contoh response `201 Created`:
   "message": "Riwayat jabatan berhasil ditambahkan.",
   "data": {
     "id": 2,
+    "unit_kerja_id": 1,
+    "unit_kerja_nama": "SDM",
     "nama_jabatan": "Perawat Madya",
     "is_current": true,
     "tmt_mulai": "2024-01-01",
@@ -1116,21 +1121,19 @@ Contoh response `201 Created`:
 }
 ```
 
-#### Contoh Request PATCH Riwayat Jabatan
+#### POST / PATCH Riwayat Jabatan (Update)
 
-```http
-PATCH /api/riwayat-karir/jabatan/1 HTTP/1.1
-Host: example.com
-Authorization: Bearer <jwt_token>
-Content-Type: application/json
+Memperbarui sebagian data riwayat jabatan berdasarkan `{id}`.
+Untuk menghindari limitasi *multipart/form-data* di PHP, Anda dapat menggunakan *method* **`POST`** (tanpa perlu `_method=PATCH`). File SK lama akan otomatis dihapus jika Anda mengunggah file SK baru.
 
-{
-  "nama_jabatan": "Kepala Perawat",
-  "is_current": false,
-  "tmt_selesai": "2026-01-01",
-  "note": "Promosi jabatan"
-}
-```
+Field request (*multipart/form-data*):
+- `unit_kerja_id` (sometimes, integer)
+- `nama_jabatan` (sometimes, string)
+- `is_current` (sometimes, boolean: 1/0)
+- `tmt_mulai` (sometimes, date)
+- `tmt_selesai` (sometimes, date)
+- `sk_jabatan` (sometimes, file: pdf/jpg/png, max 5MB)
+- `note` (sometimes, string)
 
 Contoh response `200 OK`:
 
@@ -1140,6 +1143,8 @@ Contoh response `200 OK`:
   "message": "Riwayat jabatan berhasil diupdate.",
   "data": {
     "id": 1,
+    "unit_kerja_id": 1,
+    "unit_kerja_nama": "SDM",
     "nama_jabatan": "Kepala Perawat",
     "is_current": false,
     "tmt_mulai": "2020-01-01",
@@ -1159,6 +1164,436 @@ Contoh response `200 OK`:
 {
   "success": true,
   "message": "Riwayat jabatan berhasil dihapus."
+}
+```
+
+### 12. Riwayat Karir Pangkat
+
+Fitur untuk mengelola riwayat pangkat user yang sedang login.
+
+#### GET Riwayat Pangkat
+
+Menampilkan daftar riwayat pangkat yang dimiliki user (diurutkan berdasarkan `started_at` menurun).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil mengambil riwayat pangkat.",
+  "data": {
+    "label": "Riwayat pangkat",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "nama_pangkat": "Penata Muda",
+        "is_current": true,
+        "pejabat_penetap": "Gubernur",
+        "tmt_sk": "2020-01-01",
+        "started_at": "2020-01-01",
+        "ended_at": null,
+        "link_sk": "http://127.0.0.1:8000/dokumen/pangkat/sk-pangkat-1-123456789.pdf",
+        "note": "Pangkat pertama"
+      }
+    ]
+  }
+}
+```
+
+#### POST Riwayat Pangkat
+
+Menambahkan data riwayat pangkat baru untuk user yang sedang login beserta lampiran SK.
+
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `nama_pangkat` | String | Ya | Nama pangkat |
+| `is_current` | Boolean (0/1) | Ya | Apakah pangkat ini masih aktif? |
+| `pejabat_penetap` | String | Tidak | Nama pejabat penetap |
+| `tmt_sk` | Date | Tidak | Tanggal sk pangkat (Format: YYYY-MM-DD) |
+| `started_at` | Date | Tidak | Tanggal mulai jabatan/pangkat |
+| `ended_at` | Date | Tidak | Tanggal selesai |
+| `sk_pangkat` | File | Tidak | File SK pangkat (max 5MB, format pdf/jpg/png) |
+| `note` | String | Tidak | Catatan tambahan |
+
+Contoh response `201 Created`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat pangkat berhasil ditambahkan.",
+  "data": {
+    "id": 2,
+    "nama_pangkat": "Penata Tingkat I",
+    "is_current": true,
+    "pejabat_penetap": "Gubernur",
+    "tmt_sk": "2024-01-01",
+    "started_at": "2024-01-01",
+    "ended_at": null,
+    "link_sk": "http://127.0.0.1:8000/dokumen/pangkat/sk-pangkat-2-123456789.pdf",
+    "note": "Promosi"
+  }
+}
+```
+
+#### POST / PATCH Riwayat Pangkat (Update)
+
+Memperbarui sebagian data riwayat pangkat berdasarkan `{id}`.
+Untuk menghindari limitasi *multipart/form-data* di PHP, Anda dapat menggunakan *method* **`POST`** (tanpa perlu `_method=PATCH`). File SK lama akan otomatis dihapus jika Anda mengunggah file SK baru.
+
+Field request (*multipart/form-data*):
+- `nama_pangkat` (sometimes, string)
+- `is_current` (sometimes, boolean: 1/0)
+- `pejabat_penetap` (sometimes, string)
+- `tmt_sk` (sometimes, date)
+- `started_at` (sometimes, date)
+- `ended_at` (sometimes, date)
+- `sk_pangkat` (sometimes, file: pdf/jpg/png, max 5MB)
+- `note` (sometimes, string)
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat pangkat berhasil diupdate.",
+  "data": {
+    "id": 1,
+    "nama_pangkat": "Penata Muda",
+    "is_current": false,
+    "pejabat_penetap": "Bupati",
+    "tmt_sk": "2020-01-01",
+    "started_at": "2020-01-01",
+    "ended_at": "2024-01-01",
+    "note": "Berakhir"
+  }
+}
+```
+
+#### DELETE Riwayat Pangkat
+
+Menghapus riwayat pangkat beserta file SK-nya (jika ada) milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat pangkat berhasil dihapus."
+}
+```
+
+### 13. Riwayat Karir SIP
+
+Fitur untuk mengelola riwayat SIP (Surat Izin Praktik) user yang sedang login.
+
+#### GET Riwayat SIP
+
+Menampilkan daftar riwayat SIP yang dimiliki user (diurutkan berdasarkan `tanggal_terbit` menurun).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil mengambil riwayat SIP.",
+  "data": {
+    "label": "Riwayat SIP",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "jenis_sip_id": 1,
+        "jenis_sip_nama": "SIP Dokter Umum",
+        "nomor_sip": "SIP.123/456/2023",
+        "tanggal_terbit": "2023-01-01",
+        "tanggal_kadaluarsa": "2028-01-01",
+        "is_current": true,
+        "link_sk": "http://127.0.0.1:8000/dokumen/sip/sk-sip-1-123456789.pdf"
+      }
+    ]
+  }
+}
+```
+
+#### POST Riwayat SIP
+
+Menambahkan data riwayat SIP baru untuk user yang sedang login beserta lampirannya.
+
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `jenis_sip_id` | Integer | Tidak | ID Jenis SIP |
+| `nomor_sip` | String | Ya | Nomor surat SIP |
+| `tanggal_terbit` | Date | Ya | Tanggal terbit (Format: YYYY-MM-DD) |
+| `tanggal_kadaluarsa` | Date | Ya | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Ya | Apakah SIP ini masih aktif? |
+| `sk_sip` | File | Tidak | File SK SIP (max 5MB, format pdf/jpg/png) |
+
+Contoh response `201 Created`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat SIP berhasil ditambahkan.",
+  "data": {
+    "id": 2,
+    "jenis_sip_id": null,
+    "jenis_sip_nama": "",
+    "nomor_sip": "SIP.Baru/789/2024",
+    "tanggal_terbit": "2024-01-01",
+    "tanggal_kadaluarsa": "2029-01-01",
+    "is_current": true,
+    "link_sk": "http://127.0.0.1:8000/dokumen/sip/sk-sip-2-123456789.pdf"
+  }
+}
+```
+
+#### POST / PATCH Riwayat SIP (Update)
+
+Memperbarui sebagian data riwayat SIP berdasarkan `{id}`.
+Gunakan *method* **`POST`** (tanpa `_method=PATCH`) jika mengirim file untuk menghindari limitasi PHP. File SK lama otomatis dihapus.
+
+Field request (*multipart/form-data*):
+- `jenis_sip_id` (sometimes, integer)
+- `nomor_sip` (sometimes, string)
+- `tanggal_terbit` (sometimes, date)
+- `tanggal_kadaluarsa` (sometimes, date)
+- `is_current` (sometimes, boolean: 1/0)
+- `sk_sip` (sometimes, file: pdf/jpg/png, max 5MB)
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat SIP berhasil diupdate.",
+  "data": {
+    "id": 1,
+    "jenis_sip_id": 1,
+    "jenis_sip_nama": "SIP Dokter Umum",
+    "nomor_sip": "SIP.123/456/2023",
+    "tanggal_terbit": "2023-01-01",
+    "tanggal_kadaluarsa": "2028-01-01",
+    "is_current": false,
+    "link_sk": null
+  }
+}
+```
+
+#### DELETE Riwayat SIP
+
+Menghapus riwayat SIP beserta file-nya (jika ada) milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat SIP berhasil dihapus."
+}
+```
+
+### 14. Riwayat Karir STR
+
+Fitur untuk mengelola riwayat STR (Surat Tanda Registrasi) user yang sedang login.
+
+#### GET Riwayat STR
+
+Menampilkan daftar riwayat STR yang dimiliki user (diurutkan berdasarkan `tanggal_terbit` menurun).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil mengambil riwayat STR.",
+  "data": {
+    "label": "Riwayat STR",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "nomor_str": "STR.123/456/2023",
+        "tanggal_terbit": "2023-01-01",
+        "tanggal_kadaluarsa": "2028-01-01",
+        "is_current": true,
+        "link_sk": "http://127.0.0.1:8000/dokumen/str/sk-str-1-123456789.pdf"
+      }
+    ]
+  }
+}
+```
+
+#### POST Riwayat STR
+
+Menambahkan data riwayat STR baru untuk user yang sedang login beserta lampirannya.
+
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `nomor_str` | String | Ya | Nomor surat STR |
+| `tanggal_terbit` | Date | Ya | Tanggal terbit (Format: YYYY-MM-DD) |
+| `tanggal_kadaluarsa` | Date | Ya | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Ya | Apakah STR ini masih aktif? |
+| `sk_str` | File | Tidak | File SK STR (max 5MB, format pdf/jpg/png) |
+
+Contoh response `201 Created`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat STR berhasil ditambahkan.",
+  "data": {
+    "id": 2,
+    "nomor_str": "STR.Baru/789/2024",
+    "tanggal_terbit": "2024-01-01",
+    "tanggal_kadaluarsa": "2029-01-01",
+    "is_current": true,
+    "link_sk": "http://127.0.0.1:8000/dokumen/str/sk-str-2-123456789.pdf"
+  }
+}
+```
+
+#### POST / PATCH Riwayat STR (Update)
+
+Memperbarui sebagian data riwayat STR berdasarkan `{id}`.
+Gunakan *method* **`POST`** (tanpa `_method=PATCH`) jika mengirim file untuk menghindari limitasi PHP. File SK lama otomatis dihapus.
+
+Field request (*multipart/form-data*):
+- `nomor_str` (sometimes, string)
+- `tanggal_terbit` (sometimes, date)
+- `tanggal_kadaluarsa` (sometimes, date)
+- `is_current` (sometimes, boolean: 1/0)
+- `sk_str` (sometimes, file: pdf/jpg/png, max 5MB)
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat STR berhasil diupdate.",
+  "data": {
+    "id": 1,
+    "nomor_str": "STR.123/456/2023",
+    "tanggal_terbit": "2023-01-01",
+    "tanggal_kadaluarsa": "2028-01-01",
+    "is_current": false,
+    "link_sk": null
+  }
+}
+```
+
+#### DELETE Riwayat STR
+
+Menghapus riwayat STR beserta file-nya (jika ada) milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat STR berhasil dihapus."
+}
+```
+
+### 15. Riwayat Karir Penugasan Klinis
+
+Fitur untuk mengelola riwayat penugasan klinis user yang sedang login.
+
+#### GET Riwayat Penugasan Klinis
+
+Menampilkan daftar riwayat penugasan klinis yang dimiliki user (diurutkan berdasarkan `tgl_mulai` menurun).
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil mengambil riwayat penugasan klinis.",
+  "data": {
+    "label": "Riwayat Penugasan Klinis",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "nomor_surat": "PK.123/456/2023",
+        "tgl_mulai": "2023-01-01",
+        "tgl_kadaluarsa": "2028-01-01",
+        "is_current": true,
+        "link_dokumen": "http://127.0.0.1:8000/dokumen/penugasan-klinis/sk-penugasan-klinis-1-123456789.pdf"
+      }
+    ]
+  }
+}
+```
+
+#### POST Riwayat Penugasan Klinis
+
+Menambahkan data riwayat penugasan klinis baru untuk user yang sedang login beserta lampirannya.
+
+| Parameter | Tipe | Wajib | Keterangan |
+| :--- | :--- | :--- | :--- |
+| `nomor_surat` | String | Ya | Nomor surat penugasan klinis |
+| `tgl_mulai` | Date | Ya | Tanggal mulai (Format: YYYY-MM-DD) |
+| `tgl_kadaluarsa` | Date | Ya | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Ya | Apakah penugasan ini masih aktif? |
+| `dokumen_file` | File | Tidak | File dokumen (max 5MB, format pdf/jpg/png) |
+
+Contoh response `201 Created`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat penugasan klinis berhasil ditambahkan.",
+  "data": {
+    "id": 2,
+    "nomor_surat": "PK.Baru/789/2024",
+    "tgl_mulai": "2024-01-01",
+    "tgl_kadaluarsa": "2029-01-01",
+    "is_current": true,
+    "link_dokumen": "http://127.0.0.1:8000/dokumen/penugasan-klinis/sk-penugasan-klinis-2-123456789.pdf"
+  }
+}
+```
+
+#### POST / PATCH Riwayat Penugasan Klinis (Update)
+
+Memperbarui sebagian data riwayat penugasan klinis berdasarkan `{id}`.
+Gunakan *method* **`POST`** (tanpa `_method=PATCH`) jika mengirim file untuk menghindari limitasi PHP. File dokumen lama otomatis dihapus.
+
+Field request (*multipart/form-data*):
+- `nomor_surat` (sometimes, string)
+- `tgl_mulai` (sometimes, date)
+- `tgl_kadaluarsa` (sometimes, date)
+- `is_current` (sometimes, boolean: 1/0)
+- `dokumen_file` (sometimes, file: pdf/jpg/png, max 5MB)
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat penugasan klinis berhasil diupdate.",
+  "data": {
+    "id": 1,
+    "nomor_surat": "PK.123/456/2023",
+    "tgl_mulai": "2023-01-01",
+    "tgl_kadaluarsa": "2028-01-01",
+    "is_current": false,
+    "link_dokumen": null
+  }
+}
+```
+
+#### DELETE Riwayat Penugasan Klinis
+
+Menghapus riwayat penugasan klinis beserta file-nya (jika ada) milik user yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Riwayat penugasan klinis berhasil dihapus."
 }
 ```
 
@@ -1563,7 +1998,7 @@ Update riwayat pendidikan (ganti token dan id):
 curl -X POST http://127.0.0.1:8000/api/riwayat-karir/pendidikan/1 \
   -H "Authorization: Bearer <jwt_token>" \
   -F "_method=PATCH" \
-  -F "institusi=Universitas Contoh Update"
+  -F "institusi=Universitas Brawijaya"
 ```
 
 Delete riwayat pendidikan (ganti token dan id):
@@ -1595,7 +2030,6 @@ Update riwayat jabatan (ganti token dan id):
 ```bash
 curl -X POST http://127.0.0.1:8000/api/riwayat-karir/jabatan/1 \
   -H "Authorization: Bearer <jwt_token>" \
-  -F "_method=PATCH" \
   -F "nama_jabatan=Kepala Perawat"
 ```
 
@@ -1603,6 +2037,140 @@ Delete riwayat jabatan (ganti token dan id):
 
 ```bash
 curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/jabatan/1 \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+List riwayat pangkat (ganti token):
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/riwayat-karir/pangkat \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Tambah riwayat pangkat (ganti token):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/pangkat \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nama_pangkat=Penata Muda" \
+  -F "is_current=1" \
+  -F "sk_pangkat=@/path/to/sk.pdf"
+```
+
+Update riwayat pangkat (ganti token dan id):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/pangkat/1 \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "pejabat_penetap=Gubernur"
+```
+
+Delete riwayat pangkat (ganti token dan id):
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/pangkat/1 \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+List riwayat SIP (ganti token):
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/riwayat-karir/sip \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Tambah riwayat SIP (ganti token):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/sip \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nomor_sip=SIP.123" \
+  -F "tanggal_terbit=2024-01-01" \
+  -F "tanggal_kadaluarsa=2029-01-01" \
+  -F "is_current=1" \
+  -F "sk_sip=@/path/to/sk.pdf"
+```
+
+Update riwayat SIP (ganti token dan id):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/sip/1 \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nomor_sip=SIP.BARU"
+```
+
+Delete riwayat SIP (ganti token dan id):
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/sip/1 \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+List riwayat STR (ganti token):
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/riwayat-karir/str \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Tambah riwayat STR (ganti token):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/str \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nomor_str=STR.123" \
+  -F "tanggal_terbit=2024-01-01" \
+  -F "tanggal_kadaluarsa=2029-01-01" \
+  -F "is_current=1" \
+  -F "sk_str=@/path/to/sk.pdf"
+```
+
+Update riwayat STR (ganti token dan id):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/str/1 \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nomor_str=STR.BARU"
+```
+
+Delete riwayat STR (ganti token dan id):
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/str/1 \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+List riwayat penugasan klinis (ganti token):
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/riwayat-karir/penugasan-klinis \
+  -H "Authorization: Bearer <jwt_token>"
+```
+
+Tambah riwayat penugasan klinis (ganti token):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/penugasan-klinis \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nomor_surat=PK.123" \
+  -F "tgl_mulai=2024-01-01" \
+  -F "tgl_kadaluarsa=2029-01-01" \
+  -F "is_current=1" \
+  -F "dokumen_file=@/path/to/dokumen.pdf"
+```
+
+Update riwayat penugasan klinis (ganti token dan id):
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/riwayat-karir/penugasan-klinis/1 \
+  -H "Authorization: Bearer <jwt_token>" \
+  -F "nomor_surat=PK.BARU"
+```
+
+Delete riwayat penugasan klinis (ganti token dan id):
+
+```bash
+curl -X DELETE http://127.0.0.1:8000/api/riwayat-karir/penugasan-klinis/1 \
   -H "Authorization: Bearer <jwt_token>"
 ```
 

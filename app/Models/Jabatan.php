@@ -13,11 +13,17 @@ class Jabatan extends Model
     protected $table = 'jabatan';
 
     protected $fillable = [
+        'unit_kerja_id',
         'nama',
         'tmt_mulai',
         'tmt_selesai',
         'sk_file_path',
     ];
+
+    public function unitKerja()
+    {
+        return $this->belongsTo(UnitKerja::class);
+    }
 
     protected function casts(): array
     {

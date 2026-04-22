@@ -18,15 +18,7 @@ class JabatanService
             ?->sortByDesc('started_at')
             ->values()
             ->map(function ($item) {
-                return [
-                    'id' => $item->id,
-                    'nama_jabatan' => $item->jabatan?->nama ?? '',
-                    'is_current' => (bool) $item->is_current,
-                    'tmt_mulai' => $item->jabatan?->tmt_mulai?->format('Y-m-d') ?? $item->started_at?->format('Y-m-d'),
-                    'tmt_selesai' => $item->jabatan?->tmt_selesai?->format('Y-m-d') ?? $item->ended_at?->format('Y-m-d'),
-                    'link_sk' => $item->jabatan?->sk_file_path ? url('/'.$item->jabatan->sk_file_path) : null,
-                    'note' => $item->note ?? '',
-                ];
+                return $this->formatJabatanItem($item);
             });
 
         return [
@@ -66,6 +58,7 @@ class JabatanService
         }
 
         $jabatanData = [
+            'unit_kerja_id' => isset($payload['unit_kerja_id']) ? $payload['unit_kerja_id'] : null,
             'nama' => (string) $payload['nama_jabatan'],
             'tmt_mulai' => isset($payload['tmt_mulai']) ? $payload['tmt_mulai'] : null,
             'tmt_selesai' => isset($payload['tmt_selesai']) ? $payload['tmt_selesai'] : null,
@@ -118,6 +111,7 @@ class JabatanService
         }
 
         $jabatanData = [];
+        if (array_key_exists('unit_kerja_id', $payload)) $jabatanData['unit_kerja_id'] = $payload['unit_kerja_id'];
         if (array_key_exists('nama_jabatan', $payload)) $jabatanData['nama'] = (string) $payload['nama_jabatan'];
         if (array_key_exists('tmt_mulai', $payload)) $jabatanData['tmt_mulai'] = $payload['tmt_mulai'];
         if (array_key_exists('tmt_selesai', $payload)) $jabatanData['tmt_selesai'] = $payload['tmt_selesai'];
@@ -157,6 +151,8 @@ class JabatanService
     {
         return [
             'id' => $item->id,
+            'unit_kerja_id' => $item->jabatan?->unit_kerja_id,
+            'unit_kerja_nama' => $item->jabatan?->unitKerja?->nama ?? '',
             'nama_jabatan' => $item->jabatan?->nama ?? '',
             'is_current' => (bool) $item->is_current,
             'tmt_mulai' => $item->jabatan?->tmt_mulai?->format('Y-m-d') ?? $item->started_at?->format('Y-m-d'),
