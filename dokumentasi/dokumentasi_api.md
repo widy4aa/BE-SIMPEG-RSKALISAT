@@ -2217,87 +2217,171 @@ Langkah pakai di Postman:
 
 ## Data Keluarga
 
-### GET /api/keluarga
-- **Method:** `GET`
-- **Route:** `/api/keluarga`
+### 1. Get Ringkasan Data Keluarga
+- **Nama Fitur:** Mendapatkan Ringkasan Seluruh Data Keluarga
+- **Penjelasan:** Mengambil ringkasan dari semua modul keluarga (Pasangan, Anak, Orang Tua, Kontak Darurat) milik pegawai yang sedang login.
+- **Route:** `GET /api/keluarga`
 - **Headers:** `Authorization: Bearer {token}`
-- **Response:** Summary data keluarga beserta list anggotanya (pasangan, anak, dll).
+- **Response:**
+  ```json
+  {
+    "success": true,
+    "message": "Data keluarga berhasil diambil.",
+    "data": {
+      "pasangan": { "label": "Data Pasangan", "total": 1, "items": [...] },
+      "anak": { "label": "Data Anak", "total": 2, "items": [...] },
+      "orang_tua": { "label": "Data Orang Tua", "total": 1, "items": [...] },
+      "kontak_darurat": { "label": "Data Kontak Darurat", "total": 1, "items": [...] }
+    }
+  }
+  ```
 
-### GET /api/keluarga/pasangan
-- **Method:** `GET`
-- **Route:** `/api/keluarga/pasangan`
-- **Response:** List data pasangan.
+---
 
-### POST /api/keluarga/pasangan
-- **Method:** `POST`
-- **Route:** `/api/keluarga/pasangan`
-- **Body:** `multipart/form-data` (nama_lengkap, tanggal_lahir, buku_nikah_file, dll)
+### 2. Modul Pasangan
 
-### PATCH /api/keluarga/pasangan/{id}
-- **Method:** `PATCH` atau `POST` (untuk form-data update)
-- **Route:** `/api/keluarga/pasangan/{id}`
+#### A. Ambil Data Pasangan
+- **Nama Fitur:** Mendapatkan Data Pasangan
+- **Penjelasan:** Mengambil list seluruh pasangan dari pegawai.
+- **Route:** `GET /api/keluarga/pasangan`
+- **Return:** Array of objek Pasangan.
 
-### DELETE /api/keluarga/pasangan/{id}
-- **Method:** `DELETE`
-- **Route:** `/api/keluarga/pasangan/{id}`
+#### B. Tambah Data Pasangan
+- **Nama Fitur:** Menambahkan Pasangan Baru
+- **Penjelasan:** Membuat entri pasangan baru beserta unggah dokumen buku nikah.
+- **Route:** `POST /api/keluarga/pasangan`
+- **Body Type:** `multipart/form-data`
+- **Parameter Input:**
 
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nama_lengkap` | String | Ya | Nama pasangan |
+| `nik` | String | Tidak | NIK pasangan |
+| `tempat_lahir` | String | Tidak | - |
+| `tanggal_lahir` | Date (Y-m-d) | Tidak | - |
+| `pekerjaan` | String | Tidak | - |
+| `instansi` | String | Tidak | - |
+| `status_pernikahan` | String | Tidak | - |
+| `tanggal_pernikahan`| Date (Y-m-d) | Tidak | - |
+| `nomor_buku_nikah` | String | Tidak | - |
+| `status_tanggungan` | Boolean/Int | Tidak | 1 atau 0 |
+| `npwp_pasangan` | String | Tidak | - |
+| `buku_nikah_file` | File (PDF/Image)| Tidak | Maksimal 2MB |
 
-### GET /api/keluarga/anak
-- **Method:** `GET`
-- **Route:** `/api/keluarga/anak`
-- **Response:** List data anak.
+- **Return:** `201 Created` beserta objek ringkas data yang dibuat.
 
-### POST /api/keluarga/anak
-- **Method:** `POST`
-- **Route:** `/api/keluarga/anak`
-- **Body:** `multipart/form-data` (nama_lengkap, tanggal_lahir, jenis_kelamin, status_anak, dll + akta_kelahiran_file)
+#### C. Ubah Data Pasangan
+- **Nama Fitur:** Memperbarui Data Pasangan
+- **Penjelasan:** Mengubah atribut tertentu pada entri pasangan. Gunakan method `POST` karena Laravel kesulitan menerima file pada method `PATCH` via form-data.
+- **Route:** `PATCH /api/keluarga/pasangan/{id}` atau `POST /api/keluarga/pasangan/{id}`
+- **Body Type:** `multipart/form-data` (Jika ada file baru) atau JSON/Urlencoded (jika hanya teks)
+- **Parameter Input:** (Sama seperti Tambah, tetapi seluruh field bersifat opsional / `sometimes`). Jika ingin mengganti file, kirim kembali `buku_nikah_file`.
+- **Return:** `200 OK` dan data pembaruan.
 
-### PATCH /api/keluarga/anak/{id}
-- **Method:** `PATCH` atau `POST` (untuk form-data update)
-- **Route:** `/api/keluarga/anak/{id}`
+#### D. Hapus Data Pasangan
+- **Nama Fitur:** Menghapus Data Pasangan
+- **Penjelasan:** Menghapus data secara *soft delete* beserta file-nya dari server secara fisik.
+- **Route:** `DELETE /api/keluarga/pasangan/{id}`
+- **Return:** `200 OK` dan ID yang dihapus.
 
-### DELETE /api/keluarga/anak/{id}
-- **Method:** `DELETE`
-- **Route:** `/api/keluarga/anak/{id}`
+---
 
+### 3. Modul Anak
 
-### GET /api/keluarga/orang-tua
-- **Method:** `GET`
-- **Route:** `/api/keluarga/orang-tua`
-- **Response:** List data orang tua.
+#### A. Ambil Data Anak
+- **Nama Fitur:** Mendapatkan Data Anak
+- **Penjelasan:** Mengambil list seluruh anak dari pegawai.
+- **Route:** `GET /api/keluarga/anak`
+- **Return:** Array of objek Anak.
 
-### POST /api/keluarga/orang-tua
-- **Method:** `POST`
-- **Route:** `/api/keluarga/orang-tua`
-- **Body:** `application/x-www-form-urlencoded` atau JSON (nama_ayah, nama_ibu, status_hidup, alamat)
+#### B. Tambah Data Anak
+- **Nama Fitur:** Menambahkan Anak Baru
+- **Penjelasan:** Membuat entri anak baru beserta unggah dokumen akta kelahiran.
+- **Route:** `POST /api/keluarga/anak`
+- **Body Type:** `multipart/form-data`
+- **Parameter Input:**
 
-### PATCH /api/keluarga/orang-tua/{id}
-- **Method:** `PATCH`
-- **Route:** `/api/keluarga/orang-tua/{id}`
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nama_lengkap` | String | Ya | Nama anak |
+| `nik` | String | Tidak | NIK anak |
+| `tempat_lahir` | String | Tidak | - |
+| `tanggal_lahir` | Date (Y-m-d) | Tidak | - |
+| `jenis_kelamin` | String | Tidak | `L` / `P` |
+| `status_anak` | String | Tidak | Kandung, Tiri, dll |
+| `pendidikan_terakhir`| String | Tidak | - |
+| `status_tanggungan` | Boolean/Int | Tidak | 1 atau 0 |
+| `usia` | Integer | Tidak | Usia dalam tahun |
+| `keterangan_disabilitas` | String | Tidak | - |
+| `akta_kelahiran_file` | File (PDF/Image)| Tidak | Maksimal 2MB |
 
-### DELETE /api/keluarga/orang-tua/{id}
-- **Method:** `DELETE`
-- **Route:** `/api/keluarga/orang-tua/{id}`
+- **Return:** `201 Created` beserta objek ringkas data yang dibuat.
 
+#### C. Ubah Data Anak
+- **Nama Fitur:** Memperbarui Data Anak
+- **Penjelasan:** Mengubah atribut tertentu pada entri anak. Gunakan `POST` jika menyertakan file `akta_kelahiran_file`.
+- **Route:** `PATCH /api/keluarga/anak/{id}` atau `POST /api/keluarga/anak/{id}`
+- **Body Type:** `multipart/form-data`
+- **Parameter Input:** Sama seperti parameter Tambah, tetapi opsional.
+- **Return:** `200 OK`.
 
-### GET /api/keluarga/kontak-darurat
-- **Method:** `GET`
-- **Route:** `/api/keluarga/kontak-darurat`
-- **Response:** List data kontak darurat.
+#### D. Hapus Data Anak
+- **Nama Fitur:** Menghapus Data Anak
+- **Route:** `DELETE /api/keluarga/anak/{id}`
 
-### POST /api/keluarga/kontak-darurat
-- **Method:** `POST`
-- **Route:** `/api/keluarga/kontak-darurat`
-- **Body:** `application/x-www-form-urlencoded` atau JSON (nama_kontak, hubungan_keluarga, nomor_hp, alamat)
+---
 
-### PATCH /api/keluarga/kontak-darurat/{id}
-- **Method:** `PATCH`
-- **Route:** `/api/keluarga/kontak-darurat/{id}`
+### 4. Modul Orang Tua
 
-### DELETE /api/keluarga/kontak-darurat/{id}
-- **Method:** `DELETE`
-- **Route:** `/api/keluarga/kontak-darurat/{id}`
+#### A. Ambil Data Orang Tua
+- **Nama Fitur:** Mendapatkan Data Orang Tua
+- **Route:** `GET /api/keluarga/orang-tua`
 
+#### B. Tambah Data Orang Tua
+- **Nama Fitur:** Menambahkan Orang Tua
+- **Route:** `POST /api/keluarga/orang-tua`
+- **Body Type:** `application/json` atau `application/x-www-form-urlencoded`
+- **Parameter Input:**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nama_ayah` | String | Tidak | - |
+| `nama_ibu` | String | Tidak | - |
+| `status_hidup` | String | Tidak | Hidup, Meninggal, dsb |
+| `alamat` | String | Tidak | Alamat domisili |
+
+- **Return:** `201 Created`
+
+#### C. Ubah & Hapus Orang Tua
+- **Ubah:** `PATCH /api/keluarga/orang-tua/{id}` (Field sama seperti tambah, opsional)
+- **Hapus:** `DELETE /api/keluarga/orang-tua/{id}`
+
+---
+
+### 5. Modul Kontak Darurat
+
+#### A. Ambil Data Kontak Darurat
+- **Nama Fitur:** Mendapatkan Kontak Darurat
+- **Route:** `GET /api/keluarga/kontak-darurat`
+
+#### B. Tambah Data Kontak Darurat
+- **Nama Fitur:** Menambahkan Kontak Darurat
+- **Route:** `POST /api/keluarga/kontak-darurat`
+- **Body Type:** `application/json` atau `application/x-www-form-urlencoded`
+- **Parameter Input:**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nama_kontak` | String | Ya | Nama kerabat/kontak |
+| `hubungan_keluarga` | String | Ya | Saudara, Ayah, dll |
+| `nomor_hp` | String | Ya | Nomor yang bisa dihubungi |
+| `alamat` | String | Tidak | - |
+
+- **Return:** `201 Created`
+
+#### C. Ubah & Hapus Kontak Darurat
+- **Ubah:** `PATCH /api/keluarga/kontak-darurat/{id}` (Field sama, opsional pada pengiriman `PATCH`)
+- **Hapus:** `DELETE /api/keluarga/kontak-darurat/{id}`
 
 ## Master Data (Form Dropdowns)
 
