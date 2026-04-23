@@ -48,6 +48,16 @@ BAB V Endpoint Admin Approval Change Request
 1. [List Change Request](#10-list-change-request-admin)
 2. [Detail Change Request](#11-detail-change-request-admin)
 3. [Accept Change Request](#12-accept-change-request-admin)
+
+BAB VI Data Keluarga
+1. [Get Ringkasan Data Keluarga](#1-get-ringkasan-data-keluarga)
+2. [Modul Pasangan](#2-modul-pasangan)
+3. [Modul Anak](#3-modul-anak)
+4. [Modul Orang Tua](#4-modul-orang-tua)
+5. [Modul Kontak Darurat](#5-modul-kontak-darurat)
+
+BAB VII Master Data (Form Dropdowns)
+1. [List Endpoint Master Data](#master-data-form-dropdowns)
 4. [Reject Change Request](#13-reject-change-request-admin)
 
 BAB VI Data Uji dan Simulasi
@@ -2217,21 +2227,35 @@ Langkah pakai di Postman:
 
 ## Data Keluarga
 
+Bagian ini memuat dokumentasi seluruh layanan (CRUD) terkait Data Keluarga yang terbagi menjadi entitas independen: **Pasangan**, **Anak**, **Orang Tua**, dan **Kontak Darurat**. Seluruh endpoint mewajibkan penggunaan *Bearer Token* dari user (Pegawai/Admin/HRD).
+
+---
+
 ### 1. Get Ringkasan Data Keluarga
 - **Nama Fitur:** Mendapatkan Ringkasan Seluruh Data Keluarga
-- **Penjelasan:** Mengambil ringkasan dari semua modul keluarga (Pasangan, Anak, Orang Tua, Kontak Darurat) milik pegawai yang sedang login.
+- **Penjelasan:** Mengambil ringkasan dari semua modul keluarga milik pegawai yang sedang login.
 - **Route:** `GET /api/keluarga`
 - **Headers:** `Authorization: Bearer {token}`
-- **Response:**
+- **Response:** `200 OK`
   ```json
   {
     "success": true,
     "message": "Data keluarga berhasil diambil.",
     "data": {
-      "pasangan": { "label": "Data Pasangan", "total": 1, "items": [...] },
-      "anak": { "label": "Data Anak", "total": 2, "items": [...] },
-      "orang_tua": { "label": "Data Orang Tua", "total": 1, "items": [...] },
-      "kontak_darurat": { "label": "Data Kontak Darurat", "total": 1, "items": [...] }
+      "pasangan": {
+        "label": "Data Pasangan",
+        "total": 1,
+        "items": [
+          {
+            "id": 1,
+            "nama_lengkap": "Siti Nurhaliza",
+            "pekerjaan": "Dokter"
+          }
+        ]
+      },
+      "anak": { "label": "Data Anak", "total": 0, "items": [] },
+      "orang_tua": { "label": "Data Orang Tua", "total": 0, "items": [] },
+      "kontak_darurat": { "label": "Data Kontak Darurat", "total": 0, "items": [] }
     }
   }
   ```
@@ -2240,108 +2264,178 @@ Langkah pakai di Postman:
 
 ### 2. Modul Pasangan
 
-#### A. Ambil Data Pasangan
-- **Nama Fitur:** Mendapatkan Data Pasangan
-- **Penjelasan:** Mengambil list seluruh pasangan dari pegawai.
-- **Route:** `GET /api/keluarga/pasangan`
-- **Return:** Array of objek Pasangan.
-
-#### B. Tambah Data Pasangan
+#### A. Tambah Data Pasangan
 - **Nama Fitur:** Menambahkan Pasangan Baru
 - **Penjelasan:** Membuat entri pasangan baru beserta unggah dokumen buku nikah.
 - **Route:** `POST /api/keluarga/pasangan`
+- **Headers:** `Authorization: Bearer {token}`
 - **Body Type:** `multipart/form-data`
-- **Parameter Input:**
+- **Tabel Parameter:**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `nama_lengkap` | String | Ya | Nama pasangan |
+| `nama_lengkap` | String | Ya | Nama lengkap pasangan |
 | `nik` | String | Tidak | NIK pasangan |
-| `tempat_lahir` | String | Tidak | - |
-| `tanggal_lahir` | Date (Y-m-d) | Tidak | - |
-| `pekerjaan` | String | Tidak | - |
-| `instansi` | String | Tidak | - |
-| `status_pernikahan` | String | Tidak | - |
-| `tanggal_pernikahan`| Date (Y-m-d) | Tidak | - |
+| `tempat_lahir` | String | Tidak | Tempat lahir |
+| `tanggal_lahir` | Date (Y-m-d) | Tidak | Contoh: `1990-12-01` |
+| `pekerjaan` | String | Tidak | Pekerjaan pasangan |
+| `instansi` | String | Tidak | Instansi tempat bekerja |
+| `status_pernikahan` | String | Tidak | Contoh: Sah, Cerai |
+| `tanggal_pernikahan`| Date (Y-m-d) | Tidak | Contoh: `2015-08-10` |
 | `nomor_buku_nikah` | String | Tidak | - |
-| `status_tanggungan` | Boolean/Int | Tidak | 1 atau 0 |
+| `status_tanggungan` | Boolean/Int | Tidak | `1` (Ya) atau `0` (Tidak) |
 | `npwp_pasangan` | String | Tidak | - |
-| `buku_nikah_file` | File (PDF/Image)| Tidak | Maksimal 2MB |
+| `buku_nikah_file` | File (PDF/Image)| Tidak | Bukti buku nikah, Maksimal 2MB |
 
-- **Return:** `201 Created` beserta objek ringkas data yang dibuat.
+- **Contoh Request Payload (Form-Data):**
+  ```text
+  nama_lengkap: Budi Santoso
+  pekerjaan: Guru
+  status_tanggungan: 1
+  buku_nikah_file: <File Binary>
+  ```
+- **Response:** `201 Created`
+  ```json
+  {
+    "success": true,
+    "message": "Data pasangan berhasil ditambahkan.",
+    "data": {
+      "id": 1,
+      "nama_lengkap": "Budi Santoso",
+      "buku_nikah_file_path": "/public/dokumen/pasangan/FILE_ABC123.pdf"
+    }
+  }
+  ```
 
-#### C. Ubah Data Pasangan
+#### B. Ubah Data Pasangan
 - **Nama Fitur:** Memperbarui Data Pasangan
-- **Penjelasan:** Mengubah atribut tertentu pada entri pasangan. Gunakan method `POST` karena Laravel kesulitan menerima file pada method `PATCH` via form-data.
-- **Route:** `PATCH /api/keluarga/pasangan/{id}` atau `POST /api/keluarga/pasangan/{id}`
-- **Body Type:** `multipart/form-data` (Jika ada file baru) atau JSON/Urlencoded (jika hanya teks)
-- **Parameter Input:** (Sama seperti Tambah, tetapi seluruh field bersifat opsional / `sometimes`). Jika ingin mengganti file, kirim kembali `buku_nikah_file`.
-- **Return:** `200 OK` dan data pembaruan.
+- **Penjelasan:** Mengubah atribut pada entri pasangan. Jika menyertakan file, WAJIB menggunakan method `POST` di Laravel karena keterbatasan `multipart/form-data` pada method `PATCH`.
+- **Route:** `POST /api/keluarga/pasangan/{id}` (Jika ada file) ATAU `PATCH /api/keluarga/pasangan/{id}` (Jika JSON murni)
+- **Body Type:** `multipart/form-data` atau `application/json`
+- **Tabel Parameter:** Menggunakan field yang sama dengan pembuatan (semuanya opsional saat *update*).
+- **Contoh Request Payload (JSON / PATCH):**
+  ```json
+  {
+    "pekerjaan": "Wiraswasta",
+    "status_tanggungan": 0
+  }
+  ```
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data pasangan berhasil diperbarui.",
+    "data": {
+      "id": 1,
+      "nama_lengkap": "Budi Santoso",
+      "buku_nikah_file_path": "/public/dokumen/pasangan/FILE_ABC123.pdf"
+    }
+  }
+  ```
 
-#### D. Hapus Data Pasangan
+#### C. Hapus Data Pasangan
 - **Nama Fitur:** Menghapus Data Pasangan
-- **Penjelasan:** Menghapus data secara *soft delete* beserta file-nya dari server secara fisik.
 - **Route:** `DELETE /api/keluarga/pasangan/{id}`
-- **Return:** `200 OK` dan ID yang dihapus.
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data pasangan berhasil dihapus.",
+    "data": {
+      "id": 1
+    }
+  }
+  ```
 
 ---
 
 ### 3. Modul Anak
 
-#### A. Ambil Data Anak
-- **Nama Fitur:** Mendapatkan Data Anak
-- **Penjelasan:** Mengambil list seluruh anak dari pegawai.
-- **Route:** `GET /api/keluarga/anak`
-- **Return:** Array of objek Anak.
-
-#### B. Tambah Data Anak
+#### A. Tambah Data Anak
 - **Nama Fitur:** Menambahkan Anak Baru
 - **Penjelasan:** Membuat entri anak baru beserta unggah dokumen akta kelahiran.
 - **Route:** `POST /api/keluarga/anak`
 - **Body Type:** `multipart/form-data`
-- **Parameter Input:**
+- **Tabel Parameter:**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
 | `nama_lengkap` | String | Ya | Nama anak |
 | `nik` | String | Tidak | NIK anak |
 | `tempat_lahir` | String | Tidak | - |
-| `tanggal_lahir` | Date (Y-m-d) | Tidak | - |
-| `jenis_kelamin` | String | Tidak | `L` / `P` |
-| `status_anak` | String | Tidak | Kandung, Tiri, dll |
+| `tanggal_lahir` | Date (Y-m-d) | Tidak | Contoh: `2018-05-15` |
+| `jenis_kelamin` | String | Tidak | `L` atau `P` |
+| `status_anak` | String | Tidak | Kandung, Tiri, Angkat |
 | `pendidikan_terakhir`| String | Tidak | - |
-| `status_tanggungan` | Boolean/Int | Tidak | 1 atau 0 |
+| `status_tanggungan` | Boolean/Int | Tidak | `1` atau `0` |
 | `usia` | Integer | Tidak | Usia dalam tahun |
 | `keterangan_disabilitas` | String | Tidak | - |
 | `akta_kelahiran_file` | File (PDF/Image)| Tidak | Maksimal 2MB |
 
-- **Return:** `201 Created` beserta objek ringkas data yang dibuat.
+- **Contoh Request Payload (Form-Data):**
+  ```text
+  nama_lengkap: Putri Santoso
+  jenis_kelamin: P
+  status_anak: Kandung
+  akta_kelahiran_file: <File Binary>
+  ```
+- **Response:** `201 Created`
+  ```json
+  {
+    "success": true,
+    "message": "Data anak berhasil ditambahkan.",
+    "data": {
+      "id": 1,
+      "nama_lengkap": "Putri Santoso",
+      "akta_kelahiran_file_path": "/public/dokumen/anak/FILE_XYZ789.pdf"
+    }
+  }
+  ```
 
-#### C. Ubah Data Anak
+#### B. Ubah Data Anak
 - **Nama Fitur:** Memperbarui Data Anak
-- **Penjelasan:** Mengubah atribut tertentu pada entri anak. Gunakan `POST` jika menyertakan file `akta_kelahiran_file`.
-- **Route:** `PATCH /api/keluarga/anak/{id}` atau `POST /api/keluarga/anak/{id}`
-- **Body Type:** `multipart/form-data`
-- **Parameter Input:** Sama seperti parameter Tambah, tetapi opsional.
-- **Return:** `200 OK`.
+- **Route:** `POST /api/keluarga/anak/{id}` (dengan form-data) ATAU `PATCH /api/keluarga/anak/{id}` (JSON murni)
+- **Body Type:** `multipart/form-data` atau `application/json`
+- **Contoh Request Payload (JSON / PATCH):**
+  ```json
+  {
+    "pendidikan_terakhir": "SD",
+    "usia": 8
+  }
+  ```
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data anak berhasil diperbarui.",
+    "data": {
+      "id": 1,
+      "nama_lengkap": "Putri Santoso",
+      "akta_kelahiran_file_path": "/public/dokumen/anak/FILE_XYZ789.pdf"
+    }
+  }
+  ```
 
-#### D. Hapus Data Anak
-- **Nama Fitur:** Menghapus Data Anak
+#### C. Hapus Data Anak
 - **Route:** `DELETE /api/keluarga/anak/{id}`
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data anak berhasil dihapus.",
+    "data": { "id": 1 }
+  }
+  ```
 
 ---
 
 ### 4. Modul Orang Tua
 
-#### A. Ambil Data Orang Tua
-- **Nama Fitur:** Mendapatkan Data Orang Tua
-- **Route:** `GET /api/keluarga/orang-tua`
-
-#### B. Tambah Data Orang Tua
+#### A. Tambah Data Orang Tua
 - **Nama Fitur:** Menambahkan Orang Tua
 - **Route:** `POST /api/keluarga/orang-tua`
 - **Body Type:** `application/json` atau `application/x-www-form-urlencoded`
-- **Parameter Input:**
+- **Tabel Parameter:**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
@@ -2350,71 +2444,173 @@ Langkah pakai di Postman:
 | `status_hidup` | String | Tidak | Hidup, Meninggal, dsb |
 | `alamat` | String | Tidak | Alamat domisili |
 
-- **Return:** `201 Created`
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "nama_ayah": "Agus Santoso",
+    "nama_ibu": "Siti Aminah",
+    "status_hidup": "Hidup",
+    "alamat": "Jl. Mawar No. 10"
+  }
+  ```
+- **Response:** `201 Created`
+  ```json
+  {
+    "success": true,
+    "message": "Data orang tua berhasil ditambahkan.",
+    "data": {
+      "id": 1,
+      "nama_ayah": "Agus Santoso",
+      "nama_ibu": "Siti Aminah"
+    }
+  }
+  ```
 
-#### C. Ubah & Hapus Orang Tua
-- **Ubah:** `PATCH /api/keluarga/orang-tua/{id}` (Field sama seperti tambah, opsional)
-- **Hapus:** `DELETE /api/keluarga/orang-tua/{id}`
+#### B. Ubah Data Orang Tua
+- **Route:** `PATCH /api/keluarga/orang-tua/{id}`
+- **Body Type:** `application/json`
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "status_hidup": "Meninggal",
+    "alamat": "Pindah ke alamat lain"
+  }
+  ```
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data orang tua berhasil diperbarui.",
+    "data": {
+      "id": 1,
+      "nama_ayah": "Agus Santoso",
+      "nama_ibu": "Siti Aminah"
+    }
+  }
+  ```
+
+#### C. Hapus Data Orang Tua
+- **Route:** `DELETE /api/keluarga/orang-tua/{id}`
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data orang tua berhasil dihapus.",
+    "data": { "id": 1 }
+  }
+  ```
 
 ---
 
 ### 5. Modul Kontak Darurat
 
-#### A. Ambil Data Kontak Darurat
-- **Nama Fitur:** Mendapatkan Kontak Darurat
-- **Route:** `GET /api/keluarga/kontak-darurat`
-
-#### B. Tambah Data Kontak Darurat
-- **Nama Fitur:** Menambahkan Kontak Darurat
+#### A. Tambah Data Kontak Darurat
 - **Route:** `POST /api/keluarga/kontak-darurat`
 - **Body Type:** `application/json` atau `application/x-www-form-urlencoded`
-- **Parameter Input:**
+- **Tabel Parameter:**
 
 | Field | Tipe | Wajib | Keterangan |
 |-------|------|-------|------------|
 | `nama_kontak` | String | Ya | Nama kerabat/kontak |
-| `hubungan_keluarga` | String | Ya | Saudara, Ayah, dll |
+| `hubungan_keluarga` | String | Ya | Saudara Kandung, Paman, dll |
 | `nomor_hp` | String | Ya | Nomor yang bisa dihubungi |
 | `alamat` | String | Tidak | - |
 
-- **Return:** `201 Created`
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "nama_kontak": "Rudi Hartono",
+    "hubungan_keluarga": "Saudara Kandung",
+    "nomor_hp": "081234567890",
+    "alamat": "Jl. Melati No. 5"
+  }
+  ```
+- **Response:** `201 Created`
+  ```json
+  {
+    "success": true,
+    "message": "Data kontak darurat berhasil ditambahkan.",
+    "data": {
+      "id": 1,
+      "nama_kontak": "Rudi Hartono"
+    }
+  }
+  ```
 
-#### C. Ubah & Hapus Kontak Darurat
-- **Ubah:** `PATCH /api/keluarga/kontak-darurat/{id}` (Field sama, opsional pada pengiriman `PATCH`)
-- **Hapus:** `DELETE /api/keluarga/kontak-darurat/{id}`
+#### B. Ubah Data Kontak Darurat
+- **Route:** `PATCH /api/keluarga/kontak-darurat/{id}`
+- **Body Type:** `application/json`
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "nomor_hp": "08987654321"
+  }
+  ```
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data kontak darurat berhasil diperbarui.",
+    "data": {
+      "id": 1,
+      "nama_kontak": "Rudi Hartono"
+    }
+  }
+  ```
+
+#### C. Hapus Data Kontak Darurat
+- **Route:** `DELETE /api/keluarga/kontak-darurat/{id}`
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data kontak darurat berhasil dihapus.",
+    "data": { "id": 1 }
+  }
+  ```
+
+---
 
 ## Master Data (Form Dropdowns)
 
 Semua endpoint master data diakses menggunakan metode `GET` dan wajib menyertakan Header `Authorization: Bearer <token>`.
-Respons mengembalikan array `data` yang memuat id dan nama untuk keperluan opsi dropdown di frontend.
+Respons mengembalikan array `data` yang memuat `id` dan `nama` untuk keperluan opsi *dropdown* form di antarmuka frontend.
 
-### GET /api/form/kategori-diklat
-- **Route:** `/api/form/kategori-diklat`
+### List Endpoint Master Data
 
-### GET /api/form/tipe-diklat
-- **Route:** `/api/form/tipe-diklat`
+- `GET /api/form/kategori-diklat`
+- `GET /api/form/tipe-diklat`
+- `GET /api/form/jenis-pegawai`
+- `GET /api/form/unit-kerja`
+- `GET /api/form/jenis-biaya`
+- `GET /api/form/golongan-ruang`
+- `GET /api/form/profesi`
+- `GET /api/form/jenis-sip`
 
-### GET /api/form/jenis-pegawai
-- **Route:** `/api/form/jenis-pegawai`
-
-### GET /api/form/unit-kerja
-- **Route:** `/api/form/unit-kerja`
-
-### GET /api/form/jenis-biaya
-- **Route:** `/api/form/jenis-biaya`
-
-### GET /api/form/golongan-ruang
-- **Route:** `/api/form/golongan-ruang`
-
-### GET /api/form/profesi
-- **Route:** `/api/form/profesi`
-
-### GET /api/form/jenis-sip
-- **Route:** `/api/form/jenis-sip`
+**Contoh Response Master Data (`GET /api/form/jenis-pegawai`):**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "nama": "PNS"
+    },
+    {
+      "id": 2,
+      "nama": "PPPK"
+    },
+    {
+      "id": 3,
+      "nama": "BLUD"
+    }
+  ]
+}
+```
 
 ## Daftar Request di Collection
 
-Folder dan request yang tersedia:
+Folder dan request yang tersedia di Postman:
 
 1. `01. Umum`
   - `Health Check`
@@ -2429,27 +2625,12 @@ Folder dan request yang tersedia:
   - `Get Profile`
   - `Patch Profile`
   - `Upload Foto Profile`
-  - `Upload Foto Profile (Alias)`
   - `Upload KTP`
   - `Upload KK`
   - `Get Riwayat Pendidikan`
-  - `Create Riwayat Pendidikan`
+  - `Keluarga` (Folder yang memuat CRUD Pasangan, Anak, Orang Tua, Kontak Darurat)
+  - `Master Data` (Folder yang memuat GET berbagai data referensi/dropdown)
 3. `03. Notifikasi`
   - `List Notifikasi`
-  - `Tandai 1 Notifikasi Dibaca`
-  - `Tandai Semua Notifikasi Dibaca`
 4. `04. Admin Change Request`
   - `List Change Requests`
-  - `Detail Change Request`
-  - `Accept Change Request`
-  - `Reject Change Request`
-
-Variable yang digunakan:
-
-- `base_url` (default: `http://127.0.0.1:8000`)
-- `token`
-- `token_admin`
-- `token_pegawai`
-- `notification_id`
-- `change_request_id`
-- `diklat_id`
