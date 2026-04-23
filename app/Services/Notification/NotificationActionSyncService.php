@@ -73,7 +73,11 @@ class NotificationActionSyncService
             }
         }
 
-        $keluarga = $pegawai->pribadi?->keluarga ?? collect();
+        $pasangan = $pegawai->pribadi?->pasangan ?? collect();
+        $anak = $pegawai->pribadi?->anak ?? collect();
+        $orangTua = $pegawai->pribadi?->orangTua ?? collect();
+        $kontakDarurat = $pegawai->pribadi?->kontakDarurat ?? collect();
+
         $bukuNikahFilePath = (string) ($pegawai->pribadi?->buku_nikah_file_path ?? '');
         $keterangan = [];
 
@@ -81,18 +85,19 @@ class NotificationActionSyncService
             $keterangan[] = 'bukti pernikahan belum ada';
         }
 
-        if ($keluarga->isEmpty()) {
+        if ($pasangan->isEmpty() && $anak->isEmpty() && $orangTua->isEmpty() && $kontakDarurat->isEmpty()) {
             $keterangan[] = 'data keluarga belum ada';
         }
 
-        foreach ($keluarga as $anggotaKeluarga) {
-            $isItemLengkap = filled($anggotaKeluarga->nama)
-                && filled($anggotaKeluarga->hubungan)
-                && filled($anggotaKeluarga->tanggal_lahir)
-                && filled($anggotaKeluarga->pekerjaan);
-
-            if (! $isItemLengkap) {
-                $keterangan[] = (string) ($anggotaKeluarga->nama ?: 'nama keluarga kosong');
+        foreach ($pasangan as $p) {
+            if (blank($p->nama_lengkap) || blank($p->tanggal_lahir)) {
+                $keterangan[] = (string) ($p->nama_lengkap ?: 'nama pasangan kosong');
+            }
+        }
+        
+        foreach ($anak as $a) {
+            if (blank($a->nama_lengkap) || blank($a->tanggal_lahir)) {
+                $keterangan[] = (string) ($a->nama_lengkap ?: 'nama anak kosong');
             }
         }
 

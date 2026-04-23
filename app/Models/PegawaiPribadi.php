@@ -45,8 +45,28 @@ class PegawaiPribadi extends Model
         return $this->hasMany(Pendidikan::class);
     }
 
-    public function keluarga()
+    public function pasangan()
     {
-        return $this->hasMany(Keluarga::class);
+        return $this->hasMany(Pasangan::class);
+    }
+
+    public function anak()
+    {
+        return $this->hasMany(Anak::class);
+    }
+
+    public function orangTua()
+    {
+        return $this->hasMany(OrangTua::class);
+    }
+
+    public function kontakDarurat()
+    {
+        return $this->hasMany(KontakDarurat::class);
+    }
+
+    public function tanggunganLain()
+    {
+        return $this->hasMany(TanggunganLain::class);
     }
 }

@@ -17,7 +17,11 @@ class PegawaiDashboardRepository
             ])
             ->with([
                 'str' => fn ($query) => $query->orderByDesc('tanggal_kadaluarsa'),
-                'pribadi.keluarga',
+                'pribadi.pasangan',
+                'pribadi.anak',
+                'pribadi.orangTua',
+                'pribadi.kontakDarurat',
+                'pribadi.tanggunganLain',
                 'jabatan',
                 'jenisPegawai',
                 'unitKerjaPegawai.unitKerja',

@@ -2214,6 +2214,120 @@ Langkah pakai di Postman:
 4. Jalankan request `Login`, lalu copy `access_token` ke variable `token` / `token_admin` / `token_pegawai` sesuai role.
 5. Jalankan request lain sesuai kebutuhan test.
 
+
+## Data Keluarga
+
+### GET /api/keluarga
+- **Method:** `GET`
+- **Route:** `/api/keluarga`
+- **Headers:** `Authorization: Bearer {token}`
+- **Response:** Summary data keluarga beserta list anggotanya (pasangan, anak, dll).
+
+### GET /api/keluarga/pasangan
+- **Method:** `GET`
+- **Route:** `/api/keluarga/pasangan`
+- **Response:** List data pasangan.
+
+### POST /api/keluarga/pasangan
+- **Method:** `POST`
+- **Route:** `/api/keluarga/pasangan`
+- **Body:** `multipart/form-data` (nama_lengkap, tanggal_lahir, buku_nikah_file, dll)
+
+### PATCH /api/keluarga/pasangan/{id}
+- **Method:** `PATCH` atau `POST` (untuk form-data update)
+- **Route:** `/api/keluarga/pasangan/{id}`
+
+### DELETE /api/keluarga/pasangan/{id}
+- **Method:** `DELETE`
+- **Route:** `/api/keluarga/pasangan/{id}`
+
+
+### GET /api/keluarga/anak
+- **Method:** `GET`
+- **Route:** `/api/keluarga/anak`
+- **Response:** List data anak.
+
+### POST /api/keluarga/anak
+- **Method:** `POST`
+- **Route:** `/api/keluarga/anak`
+- **Body:** `multipart/form-data` (nama_lengkap, tanggal_lahir, jenis_kelamin, status_anak, dll + akta_kelahiran_file)
+
+### PATCH /api/keluarga/anak/{id}
+- **Method:** `PATCH` atau `POST` (untuk form-data update)
+- **Route:** `/api/keluarga/anak/{id}`
+
+### DELETE /api/keluarga/anak/{id}
+- **Method:** `DELETE`
+- **Route:** `/api/keluarga/anak/{id}`
+
+
+### GET /api/keluarga/orang-tua
+- **Method:** `GET`
+- **Route:** `/api/keluarga/orang-tua`
+- **Response:** List data orang tua.
+
+### POST /api/keluarga/orang-tua
+- **Method:** `POST`
+- **Route:** `/api/keluarga/orang-tua`
+- **Body:** `application/x-www-form-urlencoded` atau JSON (nama_ayah, nama_ibu, status_hidup, alamat)
+
+### PATCH /api/keluarga/orang-tua/{id}
+- **Method:** `PATCH`
+- **Route:** `/api/keluarga/orang-tua/{id}`
+
+### DELETE /api/keluarga/orang-tua/{id}
+- **Method:** `DELETE`
+- **Route:** `/api/keluarga/orang-tua/{id}`
+
+
+### GET /api/keluarga/kontak-darurat
+- **Method:** `GET`
+- **Route:** `/api/keluarga/kontak-darurat`
+- **Response:** List data kontak darurat.
+
+### POST /api/keluarga/kontak-darurat
+- **Method:** `POST`
+- **Route:** `/api/keluarga/kontak-darurat`
+- **Body:** `application/x-www-form-urlencoded` atau JSON (nama_kontak, hubungan_keluarga, nomor_hp, alamat)
+
+### PATCH /api/keluarga/kontak-darurat/{id}
+- **Method:** `PATCH`
+- **Route:** `/api/keluarga/kontak-darurat/{id}`
+
+### DELETE /api/keluarga/kontak-darurat/{id}
+- **Method:** `DELETE`
+- **Route:** `/api/keluarga/kontak-darurat/{id}`
+
+
+## Master Data (Form Dropdowns)
+
+Semua endpoint master data diakses menggunakan metode `GET` dan wajib menyertakan Header `Authorization: Bearer <token>`.
+Respons mengembalikan array `data` yang memuat id dan nama untuk keperluan opsi dropdown di frontend.
+
+### GET /api/form/kategori-diklat
+- **Route:** `/api/form/kategori-diklat`
+
+### GET /api/form/tipe-diklat
+- **Route:** `/api/form/tipe-diklat`
+
+### GET /api/form/jenis-pegawai
+- **Route:** `/api/form/jenis-pegawai`
+
+### GET /api/form/unit-kerja
+- **Route:** `/api/form/unit-kerja`
+
+### GET /api/form/jenis-biaya
+- **Route:** `/api/form/jenis-biaya`
+
+### GET /api/form/golongan-ruang
+- **Route:** `/api/form/golongan-ruang`
+
+### GET /api/form/profesi
+- **Route:** `/api/form/profesi`
+
+### GET /api/form/jenis-sip
+- **Route:** `/api/form/jenis-sip`
+
 ## Daftar Request di Collection
 
 Folder dan request yang tersedia:

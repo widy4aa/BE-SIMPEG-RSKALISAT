@@ -287,13 +287,75 @@ Table penugasan_klinis {
   deleted_at timestamp
 }
 
-Table keluarga {
+Table pasangan {
   id int [pk, increment]
   pegawai_pribadi_id int [ref: > pegawai_pribadi.id]
-  nama varchar
-  hubungan enum [note: 'suami, istri, anak, orang tua, saudara']
-  tanggal_lahir date
-  pekerjaan varchar
+  nama_lengkap varchar [null]
+  nik varchar [null]
+  tempat_lahir varchar [null]
+  tanggal_lahir date [null]
+  pekerjaan varchar [null]
+  instansi varchar [null]
+  status_pernikahan varchar [null]
+  tanggal_pernikahan date [null]
+  nomor_buku_nikah varchar [null]
+  status_tanggungan boolean [default: false]
+  npwp_pasangan varchar [null]
+  buku_nikah_file_path varchar [null, note: 'path file buku nikah pasangan']
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table anak {
+  id int [pk, increment]
+  pegawai_pribadi_id int [ref: > pegawai_pribadi.id]
+  nama_lengkap varchar [null]
+  nik varchar [null]
+  tempat_lahir varchar [null]
+  tanggal_lahir date [null]
+  jenis_kelamin varchar [null]
+  status_anak varchar [null]
+  pendidikan_terakhir varchar [null]
+  status_tanggungan boolean [default: false]
+  usia int [null]
+  keterangan_disabilitas varchar [null]
+  akta_kelahiran_file_path varchar [null, note: 'path file akta kelahiran']
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table orang_tua {
+  id int [pk, increment]
+  pegawai_pribadi_id int [ref: > pegawai_pribadi.id]
+  nama_ayah varchar [null]
+  nama_ibu varchar [null]
+  status_hidup varchar [null]
+  alamat text [null]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table kontak_darurat {
+  id int [pk, increment]
+  pegawai_pribadi_id int [ref: > pegawai_pribadi.id]
+  nama_kontak varchar [null]
+  hubungan_keluarga varchar [null]
+  nomor_hp varchar [null]
+  alamat text [null]
+  created_at timestamp
+  updated_at timestamp
+  deleted_at timestamp
+}
+
+Table tanggungan_lain {
+  id int [pk, increment]
+  pegawai_pribadi_id int [ref: > pegawai_pribadi.id]
+  nama varchar [null]
+  hubungan_keluarga varchar [null]
+  status_tanggungan varchar [null]
   created_at timestamp
   updated_at timestamp
   deleted_at timestamp

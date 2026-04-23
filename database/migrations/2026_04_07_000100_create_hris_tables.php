@@ -178,13 +178,71 @@ return new class extends Migration
             $table->softDeletes();
         });
 
-        Schema::create('keluarga', function (Blueprint $table) {
+        Schema::create('pasangan', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('pegawai_pribadi_id')->constrained('pegawai_pribadi')->cascadeOnDelete();
+            $table->string('nama_lengkap')->nullable();
+            $table->string('nik')->nullable();
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('pekerjaan')->nullable();
+            $table->string('instansi')->nullable();
+            $table->string('status_pernikahan')->nullable();
+            $table->date('tanggal_pernikahan')->nullable();
+            $table->string('nomor_buku_nikah')->nullable();
+            $table->boolean('status_tanggungan')->default(false);
+            $table->string('npwp_pasangan')->nullable();
+            $table->string('buku_nikah_file_path')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('anak', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('pegawai_pribadi_id')->constrained('pegawai_pribadi')->cascadeOnDelete();
+            $table->string('nama_lengkap')->nullable();
+            $table->string('nik')->nullable();
+            $table->string('tempat_lahir')->nullable();
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('jenis_kelamin')->nullable();
+            $table->string('status_anak')->nullable();
+            $table->string('pendidikan_terakhir')->nullable();
+            $table->boolean('status_tanggungan')->default(false);
+            $table->integer('usia')->nullable();
+            $table->string('keterangan_disabilitas')->nullable();
+            $table->string('akta_kelahiran_file_path')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('orang_tua', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('pegawai_pribadi_id')->constrained('pegawai_pribadi')->cascadeOnDelete();
+            $table->string('nama_ayah')->nullable();
+            $table->string('nama_ibu')->nullable();
+            $table->string('status_hidup')->nullable();
+            $table->string('alamat')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('kontak_darurat', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('pegawai_pribadi_id')->constrained('pegawai_pribadi')->cascadeOnDelete();
+            $table->string('nama_kontak')->nullable();
+            $table->string('hubungan_keluarga')->nullable();
+            $table->string('nomor_hp')->nullable();
+            $table->string('alamat')->nullable();
+            $table->timestamps();
+            $table->softDeletes();
+        });
+
+        Schema::create('tanggungan_lain', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pegawai_pribadi_id')->constrained('pegawai_pribadi')->cascadeOnDelete();
             $table->string('nama')->nullable();
-            $table->enum('hubungan', ['suami', 'istri', 'anak', 'orang tua', 'saudara'])->nullable();
-            $table->date('tanggal_lahir')->nullable();
-            $table->string('pekerjaan')->nullable();
+            $table->string('hubungan_keluarga')->nullable();
+            $table->string('status_tanggungan')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

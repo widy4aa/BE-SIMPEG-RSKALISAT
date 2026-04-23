@@ -76,9 +76,29 @@ class Pegawai extends Model
         return $this->belongsTo(GolonganRuang::class);
     }
 
-    public function keluarga()
+    public function pasangan()
     {
-        return $this->hasManyThrough(Keluarga::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
+        return $this->hasManyThrough(Pasangan::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
+    }
+
+    public function anak()
+    {
+        return $this->hasManyThrough(Anak::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
+    }
+
+    public function orangTua()
+    {
+        return $this->hasManyThrough(OrangTua::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
+    }
+
+    public function kontakDarurat()
+    {
+        return $this->hasManyThrough(KontakDarurat::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
+    }
+
+    public function tanggunganLain()
+    {
+        return $this->hasManyThrough(TanggunganLain::class, PegawaiPribadi::class, 'pegawai_id', 'pegawai_pribadi_id', 'id', 'id');
     }
 
     public function jadwalDiklat()

@@ -6,7 +6,8 @@ use App\Models\Jabatan;
 use App\Models\JabatanPegawai;
 use App\Models\JenisPegawai;
 use App\Models\JenisSip;
-use App\Models\Keluarga;
+use App\Models\Pasangan;
+use App\Models\Anak;
 use App\Models\NotificationModel;
 use App\Models\Pangkat;
 use App\Models\PangkatPegawai;
@@ -79,18 +80,18 @@ class PegawaiSeeder extends Seeder
                 'ktp_file_path' => 'dokumen/ktp/admin-simpeg.pdf',
                 'kk_file_path' => 'dokumen/kk/admin-simpeg.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/admin-simpeg.pdf',
-                'keluarga' => [
+                'pasangan' => [
                     [
-                        'nama' => 'Dina Sari',
-                        'hubungan' => 'istri',
+                        'nama_lengkap' => 'Dina Sari',
                         'tanggal_lahir' => '1987-05-20',
                         'pekerjaan' => 'Guru',
                     ],
+                ],
+                'anak' => [
                     [
-                        'nama' => 'Rafi Pratama',
-                        'hubungan' => 'anak',
+                        'nama_lengkap' => 'Rafi Pratama',
                         'tanggal_lahir' => '2013-02-15',
-                        'pekerjaan' => 'Pelajar',
+                        'status_anak' => 'Kandung',
                     ],
                 ],
                 'str' => [
@@ -136,18 +137,18 @@ class PegawaiSeeder extends Seeder
                 'ktp_file_path' => 'dokumen/ktp/hrd-simpeg.pdf',
                 'kk_file_path' => 'dokumen/kk/hrd-simpeg.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/hrd-simpeg.pdf',
-                'keluarga' => [
+                'pasangan' => [
                     [
-                        'nama' => 'Andi Wijaya',
-                        'hubungan' => 'suami',
+                        'nama_lengkap' => 'Andi Wijaya',
                         'tanggal_lahir' => '1984-03-10',
                         'pekerjaan' => 'Wiraswasta',
                     ],
+                ],
+                'anak' => [
                     [
-                        'nama' => 'Nadia Putri',
-                        'hubungan' => 'anak',
+                        'nama_lengkap' => 'Nadia Putri',
                         'tanggal_lahir' => '2012-09-17',
-                        'pekerjaan' => 'Pelajar',
+                        'status_anak' => 'Kandung',
                     ],
                 ],
                 'str' => [
@@ -193,18 +194,18 @@ class PegawaiSeeder extends Seeder
                 'ktp_file_path' => 'dokumen/ktp/budi-santoso.pdf',
                 'kk_file_path' => 'dokumen/kk/budi-santoso.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/budi-santoso.pdf',
-                'keluarga' => [
+                'pasangan' => [
                     [
-                        'nama' => 'Ani Lestari',
-                        'hubungan' => 'istri',
+                        'nama_lengkap' => 'Ani Lestari',
                         'tanggal_lahir' => '1991-04-11',
                         'pekerjaan' => 'Perawat',
                     ],
+                ],
+                'anak' => [
                     [
-                        'nama' => 'Fajar Santoso',
-                        'hubungan' => 'anak',
+                        'nama_lengkap' => 'Fajar Santoso',
                         'tanggal_lahir' => '2016-06-03',
-                        'pekerjaan' => 'Pelajar',
+                        'status_anak' => 'Kandung',
                     ],
                 ],
                 'str' => [
@@ -250,14 +251,14 @@ class PegawaiSeeder extends Seeder
                 'ktp_file_path' => 'dokumen/ktp/agus-priyanto.pdf',
                 'kk_file_path' => 'dokumen/kk/agus-priyanto.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/agus-priyanto.pdf',
-                'keluarga' => [
+                'pasangan' => [
                     [
-                        'nama' => 'Rina Anggraini',
-                        'hubungan' => 'istri',
+                        'nama_lengkap' => 'Rina Anggraini',
                         'tanggal_lahir' => '1988-11-01',
                         'pekerjaan' => 'ASN',
                     ],
                 ],
+                'anak' => [],
                 'str' => [
                     [
                         'nomor_str' => 'STR-3174010101010003-01',
@@ -347,14 +348,23 @@ class PegawaiSeeder extends Seeder
                 ]
             );
 
-            Keluarga::query()->where('pegawai_pribadi_id', $pegawaiPribadi->id)->delete();
-            foreach ($seed['keluarga'] as $anggotaKeluarga) {
-                Keluarga::query()->create([
+            Pasangan::query()->where('pegawai_pribadi_id', $pegawaiPribadi->id)->delete();
+            foreach ($seed['pasangan'] as $p) {
+                Pasangan::query()->create([
                     'pegawai_pribadi_id' => $pegawaiPribadi->id,
-                    'nama' => $anggotaKeluarga['nama'],
-                    'hubungan' => $anggotaKeluarga['hubungan'],
-                    'tanggal_lahir' => $anggotaKeluarga['tanggal_lahir'],
-                    'pekerjaan' => $anggotaKeluarga['pekerjaan'],
+                    'nama_lengkap' => $p['nama_lengkap'],
+                    'tanggal_lahir' => $p['tanggal_lahir'],
+                    'pekerjaan' => $p['pekerjaan'] ?? null,
+                ]);
+            }
+
+            Anak::query()->where('pegawai_pribadi_id', $pegawaiPribadi->id)->delete();
+            foreach ($seed['anak'] as $a) {
+                Anak::query()->create([
+                    'pegawai_pribadi_id' => $pegawaiPribadi->id,
+                    'nama_lengkap' => $a['nama_lengkap'],
+                    'tanggal_lahir' => $a['tanggal_lahir'],
+                    'status_anak' => $a['status_anak'] ?? null,
                 ]);
             }
 

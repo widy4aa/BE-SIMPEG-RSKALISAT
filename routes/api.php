@@ -3,7 +3,13 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChangeRequestAdminController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\DataKeluargaController;
 use App\Http\Controllers\Api\DiklatController;
+use App\Http\Controllers\Api\Keluarga\PasanganController;
+use App\Http\Controllers\Api\Keluarga\AnakController;
+use App\Http\Controllers\Api\Keluarga\OrangTuaController;
+use App\Http\Controllers\Api\Keluarga\KontakDaruratController;
+use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RiwayatKarirController;
@@ -48,6 +54,119 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/profile', [ProfileController::class, 'show']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/keluarga', [DataKeluargaController::class, 'index']);
+
+// Keluarga - Pasangan
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/keluarga/pasangan', [PasanganController::class, 'index']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/keluarga/pasangan', [PasanganController::class, 'store']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/keluarga/pasangan/{id}', [PasanganController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/keluarga/pasangan/{id}', [PasanganController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/keluarga/pasangan/{id}', [PasanganController::class, 'destroy']);
+
+// Keluarga - Anak
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/keluarga/anak', [AnakController::class, 'index']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/keluarga/anak', [AnakController::class, 'store']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/keluarga/anak/{id}', [AnakController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/keluarga/anak/{id}', [AnakController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/keluarga/anak/{id}', [AnakController::class, 'destroy']);
+
+// Keluarga - Orang Tua
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/keluarga/orang-tua', [OrangTuaController::class, 'index']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/keluarga/orang-tua', [OrangTuaController::class, 'store']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/keluarga/orang-tua/{id}', [OrangTuaController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/keluarga/orang-tua/{id}', [OrangTuaController::class, 'destroy']);
+
+// Keluarga - Kontak Darurat
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/keluarga/kontak-darurat', [KontakDaruratController::class, 'index']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->post('/keluarga/kontak-darurat', [KontakDaruratController::class, 'store']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->patch('/keluarga/kontak-darurat/{id}', [KontakDaruratController::class, 'update']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->delete('/keluarga/kontak-darurat/{id}', [KontakDaruratController::class, 'destroy']);
+
+// Master Data
+Route::middleware([
+    JwtAuthMiddleware::class,
+])->prefix('form')->group(function () {
+    Route::get('/kategori-diklat', [MasterDataController::class, 'kategoriDiklat']);
+    Route::get('/tipe-diklat', [MasterDataController::class, 'tipeDiklat']);
+    Route::get('/jenis-pegawai', [MasterDataController::class, 'jenisPegawai']);
+    Route::get('/unit-kerja', [MasterDataController::class, 'unitKerja']);
+    Route::get('/jenis-biaya', [MasterDataController::class, 'jenisBiaya']);
+    Route::get('/golongan-ruang', [MasterDataController::class, 'golonganRuang']);
+    Route::get('/profesi', [MasterDataController::class, 'profesi']);
+    Route::get('/jenis-sip', [MasterDataController::class, 'jenisSip']);
+});
 
 Route::middleware([
     JwtAuthMiddleware::class,
