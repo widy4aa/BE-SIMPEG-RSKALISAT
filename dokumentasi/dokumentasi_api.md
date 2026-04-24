@@ -38,34 +38,29 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 9. [Riwayat Karir — SIP](#13-riwayat-karir-sip)
 10. [Riwayat Karir — STR](#14-riwayat-karir-str)
 11. [Riwayat Karir — Penugasan Klinis](#15-riwayat-karir-penugasan-klinis)
+12. [Data Keluarga](#data-keluarga)
+    - [Ringkasan Data Keluarga](#1-get-ringkasan-data-keluarga)
+    - [Modul Pasangan](#2-modul-pasangan)
+    - [Modul Anak](#3-modul-anak)
+    - [Modul Orang Tua](#4-modul-orang-tua)
+    - [Modul Kontak Darurat](#5-modul-kontak-darurat)
+13. [Master Data (Dropdown)](#master-data-form-dropdowns)
 
 **BAB IV — Ringkasan Endpoint Per Role**
-1. [Admin](#admin)
+1. [Admin](#admin) *(termasuk Admin Approval Change Request)*
+   - [List Change Request](#10-list-change-request-admin)
+   - [Detail Change Request](#11-detail-change-request-admin)
+   - [Accept Change Request](#12-accept-change-request-admin)
+   - [Reject Change Request](#13-reject-change-request-admin)
 2. [Pegawai](#pegawai)
 3. [HRD](#hrd)
 4. [Direktur](#direktur)
 
-**BAB V — Admin: Approval Change Request**
-1. [List Change Request](#10-list-change-request-admin)
-2. [Detail Change Request](#11-detail-change-request-admin)
-3. [Accept Change Request](#12-accept-change-request-admin)
-4. [Reject Change Request](#13-reject-change-request-admin)
-
-**BAB VI — Data Keluarga**
-1. [Ringkasan Data Keluarga](#1-get-ringkasan-data-keluarga)
-2. [Modul Pasangan](#2-modul-pasangan)
-3. [Modul Anak](#3-modul-anak)
-4. [Modul Orang Tua](#4-modul-orang-tua)
-5. [Modul Kontak Darurat](#5-modul-kontak-darurat)
-
-**BAB VII — Master Data (Dropdown)**
-1. [List Endpoint Master Data](#master-data-form-dropdowns)
-
-**BAB VIII — Data Uji & Simulasi**
+**BAB V — Data Uji & Simulasi**
 1. [Akun Seeder](#akun-seeder-untuk-uji-login)
 2. [Quick Test via cURL](#quick-test-via-curl)
 
-**BAB IX — Postman**
+**BAB VI — Postman**
 1. [Postman Collection](#postman-collection)
 2. [Daftar Request di Collection](#daftar-request-di-collection)
 
@@ -1719,6 +1714,152 @@ Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint 
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
 - **Change Request (Admin only):** `GET /api/admin/change-requests`, `GET /api/admin/change-requests/{id}`, `PATCH /api/admin/change-requests/{id}/accept`, `PATCH /api/admin/change-requests/{id}/reject`
 
+#### Admin Approval Change Request
+
+Endpoint ini hanya bisa diakses oleh role `admin`. Digunakan untuk melihat dan memproses pengajuan perubahan data pegawai.
+
+##### 10. List Change Request (Admin)
+
+- Method: `GET`
+- URL: `/api/admin/change-requests`
+- Auth: Wajib Bearer token
+- Role: `admin`
+- Query opsional: `status` (`pending`|`approved`|`rejected`), `fitur` (contoh: `profile`)
+
+Response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Daftar pengajuan perubahan data berhasil diambil.",
+  "data": [
+    {
+      "id": 1,
+      "by_user": {
+        "id": 4,
+        "username": "3174010101010001",
+        "role": "pegawai",
+        "nama": "Budi Santoso"
+      },
+      "fitur": "profile",
+      "status": "pending",
+      "note": "Pengajuan dari profile update",
+      "jumlah_detail": 5,
+      "created_at": "2026-04-19 09:00:00",
+      "updated_at": "2026-04-19 09:00:00"
+    }
+  ]
+}
+```
+
+##### 11. Detail Change Request (Admin)
+
+- Method: `GET`
+- URL: `/api/admin/change-requests/{id}`
+- Auth: Wajib Bearer token
+- Role: `admin`
+
+Response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Detail pengajuan perubahan data berhasil diambil.",
+  "data": {
+    "id": 1,
+    "fitur": "profile",
+    "status": "pending",
+    "details": [
+      {
+        "id": 10,
+        "target_table": "pegawai_pribadi",
+        "kolom": "alamat",
+        "old_value": "Alamat lama",
+        "value": "Alamat baru"
+      }
+    ]
+  }
+}
+```
+
+Response `404 Not Found`:
+
+```json
+{
+  "success": false,
+  "message": "Pengajuan perubahan data tidak ditemukan."
+}
+```
+
+##### 12. Accept Change Request (Admin)
+
+- Method: `PATCH`
+- URL: `/api/admin/change-requests/{id}/accept`
+- Auth: Wajib Bearer token
+- Role: `admin`
+
+Request body (opsional):
+
+```json
+{
+  "note": "Data sudah valid dan bisa diterapkan"
+}
+```
+
+Catatan: hanya bisa untuk status `pending`. Untuk fitur `profile`, perubahan langsung diaplikasikan ke tabel `pegawai` dan `pegawai_pribadi`.
+
+Response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Pengajuan perubahan data berhasil disetujui.",
+  "data": {
+    "id": 1,
+    "status": "approved"
+  }
+}
+```
+
+Response `422 Unprocessable Entity`:
+
+```json
+{
+  "success": false,
+  "message": "Pengajuan sudah diproses sebelumnya."
+}
+```
+
+##### 13. Reject Change Request (Admin)
+
+- Method: `PATCH`
+- URL: `/api/admin/change-requests/{id}/reject`
+- Auth: Wajib Bearer token
+- Role: `admin`
+
+Request body (opsional):
+
+```json
+{
+  "note": "Dokumen pendukung belum sesuai"
+}
+```
+
+Catatan: hanya bisa untuk status `pending`. Data master tidak berubah, status berubah menjadi `rejected`.
+
+Response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Pengajuan perubahan data berhasil ditolak.",
+  "data": {
+    "id": 1,
+    "status": "rejected"
+  }
+}
+```
+
 ### Pegawai
 
 - **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
@@ -1761,159 +1902,6 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 - **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
 
-## Endpoint Admin Approval Change Request
-
-### 10. List Change Request (Admin)
-
-- Method: `GET`
-- URL: `/api/admin/change-requests`
-- Auth: Wajib Bearer token
-- Role yang diizinkan: `admin`
-- Query opsional:
-  - `status`: `pending` | `approved` | `rejected`
-  - `fitur`: contoh `profile`
-
-Contoh response `200 OK`:
-
-```json
-{
-  "success": true,
-  "message": "Daftar pengajuan perubahan data berhasil diambil.",
-  "data": [
-    {
-      "id": 1,
-      "by_user": {
-        "id": 4,
-        "username": "3174010101010001",
-        "role": "pegawai",
-        "nama": "Budi Santoso"
-      },
-      "fitur": "profile",
-      "status": "pending",
-      "note": "Pengajuan dari profile update",
-      "jumlah_detail": 5,
-      "created_at": "2026-04-19 09:00:00",
-      "updated_at": "2026-04-19 09:00:00"
-    }
-  ]
-}
-```
-
-### 11. Detail Change Request (Admin)
-
-- Method: `GET`
-- URL: `/api/admin/change-requests/{id}`
-- Auth: Wajib Bearer token
-- Role yang diizinkan: `admin`
-
-Contoh response `200 OK`:
-
-```json
-{
-  "success": true,
-  "message": "Detail pengajuan perubahan data berhasil diambil.",
-  "data": {
-    "id": 1,
-    "fitur": "profile",
-    "status": "pending",
-    "details": [
-      {
-        "id": 10,
-        "target_table": "pegawai_pribadi",
-        "kolom": "alamat",
-        "old_value": "Alamat lama",
-        "value": "Alamat baru"
-      }
-    ]
-  }
-}
-```
-
-Contoh response `404 Not Found`:
-
-```json
-{
-  "success": false,
-  "message": "Pengajuan perubahan data tidak ditemukan."
-}
-```
-
-### 12. Accept Change Request (Admin)
-
-- Method: `PATCH`
-- URL: `/api/admin/change-requests/{id}/accept`
-- Auth: Wajib Bearer token
-- Role yang diizinkan: `admin`
-
-Request body opsional:
-
-```json
-{
-  "note": "Data sudah valid dan bisa diterapkan"
-}
-```
-
-Perilaku:
-
-- Hanya bisa untuk status `pending`.
-- Untuk fitur `profile`, detail perubahan akan diaplikasikan ke tabel `pegawai` dan `pegawai_pribadi`.
-- Status pengajuan berubah menjadi `approved`.
-
-Contoh response `200 OK`:
-
-```json
-{
-  "success": true,
-  "message": "Pengajuan perubahan data berhasil disetujui.",
-  "data": {
-    "id": 1,
-    "status": "approved"
-  }
-}
-```
-
-Contoh response `422 Unprocessable Entity`:
-
-```json
-{
-  "success": false,
-  "message": "Pengajuan sudah diproses sebelumnya."
-}
-```
-
-### 13. Reject Change Request (Admin)
-
-- Method: `PATCH`
-- URL: `/api/admin/change-requests/{id}/reject`
-- Auth: Wajib Bearer token
-- Role yang diizinkan: `admin`
-
-Request body opsional:
-
-```json
-{
-  "note": "Dokumen pendukung belum sesuai"
-}
-```
-
-Perilaku:
-
-- Hanya bisa untuk status `pending`.
-- Tidak mengubah data pada tabel master profile.
-- Status pengajuan berubah menjadi `rejected`.
-
-Contoh response `200 OK`:
-
-```json
-{
-  "success": true,
-  "message": "Pengajuan perubahan data berhasil ditolak.",
-  "data": {
-    "id": 1,
-    "status": "rejected"
-  }
-}
-```
 
 ## Akun Seeder Untuk Uji Login
 
