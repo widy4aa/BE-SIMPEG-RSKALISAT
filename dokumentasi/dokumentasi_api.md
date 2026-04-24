@@ -1,72 +1,71 @@
 # Dokumentasi API BE-SIMPEG-RSKALISAT
 
-Dokumen ini berisi daftar endpoint API yang tersedia pada project backend ini.
+Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai RS Kalisat. Dokumen ini mencakup seluruh endpoint yang tersedia beserta format request, validasi, dan contoh response.
+
+---
 
 ## Daftar Isi
 
-BAB I Pendahuluan
-
+**BAB I — Pendahuluan**
 1. [Format Response Standar](#format-response-standar)
 2. [Authentication](#authentication)
 
-BAB II Endpoint Umum
+**BAB II — Endpoint Umum (Tanpa Login)**
+1. [Health Check](#1-health-check)
+2. [Login](#2-login)
 
-1. [Endpoint Umum (Tanpa Role)](#endpoint-umum-tanpa-role)
-2. [Health Check](#1-health-check)
-3. [Login](#2-login)
+**BAB III — Endpoint Semua Role**
+1. [Cek Role Login](#3-cek-role-login)
+2. [Dashboard](#4-dashboard)
+3. [Diklat](#5-diklat)
+   - [GET Diklat](#5-diklat)
+   - [POST Diklat (Pegawai)](#create-diklat-pegawai)
+   - [PATCH Diklat (Pegawai)](#edit-diklat-pegawai)
+   - [DELETE Diklat (Pegawai)](#delete-diklat-pegawai)
+4. [Profile](#6-profile)
+   - [GET Profile](#6-profile)
+   - [PATCH Ajukan Perubahan](#7-ajukan-perubahan-profile)
+   - [Upload Foto Profile](#8-upload-foto-profile-tanpa-approval)
+   - [Upload KTP](#81-upload-file-ktp-tanpa-approval)
+   - [Upload KK](#82-upload-file-kk-tanpa-approval)
+5. [Notifikasi](#9-notifikasi)
+   - [List Notifikasi](#91-list-notifikasi)
+   - [Tandai Dibaca](#92-tandai-1-notifikasi-sudah-dibaca)
+   - [Tandai Semua Dibaca](#93-tandai-semua-notifikasi-sudah-dibaca)
+6. [Riwayat Karir — Pendidikan](#10-riwayat-karir-pendidikan)
+7. [Riwayat Karir — Jabatan](#11-riwayat-karir-jabatan)
+8. [Riwayat Karir — Pangkat](#12-riwayat-karir-pangkat)
+9. [Riwayat Karir — SIP](#13-riwayat-karir-sip)
+10. [Riwayat Karir — STR](#14-riwayat-karir-str)
+11. [Riwayat Karir — Penugasan Klinis](#15-riwayat-karir-penugasan-klinis)
 
-BAB III Endpoint Untuk Semua Role Login
+**BAB IV — Ringkasan Endpoint Per Role**
+1. [Admin](#admin)
+2. [Pegawai](#pegawai)
+3. [HRD](#hrd)
+4. [Direktur](#direktur)
 
-1. [Endpoint Untuk Semua Role Login](#endpoint-untuk-semua-role-login)
-2. [Cek Role Login](#3-cek-role-login)
-3. [Dashboard](#4-dashboard)
-4. [Diklat](#5-diklat)
-5. [Response Diklat Per Role](#response-diklat-per-role)
-6. [Profile](#6-profile)
-7. [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
-8. [Ajukan Perubahan Profile](#7-ajukan-perubahan-profile)
-9. [Upload Foto Profile (Tanpa Approval)](#8-upload-foto-profile-tanpa-approval)
-10. [Upload File KTP (Tanpa Approval)](#81-upload-file-ktp-tanpa-approval)
-11. [Upload File KK (Tanpa Approval)](#82-upload-file-kk-tanpa-approval)
-12. [Notifikasi](#9-notifikasi)
-13. [List Notifikasi](#91-list-notifikasi)
-14. [Tandai 1 Notifikasi Sudah Dibaca](#92-tandai-1-notifikasi-sudah-dibaca)
-15. [Tandai Semua Notifikasi Sudah Dibaca](#93-tandai-semua-notifikasi-sudah-dibaca)
-16. [Riwayat Karir Pendidikan](#10-riwayat-karir-pendidikan)
-17. [Riwayat Karir Jabatan](#11-riwayat-karir-jabatan)
-
-BAB IV Endpoint Per Role
-
-1. [Endpoint Per Role](#endpoint-per-role)
-2. [Admin](#admin)
-3. [Pegawai](#pegawai)
-4. [HRD](#hrd)
-5. [Direktur](#direktur)
-
-BAB V Endpoint Admin Approval Change Request
-
+**BAB V — Admin: Approval Change Request**
 1. [List Change Request](#10-list-change-request-admin)
 2. [Detail Change Request](#11-detail-change-request-admin)
 3. [Accept Change Request](#12-accept-change-request-admin)
+4. [Reject Change Request](#13-reject-change-request-admin)
 
-BAB VI Data Keluarga
-1. [Get Ringkasan Data Keluarga](#1-get-ringkasan-data-keluarga)
+**BAB VI — Data Keluarga**
+1. [Ringkasan Data Keluarga](#1-get-ringkasan-data-keluarga)
 2. [Modul Pasangan](#2-modul-pasangan)
 3. [Modul Anak](#3-modul-anak)
 4. [Modul Orang Tua](#4-modul-orang-tua)
 5. [Modul Kontak Darurat](#5-modul-kontak-darurat)
 
-BAB VII Master Data (Form Dropdowns)
+**BAB VII — Master Data (Dropdown)**
 1. [List Endpoint Master Data](#master-data-form-dropdowns)
-4. [Reject Change Request](#13-reject-change-request-admin)
 
-BAB VI Data Uji dan Simulasi
-
-1. [Akun Seeder Untuk Uji Login](#akun-seeder-untuk-uji-login)
+**BAB VIII — Data Uji & Simulasi**
+1. [Akun Seeder](#akun-seeder-untuk-uji-login)
 2. [Quick Test via cURL](#quick-test-via-curl)
 
-BAB VII Postman
-
+**BAB IX — Postman**
 1. [Postman Collection](#postman-collection)
 2. [Daftar Request di Collection](#daftar-request-di-collection)
 
@@ -99,7 +98,7 @@ Endpoint yang dilindungi middleware JWT wajib mengirim header:
 Authorization: Bearer <jwt_token>
 ```
 
-## Endpoint Umum (Tanpa Role)
+## Endpoint Umum (Tanpa Login)
 
 ### 1. Health Check
 
@@ -194,9 +193,9 @@ Contoh response `403 Forbidden` (akun tidak aktif):
 }
 ```
 
-## Endpoint Untuk Semua Role Login
+## Endpoint Semua Role (Login Required)
 
-Endpoint di bagian ini bisa dipakai role `admin`, `pegawai`, `hrd`, dan `direktur`.
+Endpoint berikut bisa dipakai oleh role `admin`, `pegawai`, `hrd`, dan `direktur`. Wajib menyertakan token JWT.
 
 ### 3. Cek Role Login
 
@@ -1179,13 +1178,18 @@ Contoh response `200 OK`:
 
 ### 12. Riwayat Karir Pangkat
 
-Fitur untuk mengelola riwayat pangkat user yang sedang login.
+- URL dasar: `/api/riwayat-karir/pangkat`
+- Auth: Bearer token
+- Role: `admin`, `pegawai`, `hrd`, `direktur`
 
 #### GET Riwayat Pangkat
 
-Menampilkan daftar riwayat pangkat yang dimiliki user (diurutkan berdasarkan `started_at` menurun).
+- Method: `GET`
+- URL: `/api/riwayat-karir/pangkat`
 
-Contoh response `200 OK`:
+Data diurutkan berdasarkan `started_at` menurun.
+
+Response `200 OK`:
 
 ```json
 {
@@ -1213,20 +1217,34 @@ Contoh response `200 OK`:
 
 #### POST Riwayat Pangkat
 
-Menambahkan data riwayat pangkat baru untuk user yang sedang login beserta lampiran SK.
+- Method: `POST`
+- URL: `/api/riwayat-karir/pangkat`
+- Content-Type: `multipart/form-data`
 
-| Parameter | Tipe | Wajib | Keterangan |
-| :--- | :--- | :--- | :--- |
-| `nama_pangkat` | String | Ya | Nama pangkat |
-| `is_current` | Boolean (0/1) | Ya | Apakah pangkat ini masih aktif? |
-| `pejabat_penetap` | String | Tidak | Nama pejabat penetap |
-| `tmt_sk` | Date | Tidak | Tanggal sk pangkat (Format: YYYY-MM-DD) |
-| `started_at` | Date | Tidak | Tanggal mulai jabatan/pangkat |
-| `ended_at` | Date | Tidak | Tanggal selesai |
-| `sk_pangkat` | File | Tidak | File SK pangkat (max 5MB, format pdf/jpg/png) |
-| `note` | String | Tidak | Catatan tambahan |
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `nama_pangkat` | String | Ya | `required`, `string`, `max:255` | Nama pangkat |
+| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | Pangkat masih aktif? |
+| `pejabat_penetap` | String | Tidak | `nullable`, `string`, `max:255` | Nama pejabat penetap |
+| `tmt_sk` | Date | Tidak | `nullable`, `date` | Tanggal SK (YYYY-MM-DD) |
+| `started_at` | Date | Tidak | `nullable`, `date` | Tanggal mulai pangkat |
+| `ended_at` | Date | Tidak | `nullable`, `date`, `after_or_equal:started_at` | Tanggal selesai |
+| `sk_pangkat` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK (maks 5MB) |
+| `note` | String | Tidak | `nullable`, `string` | Catatan tambahan |
 
-Contoh response `201 Created`:
+Contoh raw input (form-data):
+
+```text
+nama_pangkat: Penata Tingkat I
+is_current: 1
+pejabat_penetap: Gubernur
+tmt_sk: 2024-01-01
+started_at: 2024-01-01
+sk_pangkat: <File Binary>
+note: Promosi
+```
+
+Response `201 Created`:
 
 ```json
 {
@@ -1248,20 +1266,23 @@ Contoh response `201 Created`:
 
 #### POST / PATCH Riwayat Pangkat (Update)
 
-Memperbarui sebagian data riwayat pangkat berdasarkan `{id}`.
-Untuk menghindari limitasi *multipart/form-data* di PHP, Anda dapat menggunakan *method* **`POST`** (tanpa perlu `_method=PATCH`). File SK lama akan otomatis dihapus jika Anda mengunggah file SK baru.
+- Method: `POST /api/riwayat-karir/pangkat/{id}` atau `PATCH /api/riwayat-karir/pangkat/{id}`
+- Content-Type: `multipart/form-data`
 
-Field request (*multipart/form-data*):
-- `nama_pangkat` (sometimes, string)
-- `is_current` (sometimes, boolean: 1/0)
-- `pejabat_penetap` (sometimes, string)
-- `tmt_sk` (sometimes, date)
-- `started_at` (sometimes, date)
-- `ended_at` (sometimes, date)
-- `sk_pangkat` (sometimes, file: pdf/jpg/png, max 5MB)
-- `note` (sometimes, string)
+Gunakan `POST` kalau kirim file (PHP tidak support file upload via `PATCH`). File SK lama otomatis dihapus saat upload file baru.
 
-Contoh response `200 OK`:
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `nama_pangkat` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nama pangkat |
+| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | Pangkat masih aktif? |
+| `pejabat_penetap` | String | Opsional | `sometimes`, `nullable`, `string`, `max:255` | Pejabat penetap |
+| `tmt_sk` | Date | Opsional | `sometimes`, `nullable`, `date` | Tanggal SK |
+| `started_at` | Date | Opsional | `sometimes`, `nullable`, `date` | Tanggal mulai |
+| `ended_at` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:started_at` | Tanggal selesai |
+| `sk_pangkat` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK (maks 5MB) |
+| `note` | String | Opsional | `sometimes`, `nullable`, `string` | Catatan |
+
+Response `200 OK`:
 
 ```json
 {
@@ -1282,9 +1303,12 @@ Contoh response `200 OK`:
 
 #### DELETE Riwayat Pangkat
 
-Menghapus riwayat pangkat beserta file SK-nya (jika ada) milik user yang sedang login.
+- Method: `DELETE`
+- URL: `/api/riwayat-karir/pangkat/{id}`
 
-Contoh response `200 OK`:
+Menghapus data pangkat beserta file SK-nya (kalau ada).
+
+Response `200 OK`:
 
 ```json
 {
@@ -1295,13 +1319,18 @@ Contoh response `200 OK`:
 
 ### 13. Riwayat Karir SIP
 
-Fitur untuk mengelola riwayat SIP (Surat Izin Praktik) user yang sedang login.
+- URL dasar: `/api/riwayat-karir/sip`
+- Auth: Bearer token
+- Role: `admin`, `pegawai`, `hrd`, `direktur`
 
 #### GET Riwayat SIP
 
-Menampilkan daftar riwayat SIP yang dimiliki user (diurutkan berdasarkan `tanggal_terbit` menurun).
+- Method: `GET`
+- URL: `/api/riwayat-karir/sip`
 
-Contoh response `200 OK`:
+Data diurutkan berdasarkan `tanggal_terbit` menurun.
+
+Response `200 OK`:
 
 ```json
 {
@@ -1328,18 +1357,31 @@ Contoh response `200 OK`:
 
 #### POST Riwayat SIP
 
-Menambahkan data riwayat SIP baru untuk user yang sedang login beserta lampirannya.
+- Method: `POST`
+- URL: `/api/riwayat-karir/sip`
+- Content-Type: `multipart/form-data`
 
-| Parameter | Tipe | Wajib | Keterangan |
-| :--- | :--- | :--- | :--- |
-| `jenis_sip_id` | Integer | Tidak | ID Jenis SIP |
-| `nomor_sip` | String | Ya | Nomor surat SIP |
-| `tanggal_terbit` | Date | Ya | Tanggal terbit (Format: YYYY-MM-DD) |
-| `tanggal_kadaluarsa` | Date | Ya | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Ya | Apakah SIP ini masih aktif? |
-| `sk_sip` | File | Tidak | File SK SIP (max 5MB, format pdf/jpg/png) |
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `jenis_sip_id` | Integer | Tidak | `nullable`, `exists:jenis_sip,id` | ID Jenis SIP (dari master data) |
+| `nomor_sip` | String | Ya | `required`, `string`, `max:255` | Nomor surat SIP |
+| `tanggal_terbit` | Date | Ya | `required`, `date` | Tanggal terbit (YYYY-MM-DD) |
+| `tanggal_kadaluarsa` | Date | Tidak | `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | SIP masih aktif? |
+| `sk_sip` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK SIP (maks 5MB) |
 
-Contoh response `201 Created`:
+Contoh raw input (form-data):
+
+```text
+jenis_sip_id: 1
+nomor_sip: SIP.Baru/789/2024
+tanggal_terbit: 2024-01-01
+tanggal_kadaluarsa: 2029-01-01
+is_current: 1
+sk_sip: <File Binary>
+```
+
+Response `201 Created`:
 
 ```json
 {
@@ -1360,18 +1402,21 @@ Contoh response `201 Created`:
 
 #### POST / PATCH Riwayat SIP (Update)
 
-Memperbarui sebagian data riwayat SIP berdasarkan `{id}`.
-Gunakan *method* **`POST`** (tanpa `_method=PATCH`) jika mengirim file untuk menghindari limitasi PHP. File SK lama otomatis dihapus.
+- Method: `POST /api/riwayat-karir/sip/{id}` atau `PATCH /api/riwayat-karir/sip/{id}`
+- Content-Type: `multipart/form-data`
 
-Field request (*multipart/form-data*):
-- `jenis_sip_id` (sometimes, integer)
-- `nomor_sip` (sometimes, string)
-- `tanggal_terbit` (sometimes, date)
-- `tanggal_kadaluarsa` (sometimes, date)
-- `is_current` (sometimes, boolean: 1/0)
-- `sk_sip` (sometimes, file: pdf/jpg/png, max 5MB)
+Gunakan `POST` kalau kirim file. File SK lama otomatis dihapus saat upload baru.
 
-Contoh response `200 OK`:
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `jenis_sip_id` | Integer | Opsional | `sometimes`, `nullable`, `exists:jenis_sip,id` | ID Jenis SIP |
+| `nomor_sip` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nomor SIP |
+| `tanggal_terbit` | Date | Opsional | `sometimes`, `required`, `date` | Tanggal terbit |
+| `tanggal_kadaluarsa` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | SIP masih aktif? |
+| `sk_sip` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK (maks 5MB) |
+
+Response `200 OK`:
 
 ```json
 {
@@ -1392,9 +1437,12 @@ Contoh response `200 OK`:
 
 #### DELETE Riwayat SIP
 
-Menghapus riwayat SIP beserta file-nya (jika ada) milik user yang sedang login.
+- Method: `DELETE`
+- URL: `/api/riwayat-karir/sip/{id}`
 
-Contoh response `200 OK`:
+Menghapus data SIP beserta file-nya (kalau ada).
+
+Response `200 OK`:
 
 ```json
 {
@@ -1405,13 +1453,18 @@ Contoh response `200 OK`:
 
 ### 14. Riwayat Karir STR
 
-Fitur untuk mengelola riwayat STR (Surat Tanda Registrasi) user yang sedang login.
+- URL dasar: `/api/riwayat-karir/str`
+- Auth: Bearer token
+- Role: `admin`, `pegawai`, `hrd`, `direktur`
 
 #### GET Riwayat STR
 
-Menampilkan daftar riwayat STR yang dimiliki user (diurutkan berdasarkan `tanggal_terbit` menurun).
+- Method: `GET`
+- URL: `/api/riwayat-karir/str`
 
-Contoh response `200 OK`:
+Data diurutkan berdasarkan `tanggal_terbit` menurun.
+
+Response `200 OK`:
 
 ```json
 {
@@ -1436,17 +1489,29 @@ Contoh response `200 OK`:
 
 #### POST Riwayat STR
 
-Menambahkan data riwayat STR baru untuk user yang sedang login beserta lampirannya.
+- Method: `POST`
+- URL: `/api/riwayat-karir/str`
+- Content-Type: `multipart/form-data`
 
-| Parameter | Tipe | Wajib | Keterangan |
-| :--- | :--- | :--- | :--- |
-| `nomor_str` | String | Ya | Nomor surat STR |
-| `tanggal_terbit` | Date | Ya | Tanggal terbit (Format: YYYY-MM-DD) |
-| `tanggal_kadaluarsa` | Date | Ya | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Ya | Apakah STR ini masih aktif? |
-| `sk_str` | File | Tidak | File SK STR (max 5MB, format pdf/jpg/png) |
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `nomor_str` | String | Ya | `required`, `string`, `max:255` | Nomor surat STR |
+| `tanggal_terbit` | Date | Ya | `required`, `date` | Tanggal terbit (YYYY-MM-DD) |
+| `tanggal_kadaluarsa` | Date | Tidak | `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | STR masih aktif? |
+| `sk_str` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK STR (maks 5MB) |
 
-Contoh response `201 Created`:
+Contoh raw input (form-data):
+
+```text
+nomor_str: STR.Baru/789/2024
+tanggal_terbit: 2024-01-01
+tanggal_kadaluarsa: 2029-01-01
+is_current: 1
+sk_str: <File Binary>
+```
+
+Response `201 Created`:
 
 ```json
 {
@@ -1465,17 +1530,20 @@ Contoh response `201 Created`:
 
 #### POST / PATCH Riwayat STR (Update)
 
-Memperbarui sebagian data riwayat STR berdasarkan `{id}`.
-Gunakan *method* **`POST`** (tanpa `_method=PATCH`) jika mengirim file untuk menghindari limitasi PHP. File SK lama otomatis dihapus.
+- Method: `POST /api/riwayat-karir/str/{id}` atau `PATCH /api/riwayat-karir/str/{id}`
+- Content-Type: `multipart/form-data`
 
-Field request (*multipart/form-data*):
-- `nomor_str` (sometimes, string)
-- `tanggal_terbit` (sometimes, date)
-- `tanggal_kadaluarsa` (sometimes, date)
-- `is_current` (sometimes, boolean: 1/0)
-- `sk_str` (sometimes, file: pdf/jpg/png, max 5MB)
+Gunakan `POST` kalau kirim file. File SK lama otomatis dihapus saat upload baru.
 
-Contoh response `200 OK`:
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `nomor_str` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nomor STR |
+| `tanggal_terbit` | Date | Opsional | `sometimes`, `required`, `date` | Tanggal terbit |
+| `tanggal_kadaluarsa` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | STR masih aktif? |
+| `sk_str` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK (maks 5MB) |
+
+Response `200 OK`:
 
 ```json
 {
@@ -1494,9 +1562,12 @@ Contoh response `200 OK`:
 
 #### DELETE Riwayat STR
 
-Menghapus riwayat STR beserta file-nya (jika ada) milik user yang sedang login.
+- Method: `DELETE`
+- URL: `/api/riwayat-karir/str/{id}`
 
-Contoh response `200 OK`:
+Menghapus data STR beserta file-nya (kalau ada).
+
+Response `200 OK`:
 
 ```json
 {
@@ -1507,13 +1578,18 @@ Contoh response `200 OK`:
 
 ### 15. Riwayat Karir Penugasan Klinis
 
-Fitur untuk mengelola riwayat penugasan klinis user yang sedang login.
+- URL dasar: `/api/riwayat-karir/penugasan-klinis`
+- Auth: Bearer token
+- Role: `admin`, `pegawai`, `hrd`, `direktur`
 
 #### GET Riwayat Penugasan Klinis
 
-Menampilkan daftar riwayat penugasan klinis yang dimiliki user (diurutkan berdasarkan `tgl_mulai` menurun).
+- Method: `GET`
+- URL: `/api/riwayat-karir/penugasan-klinis`
 
-Contoh response `200 OK`:
+Data diurutkan berdasarkan `tgl_mulai` menurun.
+
+Response `200 OK`:
 
 ```json
 {
@@ -1538,17 +1614,29 @@ Contoh response `200 OK`:
 
 #### POST Riwayat Penugasan Klinis
 
-Menambahkan data riwayat penugasan klinis baru untuk user yang sedang login beserta lampirannya.
+- Method: `POST`
+- URL: `/api/riwayat-karir/penugasan-klinis`
+- Content-Type: `multipart/form-data`
 
-| Parameter | Tipe | Wajib | Keterangan |
-| :--- | :--- | :--- | :--- |
-| `nomor_surat` | String | Ya | Nomor surat penugasan klinis |
-| `tgl_mulai` | Date | Ya | Tanggal mulai (Format: YYYY-MM-DD) |
-| `tgl_kadaluarsa` | Date | Ya | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Ya | Apakah penugasan ini masih aktif? |
-| `dokumen_file` | File | Tidak | File dokumen (max 5MB, format pdf/jpg/png) |
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `nomor_surat` | String | Ya | `required`, `string`, `max:255` | Nomor surat penugasan klinis |
+| `tgl_mulai` | Date | Ya | `required`, `date` | Tanggal mulai (YYYY-MM-DD) |
+| `tgl_kadaluarsa` | Date | Tidak | `nullable`, `date`, `after_or_equal:tgl_mulai` | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | Penugasan masih aktif? |
+| `dokumen_file` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File dokumen (maks 5MB) |
 
-Contoh response `201 Created`:
+Contoh raw input (form-data):
+
+```text
+nomor_surat: PK.Baru/789/2024
+tgl_mulai: 2024-01-01
+tgl_kadaluarsa: 2029-01-01
+is_current: 1
+dokumen_file: <File Binary>
+```
+
+Response `201 Created`:
 
 ```json
 {
@@ -1567,17 +1655,20 @@ Contoh response `201 Created`:
 
 #### POST / PATCH Riwayat Penugasan Klinis (Update)
 
-Memperbarui sebagian data riwayat penugasan klinis berdasarkan `{id}`.
-Gunakan *method* **`POST`** (tanpa `_method=PATCH`) jika mengirim file untuk menghindari limitasi PHP. File dokumen lama otomatis dihapus.
+- Method: `POST /api/riwayat-karir/penugasan-klinis/{id}` atau `PATCH /api/riwayat-karir/penugasan-klinis/{id}`
+- Content-Type: `multipart/form-data`
 
-Field request (*multipart/form-data*):
-- `nomor_surat` (sometimes, string)
-- `tgl_mulai` (sometimes, date)
-- `tgl_kadaluarsa` (sometimes, date)
-- `is_current` (sometimes, boolean: 1/0)
-- `dokumen_file` (sometimes, file: pdf/jpg/png, max 5MB)
+Gunakan `POST` kalau kirim file. File dokumen lama otomatis dihapus saat upload baru.
 
-Contoh response `200 OK`:
+| Parameter | Tipe | Wajib | Validasi | Keterangan |
+| :--- | :--- | :--- | :--- | :--- |
+| `nomor_surat` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nomor surat |
+| `tgl_mulai` | Date | Opsional | `sometimes`, `required`, `date` | Tanggal mulai |
+| `tgl_kadaluarsa` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:tgl_mulai` | Tanggal kedaluwarsa |
+| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | Penugasan masih aktif? |
+| `dokumen_file` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File dokumen (maks 5MB) |
+
+Response `200 OK`:
 
 ```json
 {
@@ -1596,9 +1687,12 @@ Contoh response `200 OK`:
 
 #### DELETE Riwayat Penugasan Klinis
 
-Menghapus riwayat penugasan klinis beserta file-nya (jika ada) milik user yang sedang login.
+- Method: `DELETE`
+- URL: `/api/riwayat-karir/penugasan-klinis/{id}`
 
-Contoh response `200 OK`:
+Menghapus data penugasan klinis beserta file-nya (kalau ada).
+
+Response `200 OK`:
 
 ```json
 {
@@ -1607,123 +1701,65 @@ Contoh response `200 OK`:
 }
 ```
 
-## Endpoint Per Role
+## Ringkasan Endpoint Per Role
+
+Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint butuh header `Authorization: Bearer <jwt_token>`.
 
 ### Admin
 
-- Endpoint utama:
-  - `GET /api/role`
-  - `GET /api/dashboard`
-  - `GET /api/diklat`
-  - `GET /api/profile`
-  - `PATCH /api/profile`
-  - `POST /api/profil/profil-picture`
-  - `POST /api/profile/profile-picture`
-  - `POST /api/profil/ktp`
-  - `POST /api/profile/kk`
-  - `GET /api/notifications`
-  - `PATCH /api/notifications/{id}/read`
-  - `PATCH /api/notifications/read-all`
-  - `GET /api/riwayat-karir/pendidikan`
-  - `POST /api/riwayat-karir/pendidikan`
-  - `PATCH /api/riwayat-karir/pendidikan/{id}`
-  - `DELETE /api/riwayat-karir/pendidikan/{id}`
-  - `GET /api/riwayat-karir/jabatan`
-  - `POST /api/riwayat-karir/jabatan`
-  - `PATCH /api/riwayat-karir/jabatan/{id}`
-  - `DELETE /api/riwayat-karir/jabatan/{id}`
-  - `GET /api/admin/change-requests`
-  - `GET /api/admin/change-requests/{id}`
-  - `PATCH /api/admin/change-requests/{id}/accept`
-  - `PATCH /api/admin/change-requests/{id}/reject`
-- Catatan dashboard:
-  - `message`: `Selamat datang admin`
-  - `data.dashboard.label`: `Dashboard admin`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
+- **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
+- **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
+- **Riwayat Jabatan:** `GET|POST /api/riwayat-karir/jabatan`, `PATCH|POST|DELETE /api/riwayat-karir/jabatan/{id}`
+- **Riwayat Pangkat:** `GET|POST /api/riwayat-karir/pangkat`, `PATCH|POST|DELETE /api/riwayat-karir/pangkat/{id}`
+- **Riwayat SIP:** `GET|POST /api/riwayat-karir/sip`, `PATCH|POST|DELETE /api/riwayat-karir/sip/{id}`
+- **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
+- **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
+- **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
+- **Change Request (Admin only):** `GET /api/admin/change-requests`, `GET /api/admin/change-requests/{id}`, `PATCH /api/admin/change-requests/{id}/accept`, `PATCH /api/admin/change-requests/{id}/reject`
 
 ### Pegawai
 
-- Endpoint utama:
-  - `GET /api/role`
-  - `GET /api/dashboard`
-  - `GET /api/diklat`
-  - `GET /api/profile`
-  - `PATCH /api/profile`
-  - `POST /api/profil/profil-picture`
-  - `POST /api/profile/profile-picture`
-  - `POST /api/profil/ktp`
-  - `POST /api/profile/kk`
-  - `GET /api/notifications`
-  - `PATCH /api/notifications/{id}/read`
-  - `PATCH /api/notifications/read-all`
-  - `GET /api/riwayat-karir/pendidikan`
-  - `POST /api/riwayat-karir/pendidikan`
-  - `PATCH /api/riwayat-karir/pendidikan/{id}`
-  - `DELETE /api/riwayat-karir/pendidikan/{id}`
-  - `GET /api/riwayat-karir/jabatan`
-  - `POST /api/riwayat-karir/jabatan`
-  - `PATCH /api/riwayat-karir/jabatan/{id}`
-  - `DELETE /api/riwayat-karir/jabatan/{id}`
-- Catatan dashboard:
-  - `message`: `Selamat datang pegawai`
-  - `data.dashboard` menampilkan ringkasan lengkap pegawai:
-    - identitas: `nama`, `nip`, `jabatan`, `jenis_jabatan`, `unit_kerja`
-    - diklat: `jumlah_diklat_selesai`, `jumlah_diklat_dijadwalkan_belum_selesai`, `list_jadwal_diklat_mendatang`
-    - notifikasi info: gunakan endpoint terpisah `GET /api/notifications`
-    - aksi: `list_aksi.status_str`, `list_aksi.status_data_keluarga`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Diklat (khusus pegawai):** `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`
+- **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
+- **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
+- **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
+- **Riwayat Jabatan:** `GET|POST /api/riwayat-karir/jabatan`, `PATCH|POST|DELETE /api/riwayat-karir/jabatan/{id}`
+- **Riwayat Pangkat:** `GET|POST /api/riwayat-karir/pangkat`, `PATCH|POST|DELETE /api/riwayat-karir/pangkat/{id}`
+- **Riwayat SIP:** `GET|POST /api/riwayat-karir/sip`, `PATCH|POST|DELETE /api/riwayat-karir/sip/{id}`
+- **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
+- **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
+- **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
+
+Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `unit_kerja`), diklat (`jumlah_diklat_selesai`, `jumlah_diklat_dijadwalkan_belum_selesai`, `list_jadwal_diklat_mendatang`), dan aksi (`list_aksi`).
 
 ### HRD
 
-- Endpoint utama:
-  - `GET /api/role`
-  - `GET /api/dashboard`
-  - `GET /api/diklat`
-  - `GET /api/profile`
-  - `PATCH /api/profile`
-  - `POST /api/profil/profil-picture`
-  - `POST /api/profile/profile-picture`
-  - `POST /api/profil/ktp`
-  - `POST /api/profile/kk`
-  - `GET /api/notifications`
-  - `PATCH /api/notifications/{id}/read`
-  - `PATCH /api/notifications/read-all`
-  - `GET /api/riwayat-karir/pendidikan`
-  - `POST /api/riwayat-karir/pendidikan`
-  - `PATCH /api/riwayat-karir/pendidikan/{id}`
-  - `DELETE /api/riwayat-karir/pendidikan/{id}`
-  - `GET /api/riwayat-karir/jabatan`
-  - `POST /api/riwayat-karir/jabatan`
-  - `PATCH /api/riwayat-karir/jabatan/{id}`
-  - `DELETE /api/riwayat-karir/jabatan/{id}`
-- Catatan dashboard:
-  - `message`: `Selamat datang hrd`
-  - `data.dashboard.label`: `Dashboard hrd`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
+- **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
+- **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
+- **Riwayat Jabatan:** `GET|POST /api/riwayat-karir/jabatan`, `PATCH|POST|DELETE /api/riwayat-karir/jabatan/{id}`
+- **Riwayat Pangkat:** `GET|POST /api/riwayat-karir/pangkat`, `PATCH|POST|DELETE /api/riwayat-karir/pangkat/{id}`
+- **Riwayat SIP:** `GET|POST /api/riwayat-karir/sip`, `PATCH|POST|DELETE /api/riwayat-karir/sip/{id}`
+- **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
+- **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
+- **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
 
 ### Direktur
 
-- Endpoint utama:
-  - `GET /api/role`
-  - `GET /api/dashboard`
-  - `GET /api/diklat`
-  - `GET /api/profile`
-  - `PATCH /api/profile`
-  - `POST /api/profil/profil-picture`
-  - `POST /api/profile/profile-picture`
-  - `POST /api/profil/ktp`
-  - `POST /api/profile/kk`
-  - `GET /api/notifications`
-  - `PATCH /api/notifications/{id}/read`
-  - `PATCH /api/notifications/read-all`
-  - `GET /api/riwayat-karir/pendidikan`
-  - `POST /api/riwayat-karir/pendidikan`
-  - `PATCH /api/riwayat-karir/pendidikan/{id}`
-  - `DELETE /api/riwayat-karir/pendidikan/{id}`
-  - `GET /api/riwayat-karir/jabatan`
-  - `POST /api/riwayat-karir/jabatan`
-  - `PATCH /api/riwayat-karir/jabatan/{id}`
-  - `DELETE /api/riwayat-karir/jabatan/{id}`
-- Catatan dashboard:
-  - `message`: `Selamat datang direktur`
-  - `data.dashboard.label`: `Dashboard direktur`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
+- **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
+- **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
+- **Riwayat Jabatan:** `GET|POST /api/riwayat-karir/jabatan`, `PATCH|POST|DELETE /api/riwayat-karir/jabatan/{id}`
+- **Riwayat Pangkat:** `GET|POST /api/riwayat-karir/pangkat`, `PATCH|POST|DELETE /api/riwayat-karir/pangkat/{id}`
+- **Riwayat SIP:** `GET|POST /api/riwayat-karir/sip`, `PATCH|POST|DELETE /api/riwayat-karir/sip/{id}`
+- **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
+- **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
+- **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
 
 ## Endpoint Admin Approval Change Request
 
@@ -2225,9 +2261,9 @@ Langkah pakai di Postman:
 5. Jalankan request lain sesuai kebutuhan test.
 
 
-## Data Keluarga
+## Data Keluarga (BAB VI)
 
-Bagian ini memuat dokumentasi seluruh layanan (CRUD) terkait Data Keluarga yang terbagi menjadi entitas independen: **Pasangan**, **Anak**, **Orang Tua**, dan **Kontak Darurat**. Seluruh endpoint mewajibkan penggunaan *Bearer Token* dari user (Pegawai/Admin/HRD).
+Dokumentasi CRUD Data Keluarga yang terbagi menjadi entitas: **Pasangan**, **Anak**, **Orang Tua**, dan **Kontak Darurat**. Semua endpoint butuh Bearer token.
 
 ---
 
