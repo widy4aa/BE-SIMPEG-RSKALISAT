@@ -7,22 +7,23 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * catatan sudah dimasukkan ke migration utama. Migration ini idempotent.
      */
     public function up(): void
     {
-        Schema::table('diklat', function (Blueprint $table) {
-            $table->text('catatan')->nullable()->after('jenis_pelaksanaan');
-        });
+        if (! Schema::hasColumn('diklat', 'catatan')) {
+            Schema::table('diklat', function (Blueprint $table) {
+                $table->text('catatan')->nullable()->after('jenis_pelaksanaan');
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('diklat', function (Blueprint $table) {
-            $table->dropColumn('catatan');
-        });
+        if (Schema::hasColumn('diklat', 'catatan')) {
+            Schema::table('diklat', function (Blueprint $table) {
+                $table->dropColumn('catatan');
+            });
+        }
     }
 };

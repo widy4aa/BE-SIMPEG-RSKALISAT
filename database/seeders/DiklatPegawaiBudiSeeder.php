@@ -106,8 +106,6 @@ class DiklatPegawaiBudiSeeder extends Seeder
                     'jenis_diklat_id' => $jenisDiklat->id,
                     'kategori_diklat_id' => $kategoriDiklat->id,
                     'created_by' => $pegawaiBudi->id,
-                    'status_kelayakan' => 'layak',
-                    'status_validasi' => 'valid',
                     'penyelenggara' => 'Bagian SDM RS Kalisat',
                     'tanggal_mulai' => $seed['tanggal_mulai'],
                     'tanggal_selesai' => $seed['tanggal_selesai'],
@@ -131,6 +129,8 @@ class DiklatPegawaiBudiSeeder extends Seeder
                     'sertif_file_path' => $seed['sertif_file_path'],
                     'no_sertif' => $seed['no_sertif'],
                     'uploaded_at' => $seed['uploaded_at'],
+                    'status_kelayakan' => 'layak',
+                    'status_validasi' => 'valid',
                 ]
             );
         }

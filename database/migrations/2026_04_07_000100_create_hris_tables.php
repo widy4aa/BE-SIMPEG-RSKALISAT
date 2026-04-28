@@ -284,6 +284,12 @@ return new class extends Migration
             $table->softDeletes();
         });
 
+        Schema::create('jenis_biaya', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama')->unique();
+            $table->timestamps();
+        });
+
         Schema::create('diklat', function (Blueprint $table) {
             $table->id();
             $table->foreignId('jenis_diklat_id')->nullable()->constrained('jenis_diklat')->nullOnDelete();
@@ -356,6 +362,7 @@ return new class extends Migration
         Schema::dropIfExists('notification');
         Schema::dropIfExists('list_jadwal_diklat');
         Schema::dropIfExists('diklat');
+        Schema::dropIfExists('jenis_biaya');
         Schema::dropIfExists('penugasan_klinis');
         Schema::dropIfExists('sip');
         Schema::dropIfExists('str');

@@ -8,34 +8,57 @@ return new class extends Migration
 {
     /**
      * Memindahkan status_kelayakan dan status_validasi dari tabel diklat ke list_jadwal_diklat.
-     * Juga menghapus kolom yang tidak relevan dari diklat, dan menambah sertif_file_path / no_sertif
-     * yang sebelumnya hilang dari list_jadwal_diklat.
+     * Idempotent — menggunakan hasColumn checks agar aman untuk fresh migration maupun incremental.
      */
     public function up(): void
     {
-        // 1. Tambahkan status_kelayakan dan status_validasi ke list_jadwal_diklat
+        // Tambahkan status_kelayakan dan status_validasi ke list_jadwal_diklat jika belum ada
         Schema::table('list_jadwal_diklat', function (Blueprint $table) {
-            $table->enum('status_kelayakan', ['layak', 'tidak layak'])->nullable()->after('status_diklat');
-            $table->enum('status_validasi', ['valid', 'tidak valid'])->nullable()->after('status_kelayakan');
+            if (! Schema::hasColumn('list_jadwal_diklat', 'status_kelayakan')) {
+                $table->enum('status_kelayakan', ['layak', 'tidak layak'])->nullable()->after('status_diklat');
+            }
+            if (! Schema::hasColumn('list_jadwal_diklat', 'status_validasi')) {
+                $table->enum('status_validasi', ['valid', 'tidak valid'])->nullable()->after('status_kelayakan');
+            }
         });
 
-        // 2. Hapus kolom yang sudah dipindah dari diklat
-        Schema::table('diklat', function (Blueprint $table) {
-            $table->dropColumn(['status_kelayakan', 'status_validasi']);
-        });
+        // Hapus kolom status dari diklat jika masih ada (kasus incremental migrate)
+        if (Schema::hasColumn('diklat', 'status_kelayakan') || Schema::hasColumn('diklat', 'status_validasi')) {
+            Schema::table('diklat', function (Blueprint $table) {
+                $cols = [];
+                if (Schema::hasColumn('diklat', 'status_kelayakan')) {
+                    $cols[] = 'status_kelayakan';
+                }
+                if (Schema::hasColumn('diklat', 'status_validasi')) {
+                    $cols[] = 'status_validasi';
+                }
+                if ($cols) {
+                    $table->dropColumn($cols);
+                }
+            });
+        }
     }
 
     public function down(): void
     {
         // Rollback: hapus kolom dari list_jadwal_diklat
         Schema::table('list_jadwal_diklat', function (Blueprint $table) {
-            $table->dropColumn(['status_kelayakan', 'status_validasi']);
+            if (Schema::hasColumn('list_jadwal_diklat', 'status_kelayakan')) {
+                $table->dropColumn('status_kelayakan');
+            }
+            if (Schema::hasColumn('list_jadwal_diklat', 'status_validasi')) {
+                $table->dropColumn('status_validasi');
+            }
         });
 
-        // Rollback: kembalikan kolom ke diklat
+        // Rollback: kembalikan kolom ke diklat jika belum ada
         Schema::table('diklat', function (Blueprint $table) {
-            $table->enum('status_kelayakan', ['layak', 'tidak layak'])->nullable()->after('nama_kegiatan');
-            $table->enum('status_validasi', ['valid', 'tidak valid'])->nullable()->after('status_kelayakan');
+            if (! Schema::hasColumn('diklat', 'status_kelayakan')) {
+                $table->enum('status_kelayakan', ['layak', 'tidak layak'])->nullable()->after('nama_kegiatan');
+            }
+            if (! Schema::hasColumn('diklat', 'status_validasi')) {
+                $table->enum('status_validasi', ['valid', 'tidak valid'])->nullable()->after('status_kelayakan');
+            }
         });
     }
 };

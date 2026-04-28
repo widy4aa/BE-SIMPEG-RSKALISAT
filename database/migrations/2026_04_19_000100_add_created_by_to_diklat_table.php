@@ -7,26 +7,28 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
-     * Run the migrations.
+     * Kolom created_by sudah dimasukkan ke migration utama 2026_04_07_000100_create_hris_tables.
+     * Migration ini dipertahankan agar history tidak rusak, namun tidak melakukan apa-apa.
      */
     public function up(): void
     {
-        Schema::table('diklat', function (Blueprint $table) {
-            $table->foreignId('created_by')
-                ->nullable()
-                ->after('kategori_diklat_id')
-                ->constrained('pegawai')
-                ->nullOnDelete();
-        });
+        if (! Schema::hasColumn('diklat', 'created_by')) {
+            Schema::table('diklat', function (Blueprint $table) {
+                $table->foreignId('created_by')
+                    ->nullable()
+                    ->after('kategori_diklat_id')
+                    ->constrained('pegawai')
+                    ->nullOnDelete();
+            });
+        }
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('diklat', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('created_by');
-        });
+        if (Schema::hasColumn('diklat', 'created_by')) {
+            Schema::table('diklat', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('created_by');
+            });
+        }
     }
 };
