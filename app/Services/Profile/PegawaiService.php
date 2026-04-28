@@ -26,10 +26,6 @@ class PegawaiService
             ?->firstWhere('is_current', true)
             ?? $pegawai?->jabatanPegawai?->first();
 
-        $currentUnitKerja = $pegawai?->unitKerjaPegawai
-            ?->firstWhere('is_current', true)
-            ?? $pegawai?->unitKerjaPegawai?->first();
-
         $currentPangkat = $pegawai?->pangkatPegawai
             ?->firstWhere('is_current', true)
             ?? $pegawai?->pangkatPegawai?->first();
@@ -43,7 +39,6 @@ class PegawaiService
             $pegawai?->pribadi?->updated_at,
             $currentProfesi?->updated_at,
             $currentJabatan?->updated_at,
-            $currentUnitKerja?->updated_at,
             $currentPangkat?->updated_at,
             $currentGolonganRuang?->updated_at,
         ])->filter()->max();
@@ -60,7 +55,7 @@ class PegawaiService
                 'jenis_pegawai' => (string) ($pegawai?->jenisPegawai?->nama ?? ''),
                 'profesi' => (string) ($currentProfesi?->profesi?->nama ?? $pegawai?->profesi?->nama ?? ''),
                 'pendidikan_terakhir' => (string) ($pegawai?->pribadi?->pendidikan_terakhir ?? ''),
-                'unit_kerja' => (string) ($currentUnitKerja?->unitKerja?->nama ?? ''),
+                'unit_kerja' => (string) ($currentJabatan?->jabatan?->unitKerja?->nama ?? $pegawai?->jabatan?->unitKerja?->nama ?? ''),
                 'jk' => (string) ($pegawai?->pribadi?->jenis_kelamin ?? ''),
                 'tanggal_lahir' => optional($pegawai?->pribadi?->tanggal_lahir)?->toDateString(),
                 'jabatan_sekarang' => (string) ($currentJabatan?->jabatan?->nama ?? $pegawai?->jabatan?->nama ?? ''),

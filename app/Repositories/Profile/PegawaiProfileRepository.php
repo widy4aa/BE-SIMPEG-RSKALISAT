@@ -17,9 +17,9 @@ class PegawaiProfileRepository
                 'pegawai.pangkat',
                 'pegawai.golonganRuang',
                 'pegawai.pribadi',
+                'pegawai.jabatan.unitKerja',
                 'pegawai.profesiPegawai.profesi',
-                'pegawai.jabatanPegawai.jabatan',
-                'pegawai.unitKerjaPegawai.unitKerja',
+                'pegawai.jabatanPegawai.jabatan.unitKerja',
                 'pegawai.pangkatPegawai.pangkat',
                 'pegawai.golonganRuangPegawai.golonganRuang',
             ])

@@ -22,9 +22,8 @@ class PegawaiDashboardRepository
                 'pribadi.orangTua',
                 'pribadi.kontakDarurat',
                 'pribadi.tanggunganLain',
-                'jabatan',
+                'jabatan.unitKerja',
                 'jenisPegawai',
-                'unitKerjaPegawai.unitKerja',
             ])
             ->where('user_id', $userId)
             ->first();

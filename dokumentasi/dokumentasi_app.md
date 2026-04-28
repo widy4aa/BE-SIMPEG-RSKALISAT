@@ -275,12 +275,21 @@ classDiagram
 
 ### 4.1 Penjelasan Fitur
 
-Endpoint `GET /api/dashboard` memberikan payload dashboard berdasarkan role. Untuk role `pegawai`, response berisi:
+Endpoint `GET /api/dashboard` memberikan payload dashboard berdasarkan role. 
+
+Untuk role `pegawai`, response berisi:
 
 1. Ringkasan data pegawai (nama, nip, jabatan, unit kerja, dll).
 2. Ringkasan diklat (selesai/belum selesai).
 3. `list_aksi` dari notifikasi `type=action` yang belum resolved.
 4. Notifikasi info dipisah ke endpoint `GET /api/notifications`.
+
+Untuk role `admin`, response berisi ringkasan:
+
+1. `jumlah_pegawai` (total seluruh pegawai)
+2. `jumlah_pegawai_aktif` (total pegawai dengan status_pegawai aktif)
+3. `jumlah_permintaan_update_data` (total seluruh pengajuan perubahan data)
+4. `jumlah_permintaan_disetujui` (total pengajuan perubahan data yang disetujui)
 
 ### 4.2 File Yang Dipakai
 
@@ -292,7 +301,8 @@ Endpoint `GET /api/dashboard` memberikan payload dashboard berdasarkan role. Unt
 6. `app/Services/Dashboard/HrdService.php`
 7. `app/Services/Dashboard/DirekturService.php`
 8. `app/Repositories/Dashboard/PegawaiDashboardRepository.php`
-9. `app/Services/Notification/NotificationActionSyncService.php`
+9. `app/Repositories/Dashboard/AdminDashboardRepository.php`
+10. `app/Services/Notification/NotificationActionSyncService.php`
 
 ### 4.3 Kode Yang Dipakai
 
@@ -342,6 +352,7 @@ classDiagram
 	class HrdService
 	class DirekturService
 	class PegawaiDashboardRepository
+	class AdminDashboardRepository
 	class NotificationActionSyncService
 
 	DashboardController --> DashboardService : getPayloadByRole
@@ -351,6 +362,7 @@ classDiagram
 	DashboardService --> DirekturService : role direktur
 	PegawaiService --> NotificationActionSyncService : sync actions
 	PegawaiService --> PegawaiDashboardRepository : fetch data
+	AdminService --> AdminDashboardRepository : fetch summary
 ```
 
 ---

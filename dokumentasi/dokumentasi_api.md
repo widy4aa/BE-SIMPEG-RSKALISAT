@@ -335,6 +335,27 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 }
 ```
 
+#### Response Dashboard Untuk Role Admin
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Selamat datang admin",
+  "data": {
+    "role": "admin",
+    "dashboard": {
+      "label": "Dashboard admin",
+      "jumlah_pegawai": 150,
+      "jumlah_pegawai_aktif": 145,
+      "jumlah_permintaan_update_data": 20,
+      "jumlah_permintaan_disetujui": 15
+    }
+  }
+}
+```
+
 ### 5. Diklat
 
 - Method: `GET`

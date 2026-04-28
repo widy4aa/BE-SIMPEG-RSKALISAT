@@ -20,10 +20,6 @@ class PegawaiService
 
         $pegawai = $this->pegawaiDashboardRepository->findPegawaiDashboardByUserId($userId);
 
-        $unitKerjaAktif = $pegawai?->unitKerjaPegawai
-            ?->firstWhere('is_current', true)
-            ?? $pegawai?->unitKerjaPegawai?->first();
-
         $listAksi = $this->pegawaiDashboardRepository
             ->getActiveActionNotificationsByUserId($userId)
             ->map(function ($notification) {
@@ -65,7 +61,7 @@ class PegawaiService
                 'nip' => (string) ($pegawai?->nip ?? ''),
                 'jabatan' => (string) ($pegawai?->jabatan?->nama ?? ''),
                 'jenis_jabatan' => (string) ($pegawai?->jenisPegawai?->nama ?? ''),
-                'unit_kerja' => (string) ($unitKerjaAktif?->unitKerja?->nama ?? ''),
+                'unit_kerja' => (string) ($pegawai?->jabatan?->unitKerja?->nama ?? ''),
                 'jumlah_diklat_selesai' => (int) ($pegawai?->jumlah_diklat_selesai ?? 0),
                 'jumlah_diklat_dijadwalkan_belum_selesai' => (int) ($pegawai?->jumlah_diklat_belum_selesai ?? 0),
                 'list_jadwal_diklat_mendatang' => $listJadwalDiklatMendatang,
