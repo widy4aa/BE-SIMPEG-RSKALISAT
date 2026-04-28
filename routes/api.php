@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\Keluarga\OrangTuaController;
 use App\Http\Controllers\Api\Keluarga\KontakDaruratController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PegawaiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RiwayatKarirController;
 use App\Http\Controllers\Api\RoleController;
@@ -29,6 +30,11 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/dashboard', [DashboardController::class, 'show']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,hrd,direktur',
+])->get('/pegawai', [PegawaiController::class, 'index']);
 
 Route::middleware([
     JwtAuthMiddleware::class,

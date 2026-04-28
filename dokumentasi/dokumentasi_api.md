@@ -1717,13 +1717,50 @@ Response `200 OK`:
 }
 ```
 
+### 16. Pegawai
+
+- Method: `GET`
+- URL: `/api/pegawai`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `hrd`, `direktur`
+
+Mengambil daftar seluruh pegawai beserta ringkasan jumlahnya. Saat ini implementasi detail hanya tersedia untuk role `admin`, sedangkan role lain akan menerima balasan dummy sementara.
+
+Contoh response `200 OK` (Untuk role `admin`):
+
+```json
+{
+  "success": true,
+  "message": "Data pegawai berhasil diambil",
+  "data": {
+    "total_pegawai": 100,
+    "jumlah_dokter": 10,
+    "jumlah_perawat": 30,
+    "jumlah_profesi": 15,
+    "pegawai": [
+      {
+        "id_pegawai": 1,
+        "nama": "Dr. Andi",
+        "nip": "198001012005011001",
+        "link_photo_profil": "http://localhost:8000/storage/photos/andi.jpg",
+        "jabatan": "Dokter Spesialis",
+        "unit_kerja": "Poli Penyakit Dalam",
+        "email": "andi@example.com",
+        "no_telp": "08123456789",
+        "status": "aktif"
+      }
+    ]
+  }
+}
+```
+
 ## Ringkasan Endpoint Per Role
 
 Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint butuh header `Authorization: Bearer <jwt_token>`.
 
 ### Admin
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
@@ -1899,7 +1936,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### HRD
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
@@ -1912,7 +1949,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### Direktur
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`

@@ -1546,6 +1546,33 @@
                             }
                         }
                     ]
+                },
+                {
+                    "name": "Get Pegawai",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/pegawai",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "pegawai"
+                            ]
+                        }
+                    }
                 }
             ]
         },

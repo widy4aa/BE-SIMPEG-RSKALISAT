@@ -101,6 +101,12 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#173-kode-yang-dipakai)
 	4. [Flowchart](#174-flowchart)
 	5. [Class Diagram](#175-class-diagram)
+18. [Bab 18 - Fitur Pegawai API](#bab-18---fitur-pegawai-api)
+	1. [Penjelasan fitur](#181-penjelasan-fitur)
+	2. [File yang dipakai](#182-file-yang-dipakai)
+	3. [Kode yang dipakai](#183-kode-yang-dipakai)
+	4. [Flowchart](#184-flowchart)
+	5. [Class Diagram](#185-class-diagram)
 
 ---
 
@@ -1441,3 +1447,76 @@ classDiagram
 	RiwayatKarirController --> PenugasanKlinisService : get/create/update/delete
 	PenugasanKlinisService --> PenugasanKlinisRepository : query/insert/update/delete
 ```
+
+---
+
+## Bab 18 - Fitur Pegawai API
+
+### 18.1 Penjelasan Fitur
+
+Endpoint `GET /api/pegawai` digunakan oleh role `admin`, `hrd`, dan `direktur` untuk melihat daftar seluruh pegawai serta perhitungan ringkasan data (seperti total pegawai, jumlah dokter, perawat, dan variasi profesi).
+Saat ini implementasi logik hanya dilakukan pada role `admin`, sedangkan role lainnya dikembalikan dengan data kosong (*dummy*).
+
+### 18.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/PegawaiController.php`
+3. `app/Services/Pegawai/PegawaiService.php`
+4. `app/Services/Pegawai/AdminPegawaiService.php`
+5. `app/Services/Pegawai/HrdPegawaiService.php`
+6. `app/Services/Pegawai/DirekturPegawaiService.php`
+7. `app/Repositories/Pegawai/AdminPegawaiRepository.php`
+
+### 18.3 Kode Yang Dipakai
+
+```php
+public function index(Request $request): JsonResponse
+{
+    $claims = $request->attributes->get('_jwt_claims', []);
+    $role = strtolower((string) ($claims['role'] ?? ''));
+
+    $payload = $this->pegawaiService->getPayloadByRole($role);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Data pegawai berhasil diambil',
+        'data' => $payload,
+    ]);
+}
+```
+
+### 18.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[GET /api/pegawai] --> B[JwtAuthMiddleware & RoleMiddleware]
+	B --> C[PegawaiController index]
+	C --> D[PegawaiService dispatcher]
+	D --> E{Cek Role}
+	E -- admin --> F[AdminPegawaiService]
+	F --> G[AdminPegawaiRepository]
+	G --> H[Hitung Statistik & Mapping]
+	E -- hrd/direktur --> I[Hrd/DirekturPegawaiService]
+	I --> J[Return Dummy]
+	H --> K[Response Payload]
+	J --> K
+```
+
+### 18.5 Class Diagram
+
+```mermaid
+classDiagram
+	class PegawaiController
+	class PegawaiService
+	class AdminPegawaiService
+	class HrdPegawaiService
+	class DirekturPegawaiService
+	class AdminPegawaiRepository
+
+	PegawaiController --> PegawaiService : getPayloadByRole
+	PegawaiService --> AdminPegawaiService : role admin
+	PegawaiService --> HrdPegawaiService : role hrd
+	PegawaiService --> DirekturPegawaiService : role direktur
+	AdminPegawaiService --> AdminPegawaiRepository : fetch all pegawai
+```
+
