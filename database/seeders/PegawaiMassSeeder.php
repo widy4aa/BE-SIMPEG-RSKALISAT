@@ -218,6 +218,8 @@ class PegawaiMassSeeder extends Seeder
                         'no_sertif' => $faker->numerify('SRT-####-####'),
                         'uploaded_at' => now(),
                         'status_diklat' => 'sudah terlaksana',
+                        'status_kelayakan' => $faker->randomElement(['layak', 'tidak layak']),
+                        'status_validasi' => $faker->randomElement(['valid', 'tidak valid']),
                     ]);
                 }
             });

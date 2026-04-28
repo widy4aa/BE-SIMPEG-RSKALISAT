@@ -151,8 +151,6 @@ class PegawaiService
                 'kategori_diklat_id' => (int) $kategori->id,
                 'created_by' => (int) $pegawai->id,
                 'nama_kegiatan' => (string) $payload['nama_kegiatan'],
-                'status_kelayakan' => $statusKelayakan,
-                'status_validasi' => $statusValidasi,
                 'penyelenggara' => (string) $payload['penyelenggara'],
                 'tanggal_mulai' => $tanggalMulai->toDateString(),
                 'tanggal_selesai' => $tanggalSelesai->toDateString(),
@@ -172,6 +170,8 @@ class PegawaiService
                 'no_sertif' => (string) ($payload['no_sertif'] ?? ''),
                 'uploaded_at' => $sertifPath ? now() : null,
                 'status_diklat' => $statusDiklat,
+                'status_kelayakan' => $statusKelayakan,
+                'status_validasi' => $statusValidasi,
             ]);
 
             return [$diklat, $jadwal];
@@ -195,8 +195,8 @@ class PegawaiService
             'total_biaya' => $diklat->total_biaya,
             'catatan' => (string) ($diklat->catatan ?? ''),
             'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
-            'status_kelayakan' => $diklat->status_kelayakan,
-            'status_validasi' => $diklat->status_validasi,
+            'status_kelayakan' => $jadwal->status_kelayakan,
+            'status_validasi' => $jadwal->status_validasi,
         ];
     }
 
@@ -230,11 +230,11 @@ class PegawaiService
             }
         }
 
-        if ($jenisPelaksanaCurrent === 'internal' && (string) ($diklat->status_validasi ?? '') === 'valid') {
+        if ($jenisPelaksanaCurrent === 'internal' && (string) ($jadwal->status_validasi ?? '') === 'valid') {
             throw new InvalidArgumentException('Diklat internal yang sudah valid tidak bisa diedit.');
         }
 
-        if ($jenisPelaksanaCurrent === 'external' && (string) ($diklat->status_kelayakan ?? '') === 'layak') {
+        if ($jenisPelaksanaCurrent === 'external' && (string) ($jadwal->status_kelayakan ?? '') === 'layak') {
             throw new InvalidArgumentException('Diklat eksternal yang sudah layak tidak bisa diedit.');
         }
 
@@ -287,7 +287,7 @@ class PegawaiService
 
         if ($jenisPelaksanaCurrent === 'internal') {
             // Internal selalu layak; status validasi bisa valid/tidak valid/null sesuai proses verifikasi.
-            $diklat->status_kelayakan = 'layak';
+            $jadwal->status_kelayakan = 'layak';
 
             if (array_key_exists('jenis_biaya', $payload) && trim((string) ($payload['jenis_biaya'] ?? '')) !== '') {
                 $jenisBiaya = $this->pegawaiDiklatRepository->firstOrCreateJenisBiayaByNama((string) $payload['jenis_biaya']);
@@ -301,7 +301,7 @@ class PegawaiService
             // External tidak memerlukan validasi valid/tidak valid.
             $diklat->jenis_biaya_id = null;
             $diklat->total_biaya = null;
-            $diklat->status_validasi = null;
+            $jadwal->status_validasi = null;
         }
 
         if (array_key_exists('no_sertif', $payload)) {
@@ -351,8 +351,8 @@ class PegawaiService
             'total_biaya' => $diklat->total_biaya,
             'catatan' => (string) ($diklat->catatan ?? ''),
             'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
-            'status_kelayakan' => $diklat->status_kelayakan,
-            'status_validasi' => $diklat->status_validasi,
+            'status_kelayakan' => $jadwal->status_kelayakan,
+            'status_validasi' => $jadwal->status_validasi,
         ];
     }
 
@@ -377,8 +377,8 @@ class PegawaiService
         }
 
         $diklat = $jadwal->diklat;
-        $statusKelayakan = strtolower((string) ($diklat->status_kelayakan ?? ''));
-        $statusValidasi = strtolower((string) ($diklat->status_validasi ?? ''));
+        $statusKelayakan = strtolower((string) ($jadwal->status_kelayakan ?? ''));
+        $statusValidasi = strtolower((string) ($jadwal->status_validasi ?? ''));
 
         if ($statusKelayakan === 'layak' || $statusValidasi === 'valid') {
             throw new InvalidArgumentException('Diklat tidak bisa dihapus karena sudah masuk kelayakan atau sudah validasi.');

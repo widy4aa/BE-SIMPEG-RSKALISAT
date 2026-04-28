@@ -17,8 +17,6 @@ class Diklat extends Model
         'kategori_diklat_id',
         'created_by',
         'nama_kegiatan',
-        'status_kelayakan',
-        'status_validasi',
         'penyelenggara',
         'tanggal_mulai',
         'tanggal_selesai',

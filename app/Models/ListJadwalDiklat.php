@@ -19,6 +19,8 @@ class ListJadwalDiklat extends Model
         'no_sertif',
         'uploaded_at',
         'status_diklat',
+        'status_kelayakan',
+        'status_validasi',
     ];
 
     protected function casts(): array
