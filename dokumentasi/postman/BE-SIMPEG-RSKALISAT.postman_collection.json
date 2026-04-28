@@ -1573,6 +1573,34 @@
                             ]
                         }
                     }
+                },
+                {
+                    "name": "Generate CV",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/generate/cv",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "generate",
+                                "cv"
+                            ]
+                        }
+                    }
                 }
             ]
         },

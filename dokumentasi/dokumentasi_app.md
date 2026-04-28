@@ -107,6 +107,12 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#183-kode-yang-dipakai)
 	4. [Flowchart](#184-flowchart)
 	5. [Class Diagram](#185-class-diagram)
+19. [Bab 19 - Fitur Generate CV API](#bab-19---fitur-generate-cv-api)
+	1. [Penjelasan fitur](#191-penjelasan-fitur)
+	2. [File yang dipakai](#192-file-yang-dipakai)
+	3. [Kode yang dipakai](#193-kode-yang-dipakai)
+	4. [Flowchart](#194-flowchart)
+	5. [Class Diagram](#195-class-diagram)
 
 ---
 
@@ -1518,5 +1524,76 @@ classDiagram
 	PegawaiService --> HrdPegawaiService : role hrd
 	PegawaiService --> DirekturPegawaiService : role direktur
 	AdminPegawaiService --> AdminPegawaiRepository : fetch all pegawai
+```
+
+---
+
+## Bab 19 - Fitur Generate CV API
+
+### 19.1 Penjelasan Fitur
+
+Endpoint `GET /api/generate/cv` digunakan oleh seluruh role untuk mendapatkan *payload JSON* terstruktur yang siap dipakai untuk membangun atau mencetak dokumen riwayat hidup (CV). Format outputnya disesuaikan dengan kebutuhan frontend (berisi sub-objek header, profil, data_diri, array pendidikan, dan array diklat). Khusus untuk role `admin`, `hrd`, dan `direktur`, terdapat dukungan parameter URL opsional `?pegawai_id={id}` untuk menarik CV pegawai tertentu selain dirinya sendiri.
+
+### 19.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/CvController.php`
+3. `app/Services/Generate/CvService.php`
+4. `app/Repositories/Generate/CvRepository.php`
+
+### 19.3 Kode Yang Dipakai
+
+```php
+public function generateCvData(int $userId, string $role, ?int $requestedPegawaiId = null): array
+{
+    $pegawaiId = null;
+
+    if ($requestedPegawaiId !== null && in_array($role, ['admin', 'hrd', 'direktur'], true)) {
+        $pegawaiId = $requestedPegawaiId;
+    } else {
+        $pegawaiId = $this->cvRepository->getPegawaiIdByUserId($userId);
+    }
+
+    if (!$pegawaiId) {
+        throw new ModelNotFoundException('Data pegawai tidak ditemukan.');
+    }
+
+    $pegawai = $this->cvRepository->getPegawaiForCv($pegawaiId);
+    // Logika pemetaan data, kalkulasi usia masa kerja, dan validasi null...
+    return [ 'header' => [...], 'profil' => [...], ... ];
+}
+```
+
+### 19.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[GET /api/generate/cv?pegawai_id=] --> B[CvController]
+	B --> C[Ekstrak ID & Role JWT]
+	C --> D[Panggil CvService generateCvData]
+	D --> E{Apakah request_pegawai_id ada \ndan Role = Admin/HRD/Dir?}
+	E -- Ya --> F[Gunakan request_pegawai_id]
+	E -- Tidak --> G[Ambil pegawai_id login]
+	F --> H[CvRepository getPegawaiForCv]
+	G --> H
+	H --> I[Eager Load Relasi Pegawai]
+	I --> J[Kalkulasi Masa Kerja dgn Carbon]
+	J --> K[Pemetaan Mapping JSON]
+	K --> L[Return JSON Berisi CV]
+```
+
+### 19.5 Class Diagram
+
+```mermaid
+classDiagram
+	class CvController
+	class CvService
+	class CvRepository
+	class Pegawai
+	
+	CvController --> CvService : generateCvData(userId, role, requestedPegawaiId)
+	CvService --> CvRepository : getPegawaiIdByUserId
+	CvService --> CvRepository : getPegawaiForCv
+	CvRepository --> Pegawai : Eager Load Relasi
 ```
 

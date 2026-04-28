@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ChangeRequestAdminController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\CvController;
 use App\Http\Controllers\Api\DataKeluargaController;
 use App\Http\Controllers\Api\DiklatController;
 use App\Http\Controllers\Api\Keluarga\PasanganController;
@@ -40,6 +41,11 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/diklat', [DiklatController::class, 'index']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,pegawai,hrd,direktur',
+])->get('/generate/cv', [CvController::class, 'generate']);
 
 Route::middleware([
     JwtAuthMiddleware::class,

@@ -45,6 +45,8 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
     - [Modul Orang Tua](#4-modul-orang-tua)
     - [Modul Kontak Darurat](#5-modul-kontak-darurat)
 13. [Master Data (Dropdown)](#master-data-form-dropdowns)
+14. [Pegawai](#16-pegawai)
+15. [Generate CV](#17-generate-cv)
 
 **BAB IV — Ringkasan Endpoint Per Role**
 1. [Admin](#admin) *(termasuk Admin Approval Change Request)*
@@ -1754,13 +1756,81 @@ Contoh response `200 OK` (Untuk role `admin`):
 }
 ```
 
+### 17. Generate CV
+
+- Method: `GET`
+- URL: `/api/generate/cv`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+- Query opsional: `?pegawai_id={id}` (Hanya berlaku untuk role `admin`, `hrd`, dan `direktur` jika ingin melihat CV orang lain).
+
+Mengambil data terstruktur untuk pembuatan CV. Jika tidak menyertakan `pegawai_id`, otomatis akan menarik data milik pengguna yang sedang login.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Data CV berhasil diambil.",
+  "data": {
+    "header": {
+      "nama": "SITI RAHAYU NINGRUM, A.Md.Kep.",
+      "alamat": "Jl. Mawar No. 14, Kalisat, Jember",
+      "no_telp": "+62 813-5678-9012",
+      "email": "siti.rahayu@rsdkalisat.go.id"
+    },
+    "profil": {
+      "jabatan": "Perawat Terampil",
+      "profesi": "Perawat",
+      "unit_kerja": "Instalasi Rawat Inap RSD Kalisat",
+      "masa_kerja": "8 tahun 2 bulan"
+    },
+    "data_diri": {
+      "nip": "199002152012032001",
+      "nik": "3509121234567890",
+      "tanggal_lahir": "1990-02-15",
+      "jenis_kelamin": "P",
+      "golongan_ruang": "II/c",
+      "pangkat": "Pengatur",
+      "jabatan": "Perawat Terampil",
+      "unit_kerja": "Instalasi Rawat Inap RSD Kalisat",
+      "tmt_pns": "2012-03-01",
+      "status_kepegawaian": "PNS"
+    },
+    "pendidikan": [
+      {
+        "jenjang": "D-III",
+        "jurusan": "Keperawatan",
+        "institusi": "Politeknik Kesehatan Kemenkes Malang",
+        "tahun_lulus": 2011
+      }
+    ],
+    "diklat": [
+      {
+        "nama": "Pelatihan Basic Life Support (BLS)",
+        "jenis": "Teknis",
+        "pelaksana": "RSUD Dr. Soebandi Jember",
+        "tanggal_mulai": "2022-03-10",
+        "tanggal_selesai": "2022-03-12",
+        "jp": 24,
+        "no_sertif": "BLS-001/2022"
+      }
+    ],
+    "ttd": {
+      "kota": "Kalisat",
+      "tanggal": "2026-04-28"
+    }
+  }
+}
+```
+
 ## Ringkasan Endpoint Per Role
 
 Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint butuh header `Authorization: Bearer <jwt_token>`.
 
 ### Admin
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/generate/cv`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
@@ -1920,7 +1990,7 @@ Response `200 OK`:
 
 ### Pegawai
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/generate/cv`
 - **Diklat (khusus pegawai):** `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
@@ -1936,7 +2006,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### HRD
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/generate/cv`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
@@ -1949,7 +2019,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### Direktur
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/generate/cv`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
