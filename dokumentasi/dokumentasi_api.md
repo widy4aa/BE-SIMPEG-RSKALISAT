@@ -19,6 +19,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 2. [Dashboard](#4-dashboard)
 3. [Diklat](#5-diklat)
    - [GET Diklat](#5-diklat)
+  - [GET Diklat (All - HRD)](#get-diklat-all-hrd)
    - [POST Diklat (Pegawai)](#create-diklat-pegawai)
    - [PATCH Diklat (Pegawai)](#edit-diklat-pegawai)
    - [DELETE Diklat (Pegawai)](#delete-diklat-pegawai)
@@ -443,7 +444,8 @@ Authorization: Bearer <jwt_token>
 Keterangan implementasi saat ini:
 
 - Role `pegawai`: data diambil dari database melalui repository.
-- Role `admin`, `hrd`, `direktur`: payload ringkasan tetap dibedakan per role.
+- Role `admin`, `direktur`: payload ringkasan tetap dibedakan per role.
+- Role `hrd`: data diambil dari database berdasarkan peserta (hanya diklat yang diikuti HRD login).
 
 Contoh response role `pegawai`:
 
@@ -506,6 +508,8 @@ Keterangan field `riwayat_diklat` (role `pegawai`):
 - `sertif_file_path`: path file sertifikat diklat.
 - `no_sertif`: nomor sertifikat diklat.
 
+Untuk role `hrd`, field di `list_usulan` mengikuti struktur yang sama dengan `riwayat_diklat`.
+
 Aturan hitung `status`:
 
 - `mendatang`: hari ini < `tanggal_mulai`
@@ -516,7 +520,7 @@ Catatan bentuk payload:
 
 - `admin`: `ringkasan` + `list_diklat`
 - `pegawai`: `ringkasan` + `riwayat_diklat`
-- `hrd`: `ringkasan` + `list_usulan`
+- `hrd`: `ringkasan` + `list_usulan` (berisi riwayat diklat peserta HRD login)
 - `direktur`: `ringkasan` + `keputusan_terbaru`
 
 Catatan field `catatan`:
@@ -528,6 +532,82 @@ Catatan field `status`:
 
 - Status hitung by tanggal (`mendatang`, `berlangsung`, `selesai`) saat ini diterapkan pada item role `pegawai`.
 - Item role `admin`, `hrd`, dan `direktur` saat ini belum menggunakan field `status`.
+
+#### GET Diklat (All - HRD)
+
+- Method: `GET`
+- URL: `/api/diklat/all`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Endpoint ini menampilkan seluruh data diklat beserta atributnya untuk role HRD.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Data semua diklat berhasil diambil.",
+  "data": {
+    "total": 2,
+    "list": [
+      {
+        "id_diklat": 12,
+        "id_jadwal_diklat": 9,
+        "nama": "Workshop Pelayanan Prima",
+        "kategori": "Teknis",
+        "jenis": "ASN",
+        "pelaksana": "RS Kalisat",
+        "tanggal_mulai": "2026-05-10",
+        "tanggal_selesai": "2026-05-12",
+        "status": "belum terlaksana",
+        "tempat": "Aula RS",
+        "waktu": "08:00:00",
+        "created_by": "Admin SIMPEG",
+        "jp": 24,
+        "total_biaya": "2500000.00",
+        "jenis_biaya": "BLUD",
+        "jenis_pelaksana": "internal",
+        "catatan": "Usulan pelatihan unit SDM",
+        "pegawai_id": 3,
+        "pegawai_nama": "Budi Santoso",
+        "pegawai_nik": "3174010101010001",
+        "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",
+        "no_sertif": "SERTIF/SDM/2026/0099",
+        "status_kelayakan": "layak",
+        "status_validasi": null
+      }
+    ]
+  }
+}
+```
+
+Keterangan field `list`:
+
+- `id_diklat`: ID master diklat.
+- `id_jadwal_diklat`: ID jadwal diklat per peserta.
+- `nama`: nama kegiatan.
+- `kategori`: kategori diklat.
+- `jenis`: jenis diklat.
+- `pelaksana`: penyelenggara.
+- `tanggal_mulai`: tanggal mulai format `Y-m-d`.
+- `tanggal_selesai`: tanggal selesai format `Y-m-d`.
+- `status`: status diklat berdasarkan data jadwal (`status_diklat`).
+- `tempat`: lokasi.
+- `waktu`: jam pelaksanaan.
+- `created_by`: nama pembuat data.
+- `jp`: jumlah jam pelatihan.
+- `total_biaya`: nominal total biaya.
+- `jenis_biaya`: referensi jenis biaya.
+- `jenis_pelaksana`: `internal` atau `external`.
+- `catatan`: catatan tambahan.
+- `pegawai_id`: ID pegawai peserta.
+- `pegawai_nama`: nama pegawai peserta.
+- `pegawai_nik`: NIK pegawai peserta.
+- `sertif_file_path`: path file sertifikat.
+- `no_sertif`: nomor sertifikat.
+- `status_kelayakan`: status kelayakan.
+- `status_validasi`: status validasi.
 
 #### Create Diklat Pegawai
 

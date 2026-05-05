@@ -39,4 +39,9 @@ class DiklatService
     {
         return $this->pegawaiService->delete($diklatId, $userId);
     }
+
+    public function getAllDiklat(): array
+    {
+        return $this->hrdService->getAllDiklat();
+    }
 }

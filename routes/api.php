@@ -54,6 +54,11 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->get('/diklat/all', [DiklatController::class, 'all']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/generate/cv', [CvController::class, 'generate']);
 

@@ -780,12 +780,15 @@ Endpoint `PATCH /api/diklat/{id}` dipakai role `pegawai` untuk mengubah data dik
 
 Endpoint `DELETE /api/diklat/{id}` dipakai role `pegawai` untuk menghapus data diklat miliknya dengan aturan status tertentu.
 
+Endpoint `GET /api/diklat/all` dipakai role `hrd` untuk melihat seluruh data diklat beserta atribut detailnya (jadwal + relasi diklat + peserta).
+
 Pada implementasi saat ini, struktur payload antar role sudah dibedakan dan untuk role `pegawai` data sudah diambil dari database melalui repository.
 
 1. `admin`: ringkasan total program dan list diklat institusi.
 2. `pegawai`: ringkasan riwayat pribadi dan list riwayat diklat pegawai dari tabel `list_jadwal_diklat` + relasi `diklat`.
-3. `hrd`: ringkasan usulan dan list usulan diklat per unit.
+3. `hrd`: ringkasan riwayat dan list usulan diklat berdasarkan peserta (hanya diklat yang diikuti HRD login).
 4. `direktur`: ringkasan anggaran dan list keputusan terbaru.
+5. `hrd` (endpoint `/api/diklat/all`): list seluruh jadwal diklat dengan detail peserta.
 
 Aturan bisnis create (`POST /api/diklat`) role `pegawai`:
 
@@ -833,9 +836,9 @@ Field detail item diklat yang digunakan:
 
 Keterangan tambahan:
 
-1. Role `pegawai` mengambil field detail dari data database.
-2. Role `admin`, `hrd`, dan `direktur` saat ini masih dummy, namun detail item juga sudah mengembalikan field `catatan`.
-3. Field `status` by tanggal saat ini digunakan pada detail item role `pegawai`.
+1. Role `pegawai` dan `hrd` mengambil field detail dari data database.
+2. Role `admin` dan `direktur` saat ini masih dummy, namun detail item juga sudah mengembalikan field `catatan`.
+3. Field `status` by tanggal saat ini digunakan pada detail item role `pegawai` dan `hrd`.
 
 Aturan `status` by tanggal:
 
@@ -868,6 +871,11 @@ Route::middleware([
 	JwtAuthMiddleware::class,
 	RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/diklat', [DiklatController::class, 'index']);
+
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':hrd',
+])->get('/diklat/all', [DiklatController::class, 'all']);
 ```
 
 ```php
@@ -894,13 +902,25 @@ flowchart TD
 	E --> F{Role user}
 	F -- admin --> G[AdminService dummy]
 	F -- pegawai --> H[PegawaiService via repository]
-	F -- hrd --> I[HrdService dummy]
+	F -- hrd --> I[HrdService via repository]
 	F -- direktur --> J[DirekturService dummy]
 	H --> H1[PegawaiDiklatRepository query DB]
+	I --> I1[PegawaiDiklatRepository query DB]
 	G --> K[Return diklat payload]
 	H1 --> K
-	I --> K
+	I1 --> K
 	J --> K
+```
+
+```mermaid
+flowchart TD
+	A[GET api diklat/all] --> B[JwtAuthMiddleware]
+	B --> C[RoleMiddleware: hrd]
+	C --> D[DiklatController all]
+	D --> E[DiklatService getAllDiklat]
+	E --> F[HrdService getAllDiklat]
+	F --> G[PegawaiDiklatRepository getAllJadwalDiklat]
+	G --> H[Return list + total]
 ```
 
 ### 10.5 Class Diagram
@@ -921,6 +941,7 @@ classDiagram
 	PegawaiService --> PegawaiDiklatRepository : load riwayat dari DB
 	DiklatService --> HrdService : role hrd
 	DiklatService --> DirekturService : role direktur
+	HrdService --> PegawaiDiklatRepository : load riwayat (hrd)
 ```
 
 ---

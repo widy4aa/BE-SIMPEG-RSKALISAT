@@ -33,6 +33,20 @@ class PegawaiDiklatRepository
             ->get();
     }
 
+    public function getAllJadwalDiklat(): Collection
+    {
+        return ListJadwalDiklat::query()
+            ->with([
+                'diklat.kategoriDiklat',
+                'diklat.jenisDiklat',
+                'diklat.jenisBiaya',
+                'diklat.createdByPegawai',
+                'pegawai',
+            ])
+            ->orderByDesc('id')
+            ->get();
+    }
+
     public function firstOrCreateKategoriByNama(string $nama): KategoriDiklat
     {
         return KategoriDiklat::query()->firstOrCreate([

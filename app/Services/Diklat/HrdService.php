@@ -2,57 +2,128 @@
 
 namespace App\Services\Diklat;
 
+use App\Repositories\Diklat\PegawaiDiklatRepository;
+use Carbon\Carbon;
+
 class HrdService
 {
+    public function __construct(private readonly PegawaiDiklatRepository $pegawaiDiklatRepository)
+    {
+    }
+
     public function build(int $userId): array
     {
+        $pegawai = $this->pegawaiDiklatRepository->findPegawaiByUserId($userId);
+
+        $riwayatDiklat = $pegawai === null
+            ? collect()
+            : $this->pegawaiDiklatRepository->getRiwayatDiklatByPegawaiId((int) $pegawai->id);
+
+        $riwayat = $riwayatDiklat->map(function ($jadwal): array {
+            $diklat = $jadwal->diklat;
+            $tanggalMulai = $diklat?->tanggal_mulai;
+            $tanggalSelesai = $diklat?->tanggal_selesai;
+
+            return [
+                'id' => (int) ($diklat?->id ?? $jadwal->id),
+                'nama' => (string) ($diklat?->nama_kegiatan ?? ''),
+                'kategori' => (string) ($diklat?->kategoriDiklat?->nama ?? ''),
+                'jenis' => (string) ($diklat?->jenisDiklat?->nama ?? ''),
+                'pelaksana' => (string) ($diklat?->penyelenggara ?? ''),
+                'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
+                'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
+                'status' => $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai),
+                'tempat' => (string) ($diklat?->tempat ?? ''),
+                'waktu' => optional($diklat?->waktu)?->format('H:i:s'),
+                'created_by' => (string) ($diklat?->createdByPegawai?->nama ?? ''),
+                'jp' => $diklat?->jp,
+                'total_biaya' => $diklat?->total_biaya,
+                'jenis_biaya' => (string) ($diklat?->jenisBiaya?->nama ?? ''),
+                'jenis_pelaksana' => (string) ($diklat?->jenis_pelaksanaan ?? ''),
+                'catatan' => (string) ($diklat?->catatan ?? ''),
+                'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
+                'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
+            ];
+        })->values()->all();
+
         return [
             'welcome' => 'Daftar diklat untuk HRD berhasil diambil.',
             'summary' => [
                 'label' => 'Diklat hrd',
                 'ringkasan' => [
-                    'usulan_baru' => 8,
-                    'perlu_verifikasi' => 5,
-                    'disetujui_direktur' => 3,
+                    'total_riwayat' => $riwayatDiklat->count(),
+                    'selesai' => $riwayatDiklat->where('status_diklat', 'sudah terlaksana')->count(),
+                    'akan_datang' => $riwayatDiklat->where('status_diklat', 'belum terlaksana')->count(),
                 ],
-                'list_usulan' => [
-                    [
-                        'id' => 301,
-                        'nama' => 'Pelatihan Coding Dasar SIMRS',
-                        'kategori' => 'Teknis',
-                        'jenis' => 'ASN',
-                        'pelaksana' => 'Vendor SIMRS',
-                        'tanggal_mulai' => '2026-08-10',
-                        'tanggal_selesai' => '2026-08-12',
-                        'tempat' => 'Lab Komputer RS',
-                        'waktu' => '08:30:00',
-                        'created_by' => 'HRD SIMPEG',
-                        'jp' => 24,
-                        'total_biaya' => 6500000,
-                        'jenis_biaya' => 'Mandiri',
-                        'jenis_pelaksana' => 'external',
-                        'catatan' => 'Usulan pelatihan teknis implementasi modul coding SIMRS.',
-                    ],
-                    [
-                        'id' => 302,
-                        'nama' => 'Pelatihan Etika Pelayanan',
-                        'kategori' => 'Fungsional',
-                        'jenis' => 'Tenkes',
-                        'pelaksana' => 'Tim Diklat Internal',
-                        'tanggal_mulai' => '2026-09-01',
-                        'tanggal_selesai' => '2026-09-01',
-                        'tempat' => 'Aula Keperawatan',
-                        'waktu' => '09:00:00',
-                        'created_by' => 'HRD SIMPEG',
-                        'jp' => 8,
-                        'total_biaya' => 1500000,
-                        'jenis_biaya' => 'BLUD',
-                        'jenis_pelaksana' => 'internal',
-                        'catatan' => 'Penguatan budaya layanan prima untuk seluruh unit layanan.',
-                    ],
-                ],
-                'catatan' => 'Data diklat masih dummy untuk role hrd.',
+                'list_usulan' => $riwayat,
+                'catatan' => 'Data diklat HRD diambil dari database berdasarkan peserta.',
             ],
         ];
+    }
+
+    public function getAllDiklat(): array
+    {
+        $jadwalList = $this->pegawaiDiklatRepository->getAllJadwalDiklat();
+
+        $items = $jadwalList->map(function ($jadwal): array {
+            $diklat = $jadwal->diklat;
+            $tanggalMulai = $diklat?->tanggal_mulai;
+            $tanggalSelesai = $diklat?->tanggal_selesai;
+
+            return [
+                'id_diklat' => (int) ($diklat?->id ?? 0),
+                'id_jadwal_diklat' => (int) $jadwal->id,
+                'nama' => (string) ($diklat?->nama_kegiatan ?? ''),
+                'kategori' => (string) ($diklat?->kategoriDiklat?->nama ?? ''),
+                'jenis' => (string) ($diklat?->jenisDiklat?->nama ?? ''),
+                'pelaksana' => (string) ($diklat?->penyelenggara ?? ''),
+                'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
+                'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
+                'status' => (string) ($jadwal->status_diklat ?? ''),
+                'tempat' => (string) ($diklat?->tempat ?? ''),
+                'waktu' => optional($diklat?->waktu)?->format('H:i:s'),
+                'created_by' => (string) ($diklat?->createdByPegawai?->nama ?? ''),
+                'jp' => $diklat?->jp,
+                'total_biaya' => $diklat?->total_biaya,
+                'jenis_biaya' => (string) ($diklat?->jenisBiaya?->nama ?? ''),
+                'jenis_pelaksana' => (string) ($diklat?->jenis_pelaksanaan ?? ''),
+                'catatan' => (string) ($diklat?->catatan ?? ''),
+                'pegawai_id' => (int) ($jadwal->pegawai?->id ?? 0),
+                'pegawai_nama' => (string) ($jadwal->pegawai?->nama ?? ''),
+                'pegawai_nik' => (string) ($jadwal->pegawai?->nik ?? ''),
+                'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
+                'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
+                'status_kelayakan' => (string) ($jadwal->status_kelayakan ?? ''),
+                'status_validasi' => (string) ($jadwal->status_validasi ?? ''),
+            ];
+        })->values()->all();
+
+        return [
+            'total' => count($items),
+            'list' => $items,
+        ];
+    }
+
+    private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
+    {
+        $today = Carbon::today();
+
+        $mulai = $tanggalMulai instanceof Carbon
+            ? $tanggalMulai->copy()->startOfDay()
+            : ($tanggalMulai ? Carbon::parse($tanggalMulai)->startOfDay() : null);
+
+        $selesai = $tanggalSelesai instanceof Carbon
+            ? $tanggalSelesai->copy()->startOfDay()
+            : ($tanggalSelesai ? Carbon::parse($tanggalSelesai)->startOfDay() : null);
+
+        if ($mulai !== null && $today->lt($mulai)) {
+            return 'mendatang';
+        }
+
+        if ($selesai !== null && $today->gt($selesai)) {
+            return 'selesai';
+        }
+
+        return 'berlangsung';
     }
 }

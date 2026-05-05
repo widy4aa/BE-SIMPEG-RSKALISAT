@@ -41,6 +41,27 @@ class DiklatController extends Controller
         ]);
     }
 
+    public function all(Request $request): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
+
+        if ($role !== 'hrd') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Role tidak memiliki akses untuk melihat semua data diklat.',
+            ], 403);
+        }
+
+        $diklat = $this->diklatService->getAllDiklat();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Data semua diklat berhasil diambil.',
+            'data' => $diklat,
+        ]);
+    }
+
     public function store(StorePegawaiDiklatRequest $request): JsonResponse
     {
         $claims = $request->input('_jwt_claims', []);
