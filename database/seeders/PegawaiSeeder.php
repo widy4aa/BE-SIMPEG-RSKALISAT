@@ -297,7 +297,7 @@ class PegawaiSeeder extends Seeder
             $user = User::query()->updateOrCreate(
                 ['username' => $seed['nik']],
                 [
-                    'password' => Hash::make('servernyamanabang'),
+                    'password' => Hash::make('password'),
                     'role' => $seed['role'],
                     'is_active' => true,
                 ]

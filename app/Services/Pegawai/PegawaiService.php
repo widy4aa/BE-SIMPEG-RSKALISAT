@@ -20,4 +20,20 @@ class PegawaiService
             default => null,
         };
     }
+
+    public function createPegawai(string $role, array $data): ?array
+    {
+        return match ($role) {
+            'admin' => $this->adminService->createPegawai($data),
+            default => null,
+        };
+    }
+
+    public function changeRole(string $adminRole, int $pegawaiId, string $newRole, int $adminUserId): ?array
+    {
+        return match ($adminRole) {
+            'admin' => $this->adminService->changeRole($pegawaiId, $newRole, $adminUserId),
+            default => null,
+        };
+    }
 }

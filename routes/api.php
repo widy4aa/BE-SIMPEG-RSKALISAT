@@ -39,6 +39,16 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin',
+])->post('/pegawai', [PegawaiController::class, 'store']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin',
+])->patch('/pegawai/{id}/change-role', [PegawaiController::class, 'changeRole']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/diklat', [DiklatController::class, 'index']);
 

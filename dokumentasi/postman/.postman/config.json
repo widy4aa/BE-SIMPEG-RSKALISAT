@@ -1,0 +1,17 @@
+{
+  "workspace": {
+    "id": "0806085b-de27-47d3-834d-4fbd7399ae5a"
+  },
+  "entities": {
+    "environments": [
+      "..\\BE-SIMPEG-RSKALISAT.local.postman_environment.json"
+    ],
+    "flows": [],
+    "globals": [],
+    "mocks": [],
+    "specs": [],
+    "collections": [
+      "..\\BE-SIMPEG-RSKALISAT.postman_collection.json"
+    ]
+  }
+}

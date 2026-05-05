@@ -358,6 +358,57 @@ Contoh response `200 OK`:
 }
 ```
 
+#### Response Dashboard Untuk Role HRD
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Selamat datang hrd",
+  "data": {
+    "role": "hrd",
+    "dashboard": {
+      "label": "Dashboard hrd",
+      "pegawai": {
+        "total_pegawai": 15,
+        "total_pegawai_kurang_lengkap": 1,
+        "total_pegawai_lengkap": 14,
+        "jenis_pegawai": {
+          "PNS": 7,
+          "BLUD": 3
+        },
+        "profesi": {
+          "Dokter": 4,
+          "Perawat": 1
+        },
+        "tingkat_pendidikan": {
+          "S1/D4": 5,
+          "S2": 5
+        },
+        "tahun_masuk_5_tahun_terakhir": {
+          "2022": 0,
+          "2023": 1,
+          "2024": 0,
+          "2025": 0,
+          "2026": 0
+        }
+      },
+      "diklat_asn": {
+        "total_diklat": 12,
+        "selesai": 8,
+        "berlangsung": 4
+      },
+      "diklat_tenkes": {
+        "total_diklat": 20,
+        "selesai": 15,
+        "berlangsung": 5
+      }
+    }
+  }
+}
+```
+
 ### 5. Diklat
 
 - Method: `GET`
@@ -1755,6 +1806,89 @@ Contoh response `200 OK` (Untuk role `admin`):
   }
 }
 ```
+
+#### Tambah Data Pegawai Baru (Hanya Admin)
+
+- **Route:** `POST /api/pegawai`
+- **Body Type:** `application/json`
+- **Auth:** Wajib Bearer token
+- **Role yang diizinkan:** `admin`
+
+Digunakan oleh Admin untuk membuat data pegawai baru dengan informasi yang sangat dasar (NIK, Nama, Password). Akun `User` untuk pegawai tersebut akan terbuat otomatis.
+
+- **Request Payload:**
+
+| Field | Type | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nik` | String | Ya | NIK Pegawai (Max 16 karakter, harus unik) |
+| `nama` | String | Ya | Nama Pegawai |
+| `password` | String | Ya | Password untuk akun Pegawai (Min 6 karakter) |
+
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "nik": "3509191234567890",
+    "nama": "Ahmad Subarjo",
+    "password": "password123"
+  }
+  ```
+
+- **Response:** `201 Created`
+  ```json
+  {
+    "success": true,
+    "message": "Pegawai berhasil ditambahkan",
+    "data": {
+      "id": 101,
+      "nik": "3509191234567890",
+      "nama": "Ahmad Subarjo"
+    }
+  }
+  ```
+
+#### Ubah Role Pegawai (Hanya Admin)
+
+- **Route:** `PATCH /api/pegawai/{id}/change-role`
+- **Body Type:** `application/json`
+- **Auth:** Wajib Bearer token
+- **Role yang diizinkan:** `admin`
+
+Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada. Catatan: Admin tidak dapat mengubah rolenya sendiri.
+
+- **Request Payload:**
+
+| Field | Type | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `role` | String | Ya | Salah satu dari: `pegawai`, `admin`, `hrd`, `direktur` |
+
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "role": "hrd"
+  }
+  ```
+
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Role pegawai berhasil diubah",
+    "data": {
+      "id": 101,
+      "nik": "3509191234567890",
+      "nama": "Ahmad Subarjo",
+      "role": "hrd"
+    }
+  }
+  ```
+
+- **Response Gagal (Mengubah diri sendiri):** `400 Bad Request`
+  ```json
+  {
+    "success": false,
+    "message": "Tidak dapat mengubah role diri sendiri."
+  }
+  ```
 
 ### 17. Generate CV
 

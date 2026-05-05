@@ -314,7 +314,8 @@ Untuk role `admin`, response berisi ringkasan:
 7. `app/Services/Dashboard/DirekturService.php`
 8. `app/Repositories/Dashboard/PegawaiDashboardRepository.php`
 9. `app/Repositories/Dashboard/AdminDashboardRepository.php`
-10. `app/Services/Notification/NotificationActionSyncService.php`
+10. `app/Repositories/Dashboard/HrdDashboardRepository.php`
+11. `app/Services/Notification/NotificationActionSyncService.php`
 
 ### 4.3 Kode Yang Dipakai
 
@@ -365,6 +366,7 @@ classDiagram
 	class DirekturService
 	class PegawaiDashboardRepository
 	class AdminDashboardRepository
+	class HrdDashboardRepository
 	class NotificationActionSyncService
 
 	DashboardController --> DashboardService : getPayloadByRole
@@ -375,6 +377,7 @@ classDiagram
 	PegawaiService --> NotificationActionSyncService : sync actions
 	PegawaiService --> PegawaiDashboardRepository : fetch data
 	AdminService --> AdminDashboardRepository : fetch summary
+	HrdService --> HrdDashboardRepository : fetch HRD stats
 ```
 
 ---
@@ -1463,6 +1466,10 @@ classDiagram
 Endpoint `GET /api/pegawai` digunakan oleh role `admin`, `hrd`, dan `direktur` untuk melihat daftar seluruh pegawai serta perhitungan ringkasan data (seperti total pegawai, jumlah dokter, perawat, dan variasi profesi).
 Saat ini implementasi logik hanya dilakukan pada role `admin`, sedangkan role lainnya dikembalikan dengan data kosong (*dummy*).
 
+Endpoint `POST /api/pegawai` digunakan secara eksklusif oleh role `admin` untuk menambahkan pegawai baru. Fungsi ini akan membuat entri di tabel `users` (sebagai akun login dengan input password), tabel `pegawai`, dan `pegawai_pribadi` sekaligus melalui DB Transaction.
+
+Endpoint `PATCH /api/pegawai/{id}/change-role` digunakan eksklusif oleh role `admin` untuk mengubah role akun pegawai menjadi salah satu dari `pegawai`, `admin`, `hrd`, atau `direktur`. Logika ini mencegah admin mengubah rolenya sendiri.
+
 ### 18.2 File Yang Dipakai
 
 1. `routes/api.php`
@@ -1489,6 +1496,20 @@ public function index(Request $request): JsonResponse
         'data' => $payload,
     ]);
 }
+
+public function store(StorePegawaiRequest $request): JsonResponse
+{
+    $claims = $request->attributes->get('_jwt_claims', []);
+    $role = strtolower((string) ($claims['role'] ?? ''));
+
+    $result = $this->pegawaiService->createPegawai($role, $request->validated());
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Pegawai berhasil ditambahkan',
+        'data' => $result,
+    ], 201);
+}
 ```
 
 ### 18.4 Flowchart
@@ -1506,6 +1527,15 @@ flowchart TD
 	I --> J[Return Dummy]
 	H --> K[Response Payload]
 	J --> K
+
+	L[POST /api/pegawai] --> M[JwtAuthMiddleware & RoleMiddleware admin]
+	M --> N[StorePegawaiRequest validasi]
+	N --> O[PegawaiController store]
+	O --> P[PegawaiService createPegawai]
+	P --> Q[AdminPegawaiService]
+	Q --> R[AdminPegawaiRepository DB Transaction]
+	R --> S[Create User -> Pegawai -> PegawaiPribadi]
+	S --> T[Response 201 Created]
 ```
 
 ### 18.5 Class Diagram

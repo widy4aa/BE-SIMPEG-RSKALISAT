@@ -62,4 +62,36 @@ class AdminPegawaiService
             'pegawai' => $mappedData,
         ];
     }
+
+    public function createPegawai(array $data): array
+    {
+        $pegawai = $this->repository->createPegawaiData($data);
+
+        return [
+            'id' => $pegawai->id,
+            'nik' => $pegawai->nik,
+            'nama' => $pegawai->nama,
+        ];
+    }
+
+    public function changeRole(int $pegawaiId, string $newRole, int $adminUserId): array
+    {
+        $pegawai = $this->repository->getAllPegawai()->where('id', $pegawaiId)->first();
+        if (!$pegawai) {
+            throw new \RuntimeException('Pegawai tidak ditemukan.');
+        }
+
+        if ($pegawai->user_id === $adminUserId) {
+            throw new \RuntimeException('Tidak dapat mengubah role diri sendiri.');
+        }
+
+        $updatedPegawai = $this->repository->changeRole($pegawaiId, $newRole);
+
+        return [
+            'id' => $updatedPegawai->id,
+            'nik' => $updatedPegawai->nik,
+            'nama' => $updatedPegawai->nama,
+            'role' => $updatedPegawai->user?->role,
+        ];
+    }
 }
