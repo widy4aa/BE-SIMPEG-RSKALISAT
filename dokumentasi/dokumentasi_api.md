@@ -1950,6 +1950,41 @@ Contoh response `200 OK`:
         "no_sertif": "BLS-001/2022"
       }
     ],
+    "riwayat_jabatan": [
+      {
+        "jabatan": "Perawat Terampil",
+        "unit_kerja": "Instalasi Rawat Inap RSD Kalisat",
+        "tanggal_mulai": "2018-01-01",
+        "tanggal_selesai": "-",
+        "is_current": true,
+        "catatan": "Jabatan aktif saat ini."
+      }
+    ],
+    "str": [
+      {
+        "nomor_str": "1234567890",
+        "tanggal_terbit": "2020-05-10",
+        "tanggal_kadaluarsa": "2025-05-10",
+        "is_current": true
+      }
+    ],
+    "sip": [
+      {
+        "jenis_sip": "SIP Praktik Rumah Sakit",
+        "nomor_sip": "SIP-1234",
+        "tanggal_terbit": "2021-06-01",
+        "tanggal_kadaluarsa": "2026-06-01",
+        "is_current": true
+      }
+    ],
+    "penugasan_klinis": [
+      {
+        "nomor_surat": "SK-KLINIS-2022",
+        "tanggal_mulai": "2022-01-01",
+        "tanggal_kadaluarsa": "2026-12-31",
+        "is_current": true
+      }
+    ],
     "ttd": {
       "kota": "Kalisat",
       "tanggal": "2026-04-28"

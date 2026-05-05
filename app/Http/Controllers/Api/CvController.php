@@ -17,9 +17,9 @@ class CvController extends Controller
 
     public function generate(Request $request): JsonResponse
     {
-        $claims = $request->attributes->get('_jwt_claims', []);
-        $userId = (int) ($claims['sub'] ?? 0);
-        $role = strtolower((string) ($claims['role'] ?? ''));
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+        $role = strtolower((string) (is_array($claims) ? ($claims['role'] ?? '') : ''));
         
         $pegawaiId = $request->query('pegawai_id') ? (int) $request->query('pegawai_id') : null;
 

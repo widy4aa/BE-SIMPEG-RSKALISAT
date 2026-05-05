@@ -16,7 +16,11 @@ class CvRepository
             'jabatan.unitKerja',
             'pangkat',
             'golonganRuang',
-            'jadwalDiklat.diklat.kategoriDiklat'
+            'jadwalDiklat.diklat.kategoriDiklat',
+            'jabatanPegawai.jabatan.unitKerja',
+            'str',
+            'sip.jenisSip',
+            'penugasanKlinis'
         ])->find($pegawaiId);
     }
 

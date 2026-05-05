@@ -73,6 +73,57 @@ class CvService
             }
         }
 
+        $riwayatJabatanList = [];
+        if ($pegawai->jabatanPegawai) {
+            foreach ($pegawai->jabatanPegawai as $jp) {
+                $riwayatJabatanList[] = [
+                    'jabatan' => $jp->jabatan?->nama ?? '-',
+                    'unit_kerja' => $jp->jabatan?->unitKerja?->nama ?? '-',
+                    'tanggal_mulai' => $jp->started_at ? Carbon::parse($jp->started_at)->format('Y-m-d') : '-',
+                    'tanggal_selesai' => $jp->ended_at ? Carbon::parse($jp->ended_at)->format('Y-m-d') : '-',
+                    'is_current' => (bool) $jp->is_current,
+                    'catatan' => $jp->note ?? '-',
+                ];
+            }
+        }
+
+        $strList = [];
+        if ($pegawai->str) {
+            foreach ($pegawai->str as $s) {
+                $strList[] = [
+                    'nomor_str' => $s->nomor_str ?? '-',
+                    'tanggal_terbit' => $s->tanggal_terbit ? Carbon::parse($s->tanggal_terbit)->format('Y-m-d') : '-',
+                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa ? Carbon::parse($s->tanggal_kadaluarsa)->format('Y-m-d') : '-',
+                    'is_current' => (bool) $s->is_current,
+                ];
+            }
+        }
+
+        $sipList = [];
+        if ($pegawai->sip) {
+            foreach ($pegawai->sip as $s) {
+                $sipList[] = [
+                    'jenis_sip' => $s->jenisSip?->nama ?? '-',
+                    'nomor_sip' => $s->nomor_sip ?? '-',
+                    'tanggal_terbit' => $s->tanggal_terbit ? Carbon::parse($s->tanggal_terbit)->format('Y-m-d') : '-',
+                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa ? Carbon::parse($s->tanggal_kadaluarsa)->format('Y-m-d') : '-',
+                    'is_current' => (bool) $s->is_current,
+                ];
+            }
+        }
+
+        $penugasanKlinisList = [];
+        if ($pegawai->penugasanKlinis) {
+            foreach ($pegawai->penugasanKlinis as $pk) {
+                $penugasanKlinisList[] = [
+                    'nomor_surat' => $pk->nomor_surat ?? '-',
+                    'tanggal_mulai' => $pk->tgl_mulai ? Carbon::parse($pk->tgl_mulai)->format('Y-m-d') : '-',
+                    'tanggal_kadaluarsa' => $pk->tgl_kadaluarsa ? Carbon::parse($pk->tgl_kadaluarsa)->format('Y-m-d') : '-',
+                    'is_current' => (bool) $pk->is_current,
+                ];
+            }
+        }
+
         return [
             'header' => [
                 'nama' => $pegawai->nama ?? '-',
@@ -100,6 +151,10 @@ class CvService
             ],
             'pendidikan' => $pendidikanList,
             'diklat' => $diklatList,
+            'riwayat_jabatan' => $riwayatJabatanList,
+            'str' => $strList,
+            'sip' => $sipList,
+            'penugasan_klinis' => $penugasanKlinisList,
             'ttd' => [
                 'kota' => 'Kalisat',
                 'tanggal' => Carbon::now()->format('Y-m-d'),
