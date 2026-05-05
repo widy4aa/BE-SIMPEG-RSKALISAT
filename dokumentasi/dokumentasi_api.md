@@ -397,12 +397,28 @@ Contoh response `200 OK`:
       "diklat_asn": {
         "total_diklat": 12,
         "selesai": 8,
-        "berlangsung": 4
+        "berlangsung": 4,
+        "pegawai_sudah_ikut": 10,
+        "pegawai_belum_ikut": 5,
+        "diklat_per_kategori": {
+          "Struktural": 2,
+          "Fungsional": 3,
+          "Teknis": 5,
+          "Akred": 2
+        }
       },
       "diklat_tenkes": {
         "total_diklat": 20,
         "selesai": 15,
-        "berlangsung": 5
+        "berlangsung": 5,
+        "pegawai_sudah_ikut": 12,
+        "pegawai_belum_ikut": 3,
+        "diklat_per_kategori": {
+          "Struktural": 0,
+          "Fungsional": 8,
+          "Teknis": 10,
+          "Akred": 2
+        }
       }
     }
   }

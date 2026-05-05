@@ -77,6 +77,77 @@ class HrdDashboardRepository
             $tahunMasuk[(string)$i] = $tahunMasukCounts[$i] ?? 0;
         }
 
+        // Fetch categories to map names easily
+        $kategoriDiklatMap = DB::table('kategori_diklat')->pluck('nama', 'id')->toArray();
+
+        // Helper function to calculate stats for a specific jenis diklat
+        $getDiklatStats = function ($jenisDiklatId) use ($totalPegawai, $kategoriDiklatMap) {
+            $now = Carbon::now();
+
+            $totalDiklat = DB::table('diklat')->where('jenis_diklat_id', $jenisDiklatId)->count();
+            
+            $selesai = DB::table('diklat')
+                ->where('jenis_diklat_id', $jenisDiklatId)
+                ->where('tanggal_selesai', '<', $now)
+                ->count();
+
+            $berlangsung = DB::table('diklat')
+                ->where('jenis_diklat_id', $jenisDiklatId)
+                ->where('tanggal_mulai', '<=', $now)
+                ->where('tanggal_selesai', '>=', $now)
+                ->count();
+
+            // Total pegawai yang SUDAH mengikuti (status = sudah terlaksana)
+            $pegawaiSudahIkut = DB::table('list_jadwal_diklat')
+                ->join('diklat', 'list_jadwal_diklat.diklat_id', '=', 'diklat.id')
+                ->where('diklat.jenis_diklat_id', $jenisDiklatId)
+                ->where('list_jadwal_diklat.status_diklat', 'sudah terlaksana')
+                ->distinct('list_jadwal_diklat.pegawai_id')
+                ->count('list_jadwal_diklat.pegawai_id');
+
+            // Pegawai yang BELUM mengikuti
+            // Asumsi: Semua pegawai dikurangi yang pernah ikut/sedang ikut/belum terlaksana
+            // Atau cukup total pegawai - yang sudah terdaftar di jenis ini
+            $pegawaiTerdaftar = DB::table('list_jadwal_diklat')
+                ->join('diklat', 'list_jadwal_diklat.diklat_id', '=', 'diklat.id')
+                ->where('diklat.jenis_diklat_id', $jenisDiklatId)
+                ->distinct('list_jadwal_diklat.pegawai_id')
+                ->count('list_jadwal_diklat.pegawai_id');
+
+            $pegawaiBelumIkut = max(0, $totalPegawai - $pegawaiTerdaftar);
+
+            // Diklat per kategori
+            $diklatPerKategori = [];
+            foreach ($kategoriDiklatMap as $kategoriNama) {
+                $diklatPerKategori[$kategoriNama] = 0;
+            }
+
+            $kategoriCounts = DB::table('diklat')
+                ->where('jenis_diklat_id', $jenisDiklatId)
+                ->select('kategori_diklat_id', DB::raw('count(*) as count'))
+                ->groupBy('kategori_diklat_id')
+                ->get();
+
+            foreach ($kategoriCounts as $kc) {
+                if (isset($kategoriDiklatMap[$kc->kategori_diklat_id])) {
+                    $diklatPerKategori[$kategoriDiklatMap[$kc->kategori_diklat_id]] = $kc->count;
+                }
+            }
+
+            return [
+                'total_diklat' => $totalDiklat,
+                'selesai' => $selesai,
+                'berlangsung' => $berlangsung,
+                'pegawai_sudah_ikut' => $pegawaiSudahIkut,
+                'pegawai_belum_ikut' => $pegawaiBelumIkut,
+                'diklat_per_kategori' => $diklatPerKategori,
+            ];
+        };
+
+        // jenis_diklat: 1 = ASN, 2 = Tenkes
+        $diklatAsn = $getDiklatStats(1);
+        $diklatTenkes = $getDiklatStats(2);
+
         return [
             'pegawai' => [
                 'total_pegawai' => $totalPegawai,
@@ -87,16 +158,8 @@ class HrdDashboardRepository
                 'tingkat_pendidikan' => $pendidikanData,
                 'tahun_masuk_5_tahun_terakhir' => $tahunMasuk,
             ],
-            'diklat_asn' => [
-                'total_diklat' => 12,
-                'selesai' => 8,
-                'berlangsung' => 4,
-            ],
-            'diklat_tenkes' => [
-                'total_diklat' => 20,
-                'selesai' => 15,
-                'berlangsung' => 5,
-            ],
+            'diklat_asn' => $diklatAsn,
+            'diklat_tenkes' => $diklatTenkes,
         ];
     }
 }
