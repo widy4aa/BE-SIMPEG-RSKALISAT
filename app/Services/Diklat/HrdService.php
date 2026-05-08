@@ -55,8 +55,7 @@ class HrdService
                     'selesai' => $riwayatDiklat->where('status_diklat', 'sudah terlaksana')->count(),
                     'akan_datang' => $riwayatDiklat->where('status_diklat', 'belum terlaksana')->count(),
                 ],
-                'list_usulan' => $riwayat,
-                'catatan' => 'Data diklat HRD diambil dari database berdasarkan peserta.',
+                'riwayat_diklat' => $riwayat,
             ],
         ];
     }

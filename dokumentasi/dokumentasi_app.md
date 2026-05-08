@@ -786,7 +786,7 @@ Pada implementasi saat ini, struktur payload antar role sudah dibedakan dan untu
 
 1. `admin`: ringkasan total program dan list diklat institusi.
 2. `pegawai`: ringkasan riwayat pribadi dan list riwayat diklat pegawai dari tabel `list_jadwal_diklat` + relasi `diklat`.
-3. `hrd`: ringkasan riwayat dan list usulan diklat berdasarkan peserta (hanya diklat yang diikuti HRD login).
+3. `hrd`: ringkasan riwayat dan `riwayat_diklat` berdasarkan peserta (hanya diklat yang diikuti HRD login).
 4. `direktur`: ringkasan anggaran dan list keputusan terbaru.
 5. `hrd` (endpoint `/api/diklat/all`): list seluruh jadwal diklat dengan detail peserta.
 
