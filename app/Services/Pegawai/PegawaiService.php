@@ -21,6 +21,12 @@ class PegawaiService
         };
     }
 
+    public function getPegawaiDetailData(int $pegawaiId): array
+    {
+        // Available for admin, hrd, direktur
+        return $this->adminService->getPegawaiDetailData($pegawaiId);
+    }
+
     public function createPegawai(string $role, array $data): ?array
     {
         return match ($role) {

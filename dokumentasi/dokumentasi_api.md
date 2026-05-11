@@ -23,6 +23,13 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 3. [Diklat](#5-diklat)
   - [Response Diklat Per Role](#response-diklat-per-role)
   - [GET Diklat (All - HRD)](#get-diklat-all---hrd)
+  - [Create Master Diklat (HRD)](#create-master-diklat-hrd)
+  - [Get Peserta Diklat (HRD)](#get-peserta-diklat-hrd)
+  - [Sync Peserta Diklat (HRD)](#sync-peserta-diklat-hrd)
+  - [Get Diklat Menunggu Kelayakan (HRD)](#get-diklat-menunggu-kelayakan-hrd)
+  - [Update Status Kelayakan (HRD)](#update-status-kelayakan-hrd)
+  - [Get Diklat Menunggu Validasi (HRD)](#get-diklat-menunggu-validasi-hrd)
+  - [Update Status Validasi (HRD)](#update-status-validasi-hrd)
   - [Create Diklat Pegawai](#create-diklat-pegawai)
   - [Edit Diklat Pegawai](#edit-diklat-pegawai)
   - [Delete Diklat Pegawai](#delete-diklat-pegawai)
@@ -91,6 +98,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 13. [Master Data (Form Dropdowns)](#17-master-data-form-dropdowns)
    - [List Endpoint Master Data](#list-endpoint-master-data)
 14. [Pegawai](#18-pegawai)
+  - [Get Pegawai Detail (Admin/HRD/Direktur)](#get-pegawai-detail-adminhrddirektur)
    - [Tambah Data Pegawai Baru (Hanya Admin)](#tambah-data-pegawai-baru-hanya-admin)
    - [Ubah Role Pegawai (Hanya Admin)](#ubah-role-pegawai-hanya-admin)
 15. [Generate CV](#19-generate-cv)
@@ -656,12 +664,332 @@ Keterangan field `list`:
 - `status_kelayakan`: status kelayakan.
 - `status_validasi`: status validasi.
 
+#### Create Master Diklat (HRD)
+
+- Method: `POST`
+- URL: `/api/hrd/diklat`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+- Content-Type: `application/json` atau `multipart/form-data`
+
+Endpoint ini digunakan oleh HRD untuk menambahkan data master diklat ke dalam sistem tanpa mendaftarkan peserta (tidak membuat data di `list_jadwal_diklat`).
+
+Field request:
+
+- `nama_kegiatan` (required, string)
+- `kategori` (required, string)
+- `jenis_diklat` (required, string)
+- `penyelenggara` (required, string)
+- `lokasi` (required, string)
+- `tanggal_mulai` (required, date)
+- `tanggal_selesai` (required, date)
+- `jp` (required, integer)
+- `jenis_biaya` (required jika `jenis_pelaksana=internal`)
+- `total_biaya` (required jika `jenis_pelaksana=internal`)
+- `catatan` (nullable, string)
+- `jenis_pelaksana` (required: `internal|external`)
+
+Contoh request payload (JSON):
+
+```json
+{
+  "nama_kegiatan": "Workshop Kepemimpinan",
+  "kategori": "Manajemen",
+  "jenis_diklat": "Workshop",
+  "penyelenggara": "RS Kalisat",
+  "lokasi": "Aula RS",
+  "tanggal_mulai": "2026-08-10",
+  "tanggal_selesai": "2026-08-12",
+  "jp": 24,
+  "jenis_biaya": "BLUD",
+  "total_biaya": 1500000,
+  "jenis_pelaksana": "internal",
+  "catatan": "Diklat khusus manajerial"
+}
+```
+
+Contoh response sukses (`201`):
+
+```json
+{
+  "success": true,
+  "message": "Master Diklat berhasil dibuat.",
+  "data": {
+    "id_diklat": 13,
+    "nama_kegiatan": "Workshop Kepemimpinan",
+    "kategori": "Manajemen",
+    "jenis_diklat": "Workshop",
+    "penyelenggara": "RS Kalisat",
+    "lokasi": "Aula RS",
+    "tanggal_mulai": "2026-08-10",
+    "tanggal_selesai": "2026-08-12",
+    "jp": 24,
+    "jenis_biaya": "BLUD",
+    "total_biaya": 1500000,
+    "catatan": "Diklat khusus manajerial",
+    "jenis_pelaksana": "internal"
+  }
+}
+```
+
+#### Get Peserta Diklat (HRD)
+
+- Method: `GET`
+- URL: `/api/hrd/diklat/{id}/peserta`
+- Parameter URL: `id` (required, int) - ID dari Master Diklat
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Endpoint ini digunakan oleh HRD untuk melihat daftar semua pegawai beserta status apakah mereka mengikuti diklat tertentu atau tidak.
+
+Contoh request:
+`GET /api/hrd/diklat/13/peserta`
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Data peserta diklat berhasil diambil.",
+  "data": {
+    "diklat_id": 13,
+    "total_pegawai": 2,
+    "list": [
+      {
+        "pegawai_id": 1,
+        "nama": "Budi Santoso",
+        "nik": "350912345678",
+        "unit_kerja": "IGD",
+        "profesi": "Dokter Umum",
+        "status": true
+      },
+      {
+        "pegawai_id": 2,
+        "nama": "Siti Aminah",
+        "nik": "350987654321",
+        "unit_kerja": "Poli Gigi",
+        "profesi": "Dokter Gigi",
+        "status": false
+      }
+    ]
+  }
+}
+```
+
+#### Sync Peserta Diklat (HRD)
+
+- Method: `POST`
+- URL: `/api/hrd/diklat/{id}/peserta`
+- Parameter URL: `id` (required, int) - ID dari Master Diklat
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+- Content-Type: `application/json`
+
+Endpoint ini digunakan oleh HRD untuk menyimpan status checklist peserta. Frontend cukup mengirimkan daftar `pegawai_id` yang memiliki status `true` (di-checklist/mengikuti diklat). Sistem akan menghapus peserta yang tidak ada di list dan menambahkan peserta baru sesuai list dengan status kelayakan otomatis `layak` dan `status_diklat` otomatis menyesuaikan tanggal.
+
+Field request:
+
+- `pegawai_ids` (required, array of integers)
+
+Contoh request payload:
+
+```json
+{
+  "pegawai_ids": [1, 5, 8]
+}
+```
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Peserta diklat berhasil diperbarui.",
+  "data": {
+    "diklat_id": 13,
+    "peserta_terdaftar": 3
+  }
+}
+```
+
+#### Get Diklat Menunggu Kelayakan (HRD)
+
+- Method: `GET`
+- URL: `/api/hrd/diklat/status/layak`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Endpoint ini digunakan oleh HRD untuk melihat daftar peserta diklat yang sudah mengunggah laporan/sertifikat (`sertif_file_path` tidak kosong) tetapi status kelayakannya belum ditentukan (`status_kelayakan` masih `null`). Response mencakup data diklat, list_jadwal_diklat, serta nama dan NIK pegawai.
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Data diklat menunggu kelayakan berhasil diambil.",
+  "data": {
+    "total": 1,
+    "list": [
+      {
+        "id_diklat": 1,
+        "id_jadwal_diklat": 5,
+        "nama": "Pelatihan Keselamatan Kerja",
+        "kategori": "Wajib",
+        "jenis": "Klinis",
+        "pelaksana": "RS Kalisat",
+        "tanggal_mulai": "2026-05-01",
+        "tanggal_selesai": "2026-05-02",
+        "status": "sudah terlaksana",
+        "tempat": "Aula RS Kalisat",
+        "waktu": null,
+        "jp": 16,
+        "total_biaya": null,
+        "jenis_biaya": "",
+        "jenis_pelaksana": "external",
+        "catatan": "",
+        "pegawai_id": 3,
+        "pegawai_nama": "Dr. Siti",
+        "pegawai_nik": "350912345678",
+        "sertif_file_path": "uploads/sertifikat/1234.pdf",
+        "no_sertif": "SRT/123/2026",
+        "status_kelayakan": null,
+        "status_validasi": null
+      }
+    ]
+  }
+}
+```
+
+#### Update Status Kelayakan (HRD)
+
+- Method: `PATCH`
+- URL: `/api/hrd/diklat/{id}/status/layak`
+- Parameter URL: `id` (required, int) - ID dari `list_jadwal_diklat`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+- Content-Type: `application/json`
+
+Endpoint ini digunakan oleh HRD untuk mengubah status kelayakan peserta. Nilai boolean `true` akan disimpan sebagai `layak`, dan `false` menjadi `tidak layak`.
+
+Field request:
+
+- `status_kelayakan` (required, boolean)
+
+Contoh request payload:
+
+```json
+{
+  "status_kelayakan": true
+}
+```
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Status kelayakan berhasil diperbarui.",
+  "data": {
+    "id_jadwal_diklat": 5,
+    "diklat_id": 1,
+    "pegawai_id": 3,
+    "status_kelayakan": "layak"
+  }
+}
+```
+
+#### Get Diklat Menunggu Validasi (HRD)
+
+- Method: `GET`
+- URL: `/api/hrd/diklat/status/validasi`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Endpoint ini digunakan oleh HRD untuk melihat daftar peserta diklat yang sudah mengunggah laporan/sertifikat (`sertif_file_path` tidak kosong) tetapi status validasinya belum ditentukan (`status_validasi` masih `null`).
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Data diklat menunggu validasi berhasil diambil.",
+  "data": {
+    "total": 1,
+    "list": [
+      {
+        "id_diklat": 1,
+        "id_jadwal_diklat": 5,
+        "nama": "Pelatihan Keselamatan Kerja",
+        "kategori": "Wajib",
+        "jenis": "Klinis",
+        "pelaksana": "RS Kalisat",
+        "tanggal_mulai": "2026-05-01",
+        "tanggal_selesai": "2026-05-02",
+        "status": "sudah terlaksana",
+        "tempat": "Aula RS Kalisat",
+        "waktu": null,
+        "jp": 16,
+        "total_biaya": null,
+        "jenis_biaya": "",
+        "jenis_pelaksana": "external",
+        "catatan": "",
+        "pegawai_id": 3,
+        "pegawai_nama": "Dr. Siti",
+        "pegawai_nik": "350912345678",
+        "sertif_file_path": "uploads/sertifikat/1234.pdf",
+        "no_sertif": "SRT/123/2026",
+        "status_kelayakan": "layak",
+        "status_validasi": null
+      }
+    ]
+  }
+}
+```
+
+#### Update Status Validasi (HRD)
+
+- Method: `PATCH`
+- URL: `/api/hrd/diklat/{id}/status/validasi`
+- Parameter URL: `id` (required, int) - ID dari `list_jadwal_diklat`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+- Content-Type: `application/json`
+
+Endpoint ini digunakan oleh HRD untuk mengubah status validasi peserta. Nilai boolean `true` akan disimpan sebagai `valid`, dan `false` menjadi `tidak valid`.
+
+Field request:
+
+- `status_validasi` (required, boolean)
+
+Contoh request payload:
+
+```json
+{
+  "status_validasi": true
+}
+```
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Status validasi berhasil diperbarui.",
+  "data": {
+    "id_jadwal_diklat": 5,
+    "diklat_id": 1,
+    "pegawai_id": 3,
+    "status_validasi": "valid"
+  }
+}
+```
+
 #### Create Diklat Pegawai
 
 - Method: `POST`
 - URL: `/api/diklat`
 - Auth: Wajib Bearer token
-- Role yang diizinkan: `pegawai`
+- Role yang diizinkan: `pegawai`, `hrd`, `direktur`
 - Content-Type: `multipart/form-data`
 
 Field request:
@@ -690,7 +1018,7 @@ Aturan bisnis:
   - `jenis_biaya` otomatis `null`
   - `total_biaya` otomatis `null`
   - `status_kelayakan` otomatis `null`
-  - `status_validasi` otomatis `null`
+  - `status_validasi` otomatis `valid`
 
 Contoh response sukses (`201`):
 
@@ -2408,6 +2736,83 @@ Contoh response `200 OK` (Untuk role `admin`):
         "email": "andi@example.com",
         "no_telp": "08123456789",
         "status": "aktif"
+      }
+    ]
+  }
+}
+```
+
+#### Get Pegawai Detail (Admin/HRD/Direktur)
+
+- Method: `GET`
+- URL: `/api/pegawai/{id}`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `hrd`, `direktur`
+
+Endpoint ini digunakan untuk melihat seluruh detail data seorang pegawai (Data Pribadi, Riwayat Karir, Keluarga, dan Diklat) berdasarkan ID pegawai.
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Detail data pegawai berhasil diambil",
+  "data": {
+    "pegawai": {
+      "id_pegawai": 1,
+      "nik": "3509...",
+      "nip": "1990...",
+      "nama": "Dr. Budi",
+      "email": "budi@example.com",
+      "link_photo_profil": "...",
+      "jabatan": "Dokter Umum",
+      "unit_kerja": "IGD",
+      "profesi": "Dokter Umum",
+      "golongan_ruang": "III/c",
+      "pangkat": "Penata",
+      "jenis_pegawai": "PNS",
+      "status_pegawai": "aktif",
+      "tgl_masuk": "2020-01-01",
+      "tmt_cpns": "2020-01-01",
+      "tmt_pns": "2021-01-01"
+    },
+    "pribadi": {
+      "jenis_kelamin": "Laki-laki",
+      "tempat_lahir": "Surabaya",
+      "tanggal_lahir": "1990-01-01",
+      "agama": "Islam",
+      "status_perkawinan": "Menikah",
+      "alamat": "Jl. Mawar No. 1",
+      "no_hp": "0812...",
+      "no_telp": null,
+      "npwp": "...",
+      "bpjs_kesehatan": "...",
+      "bpjs_ketenagakerjaan": "..."
+    },
+    "keluarga": {
+      "pasangan": [],
+      "anak": [],
+      "orang_tua": [],
+      "kontak_darurat": [],
+      "tanggungan_lain": []
+    },
+    "riwayat_karir": {
+      "jabatan": [],
+      "str": [],
+      "sip": [],
+      "penugasan_klinis": []
+    },
+    "diklat": [
+      {
+        "id": 1,
+        "nama": "Pelatihan BHD",
+        "jenis": "Klinis",
+        "kategori": "Wajib",
+        "penyelenggara": "RS Kalisat",
+        "tanggal_mulai": "2023-01-01",
+        "tanggal_selesai": "2023-01-02",
+        "jp": 16,
+        "status_diklat": "sudah terlaksana"
       }
     ]
   }

@@ -21,6 +21,30 @@ class AdminPegawaiRepository
         ])->get();
     }
 
+    public function getPegawaiDetail(int $pegawaiId): ?Pegawai
+    {
+        return Pegawai::with([
+            'user',
+            'pribadi',
+            'profesi',
+            'jabatan.unitKerja',
+            'jenisPegawai',
+            'golonganRuang',
+            'pangkat',
+            'jadwalDiklat.diklat.kategoriDiklat',
+            'jadwalDiklat.diklat.jenisDiklat',
+            'jabatanPegawai.jabatan.unitKerja',
+            'str',
+            'sip.jenisSip',
+            'penugasanKlinis',
+            'pasangan',
+            'anak',
+            'orangTua',
+            'kontakDarurat',
+            'tanggunganLain'
+        ])->find($pegawaiId);
+    }
+
     public function createPegawaiData(array $data): Pegawai
     {
         return DB::transaction(function () use ($data) {

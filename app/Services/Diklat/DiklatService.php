@@ -44,4 +44,39 @@ class DiklatService
     {
         return $this->hrdService->getAllDiklat();
     }
+
+    public function createHrdDiklat(int $userId, array $payload): array
+    {
+        return $this->hrdService->createMasterDiklat($userId, $payload);
+    }
+
+    public function getPesertaDiklat(int $diklatId): array
+    {
+        return $this->hrdService->getPesertaDiklat($diklatId);
+    }
+
+    public function syncPesertaDiklat(int $diklatId, array $pegawaiIds): array
+    {
+        return $this->hrdService->syncPesertaDiklat($diklatId, $pegawaiIds);
+    }
+
+    public function getDiklatMenungguKelayakan(): array
+    {
+        return $this->hrdService->getDiklatMenungguKelayakan();
+    }
+
+    public function getDiklatMenungguValidasi(): array
+    {
+        return $this->hrdService->getDiklatMenungguValidasi();
+    }
+
+    public function updateStatusKelayakan(int $jadwalId, bool $isLayak): array
+    {
+        return $this->hrdService->updateStatusKelayakan($jadwalId, $isLayak);
+    }
+
+    public function updateStatusValidasi(int $jadwalId, bool $isValid): array
+    {
+        return $this->hrdService->updateStatusValidasi($jadwalId, $isValid);
+    }
 }

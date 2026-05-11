@@ -774,13 +774,19 @@ classDiagram
 
 Endpoint `GET /api/diklat` menampilkan data diklat berdasarkan role login.
 
-Endpoint `POST /api/diklat` dipakai role `pegawai` untuk membuat data diklat baru.
+Endpoint `POST /api/diklat` dipakai role `pegawai`, `hrd`, dan `direktur` untuk membuat data diklat baru.
 
 Endpoint `PATCH /api/diklat/{id}` dipakai role `pegawai` untuk mengubah data diklat miliknya.
 
 Endpoint `DELETE /api/diklat/{id}` dipakai role `pegawai` untuk menghapus data diklat miliknya dengan aturan status tertentu.
 
 Endpoint `GET /api/diklat/all` dipakai role `hrd` untuk melihat seluruh data diklat beserta atribut detailnya (jadwal + relasi diklat + peserta).
+
+Endpoint `PATCH /api/hrd/diklat/{id}/status/layak` dipakai role `hrd` untuk mengubah status kelayakan peserta diklat (id mengacu ke `list_jadwal_diklat`).
+
+Endpoint `GET /api/hrd/diklat/status/validasi` dipakai role `hrd` untuk melihat daftar peserta diklat yang sudah mengunggah laporan dan status validasinya masih null.
+
+Endpoint `PATCH /api/hrd/diklat/{id}/status/validasi` dipakai role `hrd` untuk mengubah status validasi peserta diklat (id mengacu ke `list_jadwal_diklat`).
 
 Pada implementasi saat ini, struktur payload antar role sudah dibedakan dan untuk role `pegawai` data sudah diambil dari database melalui repository.
 
@@ -789,8 +795,10 @@ Pada implementasi saat ini, struktur payload antar role sudah dibedakan dan untu
 3. `hrd`: ringkasan riwayat dan `riwayat_diklat` berdasarkan peserta (hanya diklat yang diikuti HRD login).
 4. `direktur`: ringkasan anggaran dan list keputusan terbaru.
 5. `hrd` (endpoint `/api/diklat/all`): list seluruh jadwal diklat dengan detail peserta.
+6. `hrd` (endpoint `/api/hrd/diklat/status/layak`): list peserta diklat menunggu kelayakan.
+7. `hrd` (endpoint `/api/hrd/diklat/status/validasi`): list peserta diklat menunggu validasi.
 
-Aturan bisnis create (`POST /api/diklat`) role `pegawai`:
+Aturan bisnis create (`POST /api/diklat`) role `pegawai`, `hrd`, dan `direktur`:
 
 1. Jika `jenis_pelaksana = internal`:
 	- `status_kelayakan` otomatis `layak`
@@ -799,7 +807,7 @@ Aturan bisnis create (`POST /api/diklat`) role `pegawai`:
 	- `jenis_biaya` otomatis `null`
 	- `total_biaya` otomatis `null`
 	- `status_kelayakan` otomatis `null`
-	- `status_validasi` otomatis `null`
+	- `status_validasi` otomatis `valid`
 
 Aturan bisnis edit (`PATCH /api/diklat/{id}`) role `pegawai`:
 

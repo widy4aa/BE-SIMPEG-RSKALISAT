@@ -35,6 +35,23 @@ class PegawaiController extends Controller
         ]);
     }
 
+    public function show(int $id): JsonResponse
+    {
+        try {
+            $payload = $this->pegawaiService->getPegawaiDetailData($id);
+            return response()->json([
+                'success' => true,
+                'message' => 'Detail data pegawai berhasil diambil',
+                'data' => $payload,
+            ]);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 404);
+        }
+    }
+
     public function store(\App\Http\Requests\Pegawai\StorePegawaiRequest $request): JsonResponse
     {
         $claims = $request->input('_jwt_claims', []);

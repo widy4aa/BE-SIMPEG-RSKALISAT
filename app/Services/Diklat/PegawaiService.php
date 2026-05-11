@@ -109,6 +109,8 @@ class PegawaiService
             $totalBiaya = (float) $payload['total_biaya'];
             $statusKelayakan = 'layak';
             $statusValidasi = null;
+        } else {
+            $statusValidasi = 'valid';
         }
 
         $sertifPath = null;

@@ -2,8 +2,8 @@
     "info": {
         "_postman_id": "f1df9da1-9f91-4dc4-9fe4-ef90a6e8b9dd",
         "name": "BE-SIMPEG-RSKALISAT API",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-        "description": "Collection untuk test semua endpoint API BE-SIMPEG-RSKALISAT"
+        "description": "Collection untuk test semua endpoint API BE-SIMPEG-RSKALISAT",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "item": [
         {
@@ -11,6 +11,7 @@
             "item": [
                 {
                     "name": "Health Check",
+                    "id": "e9cbbec5-ec2a-4251-b5c2-e6cf7f4f67bf",
                     "request": {
                         "method": "GET",
                         "header": [],
@@ -24,10 +25,12 @@
                                 "health"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Login",
+                    "id": "ee4204e4-7e25-4db9-ac1d-a6687eac51b2",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -55,10 +58,12 @@
                                 "login"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Cek Role",
+                    "id": "ab582632-b894-469d-a8f2-4915c4877800",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -82,15 +87,18 @@
                                 "role"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 }
-            ]
+            ],
+            "id": "4446d4fa-025a-4a7f-9a66-0d1c0df0fcd4"
         },
         {
             "name": "02. Dashboard",
             "item": [
                 {
                     "name": "Dashboard",
+                    "id": "ed9a2a6c-9bd9-4d03-ae36-df01972dc475",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -114,10 +122,12 @@
                                 "dashboard"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Dashboard (Admin)",
+                    "id": "69fc0fdb-2d9c-4405-b796-1e3bd88b69dd",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -141,10 +151,12 @@
                                 "dashboard"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Dashboard (HRD)",
+                    "id": "fceda218-dee0-4463-9d14-e8c3409c335f",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -167,13 +179,15 @@
                     },
                     "response": []
                 }
-            ]
+            ],
+            "id": "634daee1-a4e3-4eba-b1f2-4542273950b6"
         },
         {
             "name": "03. Profile & CV",
             "item": [
                 {
                     "name": "Get Profile",
+                    "id": "dc1062f3-5c5c-47da-84bb-3f6923a38d7a",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -197,10 +211,12 @@
                                 "profile"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Patch Profile",
+                    "id": "01e82407-1135-4ea6-b43a-8a40bde55418",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -238,10 +254,12 @@
                                 "profile"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Upload Foto Profile",
+                    "id": "c9bde123-3fbd-4d4c-aca4-4b737b5cb3f0",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -261,7 +279,9 @@
                                 {
                                     "key": "foto",
                                     "type": "file",
-                                    "src": ""
+                                    "src": [
+                                        ""
+                                    ]
                                 }
                             ]
                         },
@@ -276,10 +296,12 @@
                                 "profil-picture"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Upload Foto Profile (Alias)",
+                    "id": "b92dc91e-408b-497a-bd02-e2ff56a6983b",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -299,7 +321,9 @@
                                 {
                                     "key": "foto",
                                     "type": "file",
-                                    "src": ""
+                                    "src": [
+                                        ""
+                                    ]
                                 }
                             ]
                         },
@@ -314,10 +338,12 @@
                                 "profile-picture"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Upload KTP",
+                    "id": "cf9ec4d1-6ed7-42c0-9ae7-d10d41a8f7da",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -337,7 +363,9 @@
                                 {
                                     "key": "ktp",
                                     "type": "file",
-                                    "src": ""
+                                    "src": [
+                                        ""
+                                    ]
                                 }
                             ]
                         },
@@ -352,10 +380,12 @@
                                 "ktp"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Generate CV",
+                    "id": "780ba0e9-7ff9-4805-9164-450f7db618d6",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -380,16 +410,29 @@
                                 "cv"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 }
-            ]
+            ],
+            "id": "389edf66-24d6-4ec5-80e1-2a07e93dcfa8"
         },
         {
             "name": "04. Keluarga",
             "item": [
                 {
                     "name": "Data Keluarga (Summary)",
+                    "id": "d91862ad-58fb-4fe3-805a-c6a0ed29abb7",
                     "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_pegawai}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -406,7 +449,14 @@
                                 "api",
                                 "keluarga"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Keluarga Pasangan",
+                    "id": "2d1032b7-94af-4b33-ac0b-cc4fdf47b63d",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -416,12 +466,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Keluarga Pasangan",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -439,7 +484,14 @@
                                 "keluarga",
                                 "pasangan"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Keluarga Pasangan",
+                    "id": "1de3f67b-2b05-4426-b438-a9d74db9452a",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -449,12 +501,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Create Keluarga Pasangan",
-                    "request": {
+                        },
                         "method": "POST",
                         "header": [
                             {
@@ -478,7 +525,9 @@
                                 {
                                     "key": "buku_nikah_file",
                                     "type": "file",
-                                    "src": ""
+                                    "src": [
+                                        ""
+                                    ]
                                 }
                             ]
                         },
@@ -492,7 +541,14 @@
                                 "keluarga",
                                 "pasangan"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Keluarga Pasangan",
+                    "id": "895fe269-c2e9-4a63-a0e0-fde8326fc811",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -502,12 +558,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Keluarga Pasangan",
-                    "request": {
+                        },
                         "method": "PATCH",
                         "header": [
                             {
@@ -541,7 +592,14 @@
                                 "pasangan",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Keluarga Pasangan",
+                    "id": "7f4a3fa7-bd27-4aee-b5a1-080445342b1d",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -551,12 +609,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Delete Keluarga Pasangan",
-                    "request": {
+                        },
                         "method": "DELETE",
                         "header": [
                             {
@@ -575,7 +628,14 @@
                                 "pasangan",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Keluarga Anak",
+                    "id": "8d6282de-fd38-4daf-a1e6-82d96fd94ccc",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -585,12 +645,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Keluarga Anak",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -608,7 +663,14 @@
                                 "keluarga",
                                 "anak"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Keluarga Anak",
+                    "id": "567a9bcd-b9ee-4dff-b3a3-bc924baaf12b",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -618,12 +680,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Create Keluarga Anak",
-                    "request": {
+                        },
                         "method": "POST",
                         "header": [
                             {
@@ -652,7 +709,9 @@
                                 {
                                     "key": "akta_kelahiran_file",
                                     "type": "file",
-                                    "src": ""
+                                    "src": [
+                                        ""
+                                    ]
                                 }
                             ]
                         },
@@ -666,7 +725,14 @@
                                 "keluarga",
                                 "anak"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Keluarga Anak",
+                    "id": "0ec246ee-f4e1-4cb3-b0b4-6223acf4fd2d",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -676,12 +742,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Keluarga Anak",
-                    "request": {
+                        },
                         "method": "PATCH",
                         "header": [
                             {
@@ -710,7 +771,14 @@
                                 "anak",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Keluarga Anak",
+                    "id": "8c8ca783-f347-4a15-9504-a6c9dd3dc633",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -720,12 +788,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Delete Keluarga Anak",
-                    "request": {
+                        },
                         "method": "DELETE",
                         "header": [
                             {
@@ -744,7 +807,14 @@
                                 "anak",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Keluarga Orang Tua",
+                    "id": "28925c76-8666-496c-8d3d-76e58c4df7ce",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -754,12 +824,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Keluarga Orang Tua",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -777,7 +842,14 @@
                                 "keluarga",
                                 "orang-tua"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Keluarga Orang Tua",
+                    "id": "96806046-cdd2-46b7-9bba-068efb550fbd",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -787,12 +859,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Create Keluarga Orang Tua",
-                    "request": {
+                        },
                         "method": "POST",
                         "header": [
                             {
@@ -835,7 +902,14 @@
                                 "keluarga",
                                 "orang-tua"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Keluarga Orang Tua",
+                    "id": "ee1b55b7-cb4e-45c2-810e-fed42b580ee7",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -845,12 +919,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Keluarga Orang Tua",
-                    "request": {
+                        },
                         "method": "PATCH",
                         "header": [
                             {
@@ -879,7 +948,14 @@
                                 "orang-tua",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Keluarga Orang Tua",
+                    "id": "8953c696-4ea9-4400-b243-a764a6d0d01e",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -889,12 +965,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Delete Keluarga Orang Tua",
-                    "request": {
+                        },
                         "method": "DELETE",
                         "header": [
                             {
@@ -913,7 +984,14 @@
                                 "orang-tua",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Keluarga Kontak Darurat",
+                    "id": "10dd496e-ac93-48fd-a4eb-d7bad0d3deea",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -923,12 +1001,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Keluarga Kontak Darurat",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -946,7 +1019,14 @@
                                 "keluarga",
                                 "kontak-darurat"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Create Keluarga Kontak Darurat",
+                    "id": "c191532a-deb0-41be-9ad2-77c994440626",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -956,12 +1036,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Create Keluarga Kontak Darurat",
-                    "request": {
+                        },
                         "method": "POST",
                         "header": [
                             {
@@ -1004,7 +1079,14 @@
                                 "keluarga",
                                 "kontak-darurat"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Keluarga Kontak Darurat",
+                    "id": "22f5e692-4127-443e-af18-37e040a176e8",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1014,12 +1096,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Update Keluarga Kontak Darurat",
-                    "request": {
+                        },
                         "method": "PATCH",
                         "header": [
                             {
@@ -1048,7 +1125,14 @@
                                 "kontak-darurat",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Keluarga Kontak Darurat",
+                    "id": "139093a7-b2ea-4cd5-ad2b-03e35751110b",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1058,12 +1142,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Delete Keluarga Kontak Darurat",
-                    "request": {
+                        },
                         "method": "DELETE",
                         "header": [
                             {
@@ -1082,7 +1161,20 @@
                                 "kontak-darurat",
                                 "1"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                }
+            ],
+            "id": "dcc0ce50-0062-4d70-aa17-3c3ff2fb271e"
+        },
+        {
+            "name": "05. Master Data",
+            "item": [
+                {
+                    "name": "Get Kategori Diklat",
+                    "id": "833c2a5f-100a-4db2-ae7f-fef560d5aced",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1092,17 +1184,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "name": "05. Master Data",
-            "item": [
-                {
-                    "name": "Get Kategori Diklat",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1120,7 +1202,14 @@
                                 "form",
                                 "kategori-diklat"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Tipe Diklat",
+                    "id": "ed811d16-ca0b-473d-92d2-7432b15daa4b",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1130,12 +1219,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Tipe Diklat",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1153,7 +1237,14 @@
                                 "form",
                                 "tipe-diklat"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Jenis Pegawai",
+                    "id": "e091328d-be21-409b-9df1-78d33dfb8b2e",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1163,12 +1254,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Jenis Pegawai",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1186,7 +1272,14 @@
                                 "form",
                                 "jenis-pegawai"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Unit Kerja",
+                    "id": "61dfb7b4-ed67-4851-bb2a-72e7ec296166",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1196,12 +1289,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Unit Kerja",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1219,7 +1307,14 @@
                                 "form",
                                 "unit-kerja"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Jenis Biaya",
+                    "id": "73f583a0-8984-4c5a-9488-5c846ae69003",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1229,12 +1324,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Jenis Biaya",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1252,7 +1342,14 @@
                                 "form",
                                 "jenis-biaya"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Golongan Ruang",
+                    "id": "7491a345-5557-459f-b207-577a910ba769",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1262,12 +1359,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Golongan Ruang",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1285,7 +1377,14 @@
                                 "form",
                                 "golongan-ruang"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Profesi",
+                    "id": "8d9d788b-574e-40ed-b0d4-f6e526246277",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1295,12 +1394,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Profesi",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1318,7 +1412,14 @@
                                 "form",
                                 "profesi"
                             ]
-                        },
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Jenis SIP",
+                    "id": "04825cfd-6aa6-47f1-a09f-7e0369d86120",
+                    "request": {
                         "auth": {
                             "type": "bearer",
                             "bearer": [
@@ -1328,12 +1429,7 @@
                                     "type": "string"
                                 }
                             ]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Jenis SIP",
-                    "request": {
+                        },
                         "method": "GET",
                         "header": [
                             {
@@ -1351,26 +1447,19 @@
                                 "form",
                                 "jenis-sip"
                             ]
-                        },
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token_pegawai}}",
-                                    "type": "string"
-                                }
-                            ]
                         }
-                    }
+                    },
+                    "response": []
                 }
-            ]
+            ],
+            "id": "ca1d21b0-250f-4842-aa07-8739f9542313"
         },
         {
             "name": "06. Notifikasi",
             "item": [
                 {
                     "name": "Get Notifikasi",
+                    "id": "00b4158d-8fcf-4063-9386-4bc5dfe41086",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1399,6 +1488,7 @@
                 },
                 {
                     "name": "Tandai 1 Notifikasi Dibaca",
+                    "id": "9a152f71-2a4c-4979-afe0-a03c7364201a",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1424,10 +1514,12 @@
                                 "read"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Tandai Semua Notifikasi Dibaca",
+                    "id": "5e269122-b6e2-48da-bf7d-235e745d5641",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -1452,9 +1544,11 @@
                                 "read-all"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 }
-            ]
+            ],
+            "id": "3f4d1148-6a84-45e0-b6ab-cf2a7ce22a02"
         },
         {
             "name": "07. Riwayat Karir",
@@ -1464,6 +1558,7 @@
                     "item": [
                         {
                             "name": "GET Riwayat Pendidikan",
+                            "id": "ac1a12f8-4f47-4db0-bbce-ee5701ed10e6",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1493,6 +1588,7 @@
                         },
                         {
                             "name": "POST Riwayat Pendidikan",
+                            "id": "ad432071-0958-40fd-a33f-6879b7e7ac40",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1542,6 +1638,7 @@
                         },
                         {
                             "name": "PATCH Riwayat Pendidikan",
+                            "id": "d4872861-a747-4b52-a078-72326418545b",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1582,6 +1679,7 @@
                         },
                         {
                             "name": "DELETE Riwayat Pendidikan",
+                            "id": "a7a62e7c-2158-46a9-bec8-9d979181422f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1610,13 +1708,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "ac40f4ad-0e71-4dfe-9967-2622bc729489"
                 },
                 {
                     "name": "Jabatan",
                     "item": [
                         {
                             "name": "GET Riwayat Jabatan",
+                            "id": "6f21fdf4-b68c-422a-ac80-4e70a1e82230",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1646,6 +1746,7 @@
                         },
                         {
                             "name": "POST Riwayat Jabatan",
+                            "id": "7a237b6e-3108-4317-b838-e93d17b5238a",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1690,6 +1791,7 @@
                         },
                         {
                             "name": "PATCH Riwayat Jabatan",
+                            "id": "4990025a-1b5e-425a-afc1-78d6129e1abf",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1730,6 +1832,7 @@
                         },
                         {
                             "name": "DELETE Riwayat Jabatan",
+                            "id": "feb358c9-2331-457a-aa36-03c69caa4198",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1758,13 +1861,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "598672f6-d866-42d2-b86c-eb06a9dba9f4"
                 },
                 {
                     "name": "Pangkat",
                     "item": [
                         {
                             "name": "GET Riwayat Pangkat",
+                            "id": "275a54fc-7539-405a-8451-b1211e45a0dd",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1794,6 +1899,7 @@
                         },
                         {
                             "name": "POST Riwayat Pangkat",
+                            "id": "6ec3d33f-4083-4826-ad37-0a1333f2ef72",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1843,6 +1949,7 @@
                         },
                         {
                             "name": "PATCH Riwayat Pangkat",
+                            "id": "0b9ac2c5-30c5-40e7-871c-922f1662d015",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1883,6 +1990,7 @@
                         },
                         {
                             "name": "DELETE Riwayat Pangkat",
+                            "id": "748414e4-7602-430d-be4b-4c7e1afeb425",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1911,13 +2019,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "24148e51-1f00-4a93-83e9-bed9243c69c4"
                 },
                 {
                     "name": "SIP",
                     "item": [
                         {
                             "name": "GET Riwayat SIP",
+                            "id": "079e5da3-7c72-48b4-9f7c-bfe689b79072",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -1947,6 +2057,7 @@
                         },
                         {
                             "name": "POST Riwayat SIP",
+                            "id": "120ef20b-a429-47f8-b754-e40391dab05f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2001,6 +2112,7 @@
                         },
                         {
                             "name": "PATCH Riwayat SIP",
+                            "id": "9c3fbdc8-6afb-459d-b843-9cffa8ebabb8",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2041,6 +2153,7 @@
                         },
                         {
                             "name": "DELETE Riwayat SIP",
+                            "id": "d3d38757-268b-4f48-ac66-92c587087927",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2069,13 +2182,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "8a34711d-73bd-43fa-9b1a-f4e7da9b9603"
                 },
                 {
                     "name": "STR",
                     "item": [
                         {
                             "name": "GET Riwayat STR",
+                            "id": "6d7eba97-2b86-49ae-b1eb-e91afa22700c",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2105,6 +2220,7 @@
                         },
                         {
                             "name": "POST Riwayat STR",
+                            "id": "dce172ac-9c0e-4ca4-b6b0-e9a959b20611",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2159,6 +2275,7 @@
                         },
                         {
                             "name": "PATCH Riwayat STR",
+                            "id": "b8d0b48a-d5ef-467e-a951-335a4144e0b4",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2199,6 +2316,7 @@
                         },
                         {
                             "name": "DELETE Riwayat STR",
+                            "id": "14346df1-e95b-47a9-933c-5595a7bda0e2",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2227,13 +2345,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "4a1893c4-e871-4c5f-b9d1-9dc87ce35e26"
                 },
                 {
                     "name": "Penugasan Klinis",
                     "item": [
                         {
                             "name": "GET Riwayat Penugasan Klinis",
+                            "id": "2d2307d3-daef-4148-ae27-12aa18ef446e",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2263,6 +2383,7 @@
                         },
                         {
                             "name": "POST Riwayat Penugasan Klinis",
+                            "id": "693908f5-0492-423e-b8d0-b3e3242bd51d",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2317,6 +2438,7 @@
                         },
                         {
                             "name": "PATCH Riwayat Penugasan Klinis",
+                            "id": "60481cf3-a617-412d-8a0e-9aa413cb53ae",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2357,6 +2479,7 @@
                         },
                         {
                             "name": "DELETE Riwayat Penugasan Klinis",
+                            "id": "6f8a395b-edee-4b79-9994-a0f77e842c9e",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2385,9 +2508,11 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "9cbffd61-8fcb-4067-b37f-c2521776a5e5"
                 }
-            ]
+            ],
+            "id": "f65e0d84-a42e-4eba-962a-a32c530bd8c0"
         },
         {
             "name": "08. Diklat",
@@ -2397,6 +2522,7 @@
                     "item": [
                         {
                             "name": "Get Diklat",
+                            "id": "69758480-20e9-493d-97c9-d9c419423934",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2420,10 +2546,12 @@
                                         "diklat"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         },
                         {
                             "name": "Create Diklat (Pegawai)",
+                            "id": "45189b1b-2c0c-4860-af81-fdaf7eae916f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2483,7 +2611,9 @@
                                         {
                                             "key": "upload_sertif",
                                             "type": "file",
-                                            "src": ""
+                                            "src": [
+                                                ""
+                                            ]
                                         },
                                         {
                                             "key": "jp",
@@ -2522,10 +2652,12 @@
                                         "diklat"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         },
                         {
                             "name": "Update Diklat (Pegawai)",
+                            "id": "461f20b6-d261-494f-aadf-d5c94ca7fb8e",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2585,7 +2717,9 @@
                                         {
                                             "key": "upload_sertif",
                                             "type": "file",
-                                            "src": ""
+                                            "src": [
+                                                ""
+                                            ]
                                         },
                                         {
                                             "key": "catatan",
@@ -2605,10 +2739,12 @@
                                         "{{diklat_id}}"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         },
                         {
                             "name": "Delete Diklat (Pegawai)",
+                            "id": "10d1405a-f752-4bcb-b3d7-bfd4be89e2d5",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2633,15 +2769,18 @@
                                         "{{diklat_id}}"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         }
-                    ]
+                    ],
+                    "id": "e39b8952-0650-4196-8916-9fcc443562f9"
                 },
                 {
                     "name": "HRD",
                     "item": [
                         {
                             "name": "GET Semua Diklat",
+                            "id": "1e31b2ac-5e42-4460-859c-13efabeaf47d",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2665,10 +2804,12 @@
                                         "diklat"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         },
                         {
                             "name": "POST Buat Diklat",
+                            "id": "e4f33fde-c984-429e-845b-71758fc9b937",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2692,10 +2833,12 @@
                                         "diklat"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         },
                         {
                             "name": "PATCH Update Diklat",
+                            "id": "3bf11594-08a6-4256-916e-4420372310a0",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2719,10 +2862,12 @@
                                         "diklat"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
                         },
                         {
                             "name": "DELETE Diklat",
+                            "id": "2f0b21e9-a5c3-4896-b565-97445e8ff0ff",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -2746,17 +2891,301 @@
                                         "diklat"
                                     ]
                                 }
-                            }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Master Diklat (HRD)",
+                            "id": "19ecff96-cb53-457a-b6f8-3811065fa315",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama_kegiatan\": \"Workshop Kepemimpinan\",\n  \"kategori\": \"Manajemen\",\n  \"jenis_diklat\": \"Workshop\",\n  \"penyelenggara\": \"RS Kalisat\",\n  \"lokasi\": \"Aula RS\",\n  \"tanggal_mulai\": \"2026-08-10\",\n  \"tanggal_selesai\": \"2026-08-12\",\n  \"jp\": 24,\n  \"jenis_biaya\": \"BLUD\",\n  \"total_biaya\": 1500000,\n  \"jenis_pelaksana\": \"internal\",\n  \"catatan\": \"Diklat khusus manajerial\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Peserta Diklat (HRD)",
+                            "id": "837bc6df-c4f3-412a-9dd1-a90333a44997",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat/1/peserta",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat",
+                                        "1",
+                                        "peserta"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Sync Peserta Diklat (HRD)",
+                            "id": "f80c3b31-9445-46b7-9335-f79873cacff4",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"pegawai_ids\": [\n    1,\n    2\n  ]\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat/1/peserta",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat",
+                                        "1",
+                                        "peserta"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Diklat Menunggu Kelayakan (HRD)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat/status/layak",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat",
+                                        "status",
+                                        "layak"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Patch Status Kelayakan (HRD)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"status_kelayakan\": true\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat/1/status/layak",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat",
+                                        "1",
+                                        "status",
+                                        "layak"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Get Diklat Menunggu Validasi (HRD)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat/status/validasi",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat",
+                                        "status",
+                                        "validasi"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Patch Status Validasi (HRD)",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"status_validasi\": true\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/diklat/1/status/validasi",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "diklat",
+                                        "1",
+                                        "status",
+                                        "validasi"
+                                    ]
+                                }
+                            },
+                            "response": []
                         }
-                    ]
+                    ],
+                    "id": "be524d7c-57fe-4f4c-ba6d-6b4998b97bea"
                 }
-            ]
+            ],
+            "id": "986600de-5340-4656-9416-664337a1190f"
         },
         {
-            "name": "09. Pegawai Management (Admin)",
+            "name": "09. Pegawai Management",
             "item": [
                 {
                     "name": "Get Pegawai",
+                    "id": "1f2e6d26-07a0-4858-a497-25cb7456d9de",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -2780,10 +3209,42 @@
                                 "pegawai"
                             ]
                         }
-                    }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Pegawai Detail",
+                    "id": "2d202999-b172-4584-9481-f6a943728e21",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/pegawai/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "pegawai",
+                                "1"
+                            ]
+                        }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Create Pegawai (Admin)",
+                    "id": "1b1f8be3-7dd1-42f4-97f6-c39b7e790ee6",
                     "request": {
                         "method": "POST",
                         "header": [
@@ -2817,6 +3278,7 @@
                 },
                 {
                     "name": "Change Role Pegawai (Admin)",
+                    "id": "bc4f7f0c-c9bc-4875-b7dd-5e93f072e015",
                     "request": {
                         "method": "PATCH",
                         "header": [
@@ -2850,13 +3312,15 @@
                     },
                     "response": []
                 }
-            ]
+            ],
+            "id": "d3edcfa1-2b39-47e8-b95b-5947c547ca72"
         },
         {
             "name": "10. Admin Change Request",
             "item": [
                 {
                     "name": "List Change Requests",
+                    "id": "787bcedf-ec71-4fdc-841b-20dd36f7e49e",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -2881,10 +3345,12 @@
                                 "change-requests"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Detail Change Request",
+                    "id": "733052ee-ebd0-4a5f-be56-c5e493d0d7f6",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -2910,10 +3376,12 @@
                                 "{{change_request_id}}"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Accept Change Request",
+                    "id": "c954b114-4b45-47cf-923f-97ff26bd6cb1",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -2954,10 +3422,12 @@
                                 "accept"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 },
                 {
                     "name": "Reject Change Request",
+                    "id": "feba2b8e-1669-4cb4-8ef2-feecff38bdbd",
                     "request": {
                         "auth": {
                             "type": "bearer",
@@ -2998,37 +3468,46 @@
                                 "reject"
                             ]
                         }
-                    }
+                    },
+                    "response": []
                 }
-            ]
+            ],
+            "id": "9ecc5d65-1444-4771-bbce-fd91a3532996"
         }
     ],
     "variable": [
         {
+            "id": "0c2af37f-bfec-4a56-a08e-bd430058ed7a",
             "key": "base_url",
             "value": "http://127.0.0.1:8000"
         },
         {
+            "id": "e7fbedc4-dad9-4c61-8146-5e4f11db9543",
             "key": "token",
             "value": ""
         },
         {
+            "id": "2cde5762-ea38-4ce4-864b-132f146860ba",
             "key": "token_admin",
             "value": ""
         },
         {
+            "id": "855f3257-a5ac-4f5c-909b-a15293191a0b",
             "key": "token_pegawai",
             "value": ""
         },
         {
+            "id": "b76d7ebf-c890-4548-89ee-476ad4650c22",
             "key": "notification_id",
             "value": "1"
         },
         {
+            "id": "7b33c854-178f-45c8-91c4-0b24a2345d7b",
             "key": "change_request_id",
             "value": "1"
         },
         {
+            "id": "2aa05006-c975-4e89-b3e8-2ef5b0b313ad",
             "key": "diklat_id",
             "value": "1"
         }

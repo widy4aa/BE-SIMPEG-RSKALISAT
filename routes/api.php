@@ -39,6 +39,11 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':admin,hrd,direktur',
+])->get('/pegawai/{id}', [PegawaiController::class, 'show']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin',
 ])->post('/pegawai', [PegawaiController::class, 'store']);
 
@@ -59,22 +64,57 @@ Route::middleware([
 
 Route::middleware([
     JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->post('/hrd/diklat', [DiklatController::class, 'storeMaster']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->get('/hrd/diklat/{id}/peserta', [DiklatController::class, 'peserta']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->post('/hrd/diklat/{id}/peserta', [DiklatController::class, 'syncPeserta']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->get('/hrd/diklat/status/layak', [DiklatController::class, 'menungguKelayakan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->get('/hrd/diklat/status/validasi', [DiklatController::class, 'menungguValidasi']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->patch('/hrd/diklat/{id}/status/layak', [DiklatController::class, 'updateStatusKelayakan']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->patch('/hrd/diklat/{id}/status/validasi', [DiklatController::class, 'updateStatusValidasi']);
+
+Route::middleware([
+    JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->get('/generate/cv', [CvController::class, 'generate']);
 
 Route::middleware([
     JwtAuthMiddleware::class,
-    RoleMiddleware::class.':pegawai',
+    RoleMiddleware::class.':pegawai,hrd,direktur',
 ])->post('/diklat', [DiklatController::class, 'store']);
 
 Route::middleware([
     JwtAuthMiddleware::class,
-    RoleMiddleware::class.':pegawai',
+    RoleMiddleware::class.':pegawai,hrd,direktur',
 ])->patch('/diklat/{id}', [DiklatController::class, 'update']);
 
 Route::middleware([
     JwtAuthMiddleware::class,
-    RoleMiddleware::class.':pegawai',
+    RoleMiddleware::class.':pegawai,hrd,direktur',
 ])->delete('/diklat/{id}', [DiklatController::class, 'destroy']);
 
 Route::middleware([

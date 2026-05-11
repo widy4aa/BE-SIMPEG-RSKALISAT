@@ -19,6 +19,11 @@ class PegawaiDiklatRepository
             ->first();
     }
 
+    public function findDiklatById(int $diklatId): ?Diklat
+    {
+        return Diklat::find($diklatId);
+    }
+
     public function getRiwayatDiklatByPegawaiId(int $pegawaiId): Collection
     {
         return ListJadwalDiklat::query()
@@ -91,6 +96,14 @@ class PegawaiDiklatRepository
             ->first();
     }
 
+    public function findJadwalById(int $jadwalId): ?ListJadwalDiklat
+    {
+        return ListJadwalDiklat::query()
+            ->with(['diklat', 'pegawai'])
+            ->whereKey($jadwalId)
+            ->first();
+    }
+
     public function saveDiklat(Diklat $diklat): bool
     {
         return $diklat->save();
@@ -116,5 +129,58 @@ class PegawaiDiklatRepository
     public function deleteDiklat(Diklat $diklat): ?bool
     {
         return $diklat->delete();
+    }
+
+    public function getAllPegawaiWithUnitKerjaProfesi(): Collection
+    {
+        return Pegawai::query()
+            ->with(['jabatan.unitKerja', 'profesi'])
+            ->get();
+    }
+
+    public function getPesertaDiklatIds(int $diklatId): array
+    {
+        return ListJadwalDiklat::query()
+            ->where('diklat_id', $diklatId)
+            ->pluck('pegawai_id')
+            ->toArray();
+    }
+
+    public function deleteJadwalNotInPegawaiIds(int $diklatId, array $pegawaiIds): void
+    {
+        ListJadwalDiklat::query()
+            ->where('diklat_id', $diklatId)
+            ->whereNotIn('pegawai_id', $pegawaiIds)
+            ->delete();
+    }
+
+    public function getJadwalDiklatMenungguKelayakan(): Collection
+    {
+        return ListJadwalDiklat::query()
+            ->with([
+                'diklat.kategoriDiklat',
+                'diklat.jenisDiklat',
+                'diklat.jenisBiaya',
+                'pegawai',
+            ])
+            ->whereNull('status_kelayakan')
+            ->whereNotNull('sertif_file_path')
+            ->orderByDesc('id')
+            ->get();
+    }
+
+    public function getJadwalDiklatMenungguValidasi(): Collection
+    {
+        return ListJadwalDiklat::query()
+            ->with([
+                'diklat.kategoriDiklat',
+                'diklat.jenisDiklat',
+                'diklat.jenisBiaya',
+                'pegawai',
+            ])
+            ->whereNotNull('sertif_file_path')
+            ->whereNull('status_validasi')
+            ->orderByDesc('id')
+            ->get();
     }
 }
