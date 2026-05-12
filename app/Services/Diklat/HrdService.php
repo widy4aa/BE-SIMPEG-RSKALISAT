@@ -45,6 +45,11 @@ class HrdService
                 'catatan' => (string) ($diklat?->catatan ?? ''),
                 'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
                 'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
+                'status_validasi' => $this->resolveStatusValidasiText(
+                    $diklat?->jenis_pelaksanaan,
+                    $jadwal->sertif_file_path,
+                    $jadwal->status_validasi
+                ),
             ];
         })->values()->all();
 
@@ -393,5 +398,32 @@ class HrdService
         }
 
         return 'sedang terlaksana';
+    }
+
+    private function resolveStatusValidasiText(?string $jenisPelaksana, ?string $sertifFilePath, ?string $statusValidasi): ?string
+    {
+        $jenisPelaksana = strtolower((string) $jenisPelaksana);
+        if ($jenisPelaksana !== 'internal') {
+            return null;
+        }
+
+        if (empty($sertifFilePath)) {
+            return 'Upload laporan';
+        }
+
+        if ($statusValidasi === null) {
+            return 'menunggu validasi';
+        }
+
+        $statusValidasi = strtolower($statusValidasi);
+        if ($statusValidasi === 'tidak valid') {
+            return 'di tolak';
+        }
+
+        if ($statusValidasi === 'valid') {
+            return 'diklat valid';
+        }
+
+        return null;
     }
 }

@@ -535,7 +535,8 @@ Contoh response role `pegawai`:
           "jenis_pelaksana": "internal",
           "catatan": "Workshop peningkatan komunikasi lintas unit.",
           "sertif_file_path": "dokumen/sertif-diklat/budi-audit-internal.pdf",
-          "no_sertif": "SERTIF/SDM/2026/0001"
+          "no_sertif": "SERTIF/SDM/2026/0001",
+          "status_validasi": "diklat valid"
         }
       ]
     }
@@ -562,6 +563,7 @@ Keterangan field `riwayat_diklat` (role `pegawai`):
 - `catatan`: catatan tambahan diklat.
 - `sertif_file_path`: path file sertifikat diklat.
 - `no_sertif`: nomor sertifikat diklat.
+- `status_validasi`: status validasi khusus untuk diklat `internal`.
 
 Untuk role `hrd`, field di `riwayat_diklat` mengikuti struktur yang sama dengan `riwayat_diklat` (role `pegawai`).
 
@@ -570,6 +572,13 @@ Aturan hitung `status`:
 - `mendatang`: hari ini < `tanggal_mulai`
 - `berlangsung`: hari ini di antara `tanggal_mulai` dan `tanggal_selesai`
 - `selesai`: hari ini > `tanggal_selesai`
+
+Aturan hitung `status_validasi` (hanya ada jika `jenis_pelaksana` bernilai `internal`, jika `external` maka `null`):
+
+- `Upload laporan`: jika belum mengunggah sertifikat (`sertif_file_path` null)
+- `menunggu validasi`: jika sertifikat sudah diunggah tapi status validasi di database masih null
+- `di tolak`: jika status validasi di database adalah `tidak valid`
+- `diklat valid`: jika status validasi di database adalah `valid`
 
 Catatan bentuk payload:
 

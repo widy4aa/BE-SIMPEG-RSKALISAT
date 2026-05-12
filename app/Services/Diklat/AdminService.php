@@ -33,6 +33,7 @@ class AdminService
                         'jenis_biaya' => 'BLUD',
                         'jenis_pelaksana' => 'internal',
                         'catatan' => 'Program peningkatan kompetensi manajemen SDM tingkat lanjut.',
+                        'status_validasi' => 'diklat valid',
                     ],
                     [
                         'id' => 102,
@@ -50,6 +51,7 @@ class AdminService
                         'jenis_biaya' => 'APBD',
                         'jenis_pelaksana' => 'external',
                         'catatan' => 'Fokus penguatan kontrol mutu dan tindak lanjut audit internal.',
+                        'status_validasi' => null,
                     ],
                 ],
                 'catatan' => 'Data diklat masih dummy untuk role admin.',
