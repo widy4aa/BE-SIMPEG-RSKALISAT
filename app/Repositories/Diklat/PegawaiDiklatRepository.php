@@ -52,6 +52,20 @@ class PegawaiDiklatRepository
             ->get();
     }
 
+    public function getAllMasterDiklat(): Collection
+    {
+        return Diklat::query()
+            ->with([
+                'kategoriDiklat',
+                'jenisDiklat',
+                'jenisBiaya',
+                'createdByPegawai',
+            ])
+            ->withCount('jadwalPeserta')
+            ->orderByDesc('id')
+            ->get();
+    }
+
     public function firstOrCreateKategoriByNama(string $nama): KategoriDiklat
     {
         return KategoriDiklat::query()->firstOrCreate([

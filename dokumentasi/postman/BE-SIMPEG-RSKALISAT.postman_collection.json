@@ -2895,6 +2895,36 @@
                             "response": []
                         },
                         {
+                            "name": "Get Diklat (All - HRD)",
+                            "id": "e96a4b18-3fc1-4d1d-91b5-6f17e727e02a",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/diklat/all",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "diklat",
+                                        "all"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
                             "name": "Create Master Diklat (HRD)",
                             "id": "19ecff96-cb53-457a-b6f8-3811065fa315",
                             "request": {
