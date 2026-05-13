@@ -11,8 +11,7 @@ class AuthService
     public function __construct(
         private readonly AuthRepository $authRepository,
         private readonly JwtService $jwtService,
-    ) {
-    }
+    ) {}
 
     public function login(string $nik, string $password): array
     {

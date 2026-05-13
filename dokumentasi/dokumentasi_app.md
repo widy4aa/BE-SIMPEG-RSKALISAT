@@ -107,12 +107,18 @@ Dokumentasi ini dibagi per bab dan subbab berdasarkan fitur, sesuai implementasi
 	3. [Kode yang dipakai](#183-kode-yang-dipakai)
 	4. [Flowchart](#184-flowchart)
 	5. [Class Diagram](#185-class-diagram)
-19. [Bab 19 - Fitur Generate CV API](#bab-19---fitur-generate-cv-api)
+19. [Bab 19 - Fitur STR/SIP (HRD) API](#bab-19---fitur-strsip-hrd-api)
 	1. [Penjelasan fitur](#191-penjelasan-fitur)
 	2. [File yang dipakai](#192-file-yang-dipakai)
 	3. [Kode yang dipakai](#193-kode-yang-dipakai)
 	4. [Flowchart](#194-flowchart)
 	5. [Class Diagram](#195-class-diagram)
+20. [Bab 20 - Fitur Generate CV API](#bab-20---fitur-generate-cv-api)
+	1. [Penjelasan fitur](#201-penjelasan-fitur)
+	2. [File yang dipakai](#202-file-yang-dipakai)
+	3. [Kode yang dipakai](#203-kode-yang-dipakai)
+	4. [Flowchart](#204-flowchart)
+	5. [Class Diagram](#205-class-diagram)
 
 ---
 
@@ -1587,20 +1593,96 @@ classDiagram
 
 ---
 
-## Bab 19 - Fitur Generate CV API
+## Bab 19 - Fitur STR/SIP (HRD) API
 
 ### 19.1 Penjelasan Fitur
 
-Endpoint `GET /api/generate/cv` digunakan oleh seluruh role untuk mendapatkan *payload JSON* terstruktur yang siap dipakai untuk membangun atau mencetak dokumen riwayat hidup (CV). Format outputnya disesuaikan dengan kebutuhan frontend (berisi sub-objek header, profil, data_diri, array pendidikan, dan array diklat). Khusus untuk role `admin`, `hrd`, dan `direktur`, terdapat dukungan parameter URL opsional `?pegawai_id={id}` untuk menarik CV pegawai tertentu selain dirinya sendiri.
+Endpoint `GET /api/str-sip` dipakai oleh role `hrd` untuk mengambil daftar STR dan SIP seluruh pegawai beserta ringkasan statusnya.
+
+Aturan status:
+
+1. **Aktif:** `tanggal_habis >= today`
+2. **Hampir Habis:** sisa hari `<= 30` dan `tanggal_habis >= today`
+3. **Tidak Aktif:** `tanggal_habis < today` atau `tanggal_habis` kosong
 
 ### 19.2 File Yang Dipakai
+
+1. `routes/api.php`
+2. `app/Http/Controllers/Api/StrSipController.php`
+3. `app/Services/StrSip/StrSipService.php`
+4. `app/Repositories/StrSip/StrSipRepository.php`
+5. `app/Models/StrPegawai.php`
+6. `app/Models/Sip.php`
+7. `app/Models/Pegawai.php`
+8. `app/Models/JenisSip.php`
+
+### 19.3 Kode Yang Dipakai
+
+```php
+Route::middleware([
+	JwtAuthMiddleware::class,
+	RoleMiddleware::class.':hrd',
+])->get('/str-sip', [StrSipController::class, 'index']);
+```
+
+```php
+public function index(): JsonResponse
+{
+	$payload = $this->strSipService->getSummary();
+
+	return response()->json([
+		'success' => true,
+		'message' => 'Data STR/SIP berhasil diambil.',
+		'data' => $payload,
+	]);
+}
+```
+
+### 19.4 Flowchart
+
+```mermaid
+flowchart TD
+	A[GET /api/str-sip] --> B[JwtAuthMiddleware]
+	B --> C[RoleMiddleware: hrd]
+	C --> D[StrSipController index]
+	D --> E[StrSipService getSummary]
+	E --> F[StrSipRepository getAllStr/getAllSip]
+	F --> G[Map item + status]
+	G --> H[Return summary + items]
+```
+
+### 19.5 Class Diagram
+
+```mermaid
+classDiagram
+	class StrSipController
+	class StrSipService
+	class StrSipRepository
+	class StrPegawai
+	class Sip
+
+	StrSipController --> StrSipService : getSummary
+	StrSipService --> StrSipRepository : getAllStr/getAllSip
+	StrSipRepository --> StrPegawai : query
+	StrSipRepository --> Sip : query
+```
+
+---
+
+## Bab 20 - Fitur Generate CV API
+
+### 20.1 Penjelasan Fitur
+
+Endpoint `GET /api/generate/cv` digunakan oleh seluruh role untuk mendapatkan *payload JSON* terstruktur yang siap dipakai untuk membangun atau mencetak dokumen riwayat hidup (CV). Format outputnya disesuaikan dengan kebutuhan frontend (berisi sub-objek header, profil, data_diri, array pendidikan, dan array diklat). Khusus untuk role `admin`, `hrd`, dan `direktur`, terdapat dukungan parameter URL opsional `?pegawai_id={id}` untuk menarik CV pegawai tertentu selain dirinya sendiri.
+
+### 20.2 File Yang Dipakai
 
 1. `routes/api.php`
 2. `app/Http/Controllers/Api/CvController.php`
 3. `app/Services/Generate/CvService.php`
 4. `app/Repositories/Generate/CvRepository.php`
 
-### 19.3 Kode Yang Dipakai
+### 20.3 Kode Yang Dipakai
 
 ```php
 public function generateCvData(int $userId, string $role, ?int $requestedPegawaiId = null): array
@@ -1623,7 +1705,7 @@ public function generateCvData(int $userId, string $role, ?int $requestedPegawai
 }
 ```
 
-### 19.4 Flowchart
+### 20.4 Flowchart
 
 ```mermaid
 flowchart TD
@@ -1641,7 +1723,7 @@ flowchart TD
 	K --> L[Return JSON Berisi CV]
 ```
 
-### 19.5 Class Diagram
+### 20.5 Class Diagram
 
 ```mermaid
 classDiagram

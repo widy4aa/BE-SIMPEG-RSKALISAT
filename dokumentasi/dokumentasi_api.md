@@ -101,7 +101,8 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
   - [Get Pegawai Detail (Admin/HRD/Direktur)](#get-pegawai-detail-adminhrddirektur)
    - [Tambah Data Pegawai Baru (Hanya Admin)](#tambah-data-pegawai-baru-hanya-admin)
    - [Ubah Role Pegawai (Hanya Admin)](#ubah-role-pegawai-hanya-admin)
-15. [Generate CV](#19-generate-cv)
+15. [STR/SIP (HRD)](#19-strsip-hrd)
+16. [Generate CV](#20-generate-cv)
 
 **BAB IV — Ringkasan Endpoint Per Role**
 1. [Admin](#admin) *(termasuk Admin Approval Change Request)*
@@ -2897,7 +2898,71 @@ Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada. Catatan: A
   }
   ```
 
-### 19. Generate CV
+### 19. STR/SIP (HRD)
+
+- Method: `GET`
+- URL: `/api/str-sip`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Mengambil daftar STR dan SIP seluruh pegawai beserta ringkasan statusnya.
+
+Aturan status:
+
+- **Aktif:** `tanggal_habis >= today`
+- **Hampir Habis:** sisa hari `<= 30` dan `tanggal_habis >= today`
+- **Tidak Aktif:** `tanggal_habis < today` atau `tanggal_habis` kosong
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Data STR/SIP berhasil diambil.",
+  "data": {
+    "summary": {
+      "total": 45,
+      "aktif": 10,
+      "hampir_habis": 5,
+      "tidak_aktif": 3
+    },
+    "items": [
+      {
+        "id": 10,
+        "pegawai_id": 1,
+        "nama": "Dr. Ahmad Wijaya",
+        "nip": "198501152010011001",
+        "profesi": "Dokter Spesialis Penyakit Dalam",
+        "str_sip": "STR",
+        "jenis": null,
+        "nomor": "123415161717",
+        "link_dokumen": "http://localhost:8000/dokumen/str/sk-str-1-1715778987.pdf",
+        "tanggal_terbit": "2026-03-25",
+        "tanggal_habis": "2026-03-30",
+        "status": "Aktif",
+        "is_current": true
+      },
+      {
+        "id": 11,
+        "pegawai_id": 1,
+        "nama": "Dr. Ahmad Wijaya",
+        "nip": "198501152010011001",
+        "profesi": "Dokter Spesialis Penyakit Dalam",
+        "str_sip": "SIP",
+        "jenis": "SIP Dokter",
+        "nomor": "123415161717",
+        "link_dokumen": "http://localhost:8000/dokumen/sip/sk-sip-1-1715778987.pdf",
+        "tanggal_terbit": "2026-03-25",
+        "tanggal_habis": "2026-03-30",
+        "status": "Hampir Habis",
+        "is_current": true
+      }
+    ]
+  }
+}
+```
+
+### 20. Generate CV
 
 - Method: `GET`
 - URL: `/api/generate/cv`
@@ -3182,7 +3247,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### HRD
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/generate/cv`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/str-sip`, `GET /api/generate/cv`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Riwayat Pendidikan:** `GET|POST /api/riwayat-karir/pendidikan`, `PATCH|POST|DELETE /api/riwayat-karir/pendidikan/{id}`
