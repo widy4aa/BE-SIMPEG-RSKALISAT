@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://images.unsplash.com/photo-1576091160550-2173ff9e5ee5?auto=format&fit=crop&w=1200&h=300&q=80" alt="SIMPEG Banner" style="border-radius: 8px; margin-bottom: 20px; object-fit: cover; max-height: 250px; width: 100%;" />
+  <img src="https://rsdkalisat.jemberkab.go.id/images/LOGO.png" alt="SIMPEG Banner" style="border-radius: 8px; margin-bottom: 20px; object-fit: cover; max-height: 250px; width: 100%;" />
 
   # BE-SIMPEG-RSKALISAT
   
