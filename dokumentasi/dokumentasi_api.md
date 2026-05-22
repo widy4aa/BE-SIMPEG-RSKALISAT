@@ -101,7 +101,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
   - [Get Pegawai Detail (Admin/HRD/Direktur)](#get-pegawai-detail-adminhrddirektur)
    - [Tambah Data Pegawai Baru (Hanya Admin)](#tambah-data-pegawai-baru-hanya-admin)
    - [Ubah Role Pegawai (Hanya Admin)](#ubah-role-pegawai-hanya-admin)
-15. [STR/SIP (HRD)](#19-strsip-hrd)
+15. [STR/SIP (Admin/HRD/Direktur)](#19-strsip-adminhrddirektur)
 16. [Generate CV](#20-generate-cv)
 
 **BAB IV — Ringkasan Endpoint Per Role**
@@ -2898,20 +2898,20 @@ Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada. Catatan: A
   }
   ```
 
-### 19. STR/SIP (HRD)
+### 19. STR/SIP (Admin/HRD/Direktur)
 
 - Method: `GET`
 - URL: `/api/str-sip`
 - Auth: Wajib Bearer token
-- Role yang diizinkan: `hrd`
+- Role yang diizinkan: `admin`, `hrd`, `direktur`
 
 Mengambil daftar STR dan SIP seluruh pegawai beserta ringkasan statusnya.
 
 Aturan status:
 
-- **Aktif:** `tanggal_habis >= today`
-- **Hampir Habis:** sisa hari `<= 30` dan `tanggal_habis >= today`
-- **Tidak Aktif:** `tanggal_habis < today` atau `tanggal_habis` kosong
+- **Aktif:** `tanggal_selesai >= today`
+- **Hampir Habis:** sisa hari `<= 30` dan `tanggal_selesai >= today`
+- **Tidak Aktif:** `tanggal_selesai < today` atau `tanggal_selesai` kosong
 
 Contoh response `200 OK`:
 
@@ -2936,9 +2936,9 @@ Contoh response `200 OK`:
         "str_sip": "STR",
         "jenis": null,
         "nomor": "123415161717",
-        "link_dokumen": "http://localhost:8000/dokumen/str/sk-str-1-1715778987.pdf",
+        "link_pdf": "http://localhost:8000/dokumen/str/sk-str-1-1715778987.pdf",
         "tanggal_terbit": "2026-03-25",
-        "tanggal_habis": "2026-03-30",
+        "tanggal_selesai": "2026-03-30",
         "status": "Aktif",
         "is_current": true
       },
@@ -2951,9 +2951,9 @@ Contoh response `200 OK`:
         "str_sip": "SIP",
         "jenis": "SIP Dokter",
         "nomor": "123415161717",
-        "link_dokumen": "http://localhost:8000/dokumen/sip/sk-sip-1-1715778987.pdf",
+        "link_pdf": "http://localhost:8000/dokumen/sip/sk-sip-1-1715778987.pdf",
         "tanggal_terbit": "2026-03-25",
-        "tanggal_habis": "2026-03-30",
+        "tanggal_selesai": "2026-03-30",
         "status": "Hampir Habis",
         "is_current": true
       }

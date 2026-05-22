@@ -155,7 +155,7 @@
                     "response": []
                 },
                 {
-                    "name": "Dashboard (HRD)",
+                    "name": "Dashboard (HRD) || Pisah Jadi 3",
                     "id": "fceda218-dee0-4463-9d14-e8c3409c335f",
                     "request": {
                         "method": "GET",
@@ -454,7 +454,7 @@
                     "response": []
                 },
                 {
-                    "name": "Get Keluarga Pasangan",
+                    "name": "Get Keluarga Pasangan | anak + pasangan",
                     "id": "2d1032b7-94af-4b33-ac0b-cc4fdf47b63d",
                     "request": {
                         "auth": {
@@ -3050,6 +3050,7 @@
                         },
                         {
                             "name": "Get Diklat Menunggu Kelayakan (HRD)",
+                            "id": "8e2b5668-92c3-405a-98f7-4276578e753d",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3081,6 +3082,7 @@
                         },
                         {
                             "name": "Patch Status Kelayakan (HRD)",
+                            "id": "63d81d7a-c9df-4d26-87e4-a0dae3bfa5d7",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3128,6 +3130,7 @@
                         },
                         {
                             "name": "Get Diklat Menunggu Validasi (HRD)",
+                            "id": "58ef701f-180c-47e3-9869-766904c51697",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3159,6 +3162,7 @@
                         },
                         {
                             "name": "Patch Status Validasi (HRD)",
+                            "id": "0c5cf99e-f962-4ddd-95ad-5f1d837acc7a",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3341,6 +3345,35 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Get STR & SIP",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{jwt_token}}",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Accept",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/str-sip",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "str-sip"
+                            ]
+                        }
+                    },
+                    "response": []
                 }
             ],
             "id": "d3edcfa1-2b39-47e8-b95b-5947c547ca72"
@@ -3512,6 +3545,7 @@
                     "item": [
                         {
                             "name": "1. Login",
+                            "id": "5d588fc2-56de-4da9-8bf9-54c7b1d8b2e5",
                             "request": {
                                 "method": "POST",
                                 "header": [
@@ -3544,6 +3578,7 @@
                         },
                         {
                             "name": "2. Cek Role",
+                            "id": "850b072c-36f6-4eba-bc6a-da61a2a1b84f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3572,6 +3607,7 @@
                         },
                         {
                             "name": "3. Get Profile",
+                            "id": "d25b6eb6-c4d5-49d1-b8ec-6d9490da2647",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3598,13 +3634,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "82a9ad19-c0ce-47ae-a318-f0bd2dbf7b06"
                 },
                 {
                     "name": "Test Update Profile",
                     "item": [
                         {
                             "name": "1. Get Profile",
+                            "id": "8c5b3f48-80c6-40b6-80a5-69f221a15aeb",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3633,6 +3671,7 @@
                         },
                         {
                             "name": "2. Patch Profile (Creates Change Request)",
+                            "id": "eebbc729-e303-45c6-87a4-f1552670d10b",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3675,6 +3714,7 @@
                         },
                         {
                             "name": "3. List Change Requests (Admin)",
+                            "id": "de6d4cd4-2188-4423-a00a-e3c6c8b10f0f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3704,6 +3744,7 @@
                         },
                         {
                             "name": "4. Accept Change Request (Admin)",
+                            "id": "4ffeba0d-6d19-4916-ba27-485ff4235c3f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3749,6 +3790,7 @@
                         },
                         {
                             "name": "5. Get Profile (Verify)",
+                            "id": "75e7202e-cb6f-4d9b-b246-aedf40027ffa",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3775,13 +3817,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "e4c361b8-677c-4276-ab43-3a7959e3eed3"
                 },
                 {
                     "name": "Test Diklat Flow",
                     "item": [
                         {
                             "name": "1. Create Diklat (Pegawai)",
+                            "id": "8b75a973-b8ae-4f41-8181-8d21d7a2d668",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3887,6 +3931,7 @@
                         },
                         {
                             "name": "2. Get Diklat Menunggu Kelayakan (HRD)",
+                            "id": "443a1337-feac-48f6-a29b-5cb9063234d7",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3918,6 +3963,7 @@
                         },
                         {
                             "name": "3. Patch Status Kelayakan (HRD)",
+                            "id": "d40eacd6-9deb-41a2-9a8d-9781720713f4",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -3964,7 +4010,8 @@
                             "response": []
                         },
                         {
-                            "name": "4. Update Diklat - Upload Sertifikat (Pegawai)",
+                            "name": "4. Update Diklat - Upload Sertifikat (Pegawai) | BUG",
+                            "id": "0bbf175c-e699-4331-87cd-4a1988204682",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4047,10 +4094,124 @@
                                     ]
                                 }
                             },
-                            "response": []
+                            "response": [
+                                {
+                                    "id": "9b3c3753-453e-47c7-87e4-a4e988607ee4",
+                                    "name": "4. Update Diklat - Upload Sertifikat (Pegawai)",
+                                    "originalRequest": {
+                                        "method": "PATCH",
+                                        "header": [],
+                                        "body": {
+                                            "mode": "formdata",
+                                            "formdata": [
+                                                {
+                                                    "key": "nama_kegiatan",
+                                                    "value": "Workshop Pelayanan Prima Update",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "lokasi",
+                                                    "value": "Aula RS Kalisat Lt.2",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "tanggal_mulai",
+                                                    "value": "2026-08-11",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "tanggal_selesai",
+                                                    "value": "2026-08-13",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "jp",
+                                                    "value": "24",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "jenis_biaya",
+                                                    "value": "BLUD",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "total_biaya",
+                                                    "value": "3000000",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "no_sertif",
+                                                    "value": "SERTIF/SDM/2026/0100",
+                                                    "type": "text"
+                                                },
+                                                {
+                                                    "key": "upload_sertif",
+                                                    "type": "file",
+                                                    "src": [
+                                                        "postman-cloud:///1f04f758-39c6-4c80-a778-f736ed50e6f3"
+                                                    ]
+                                                },
+                                                {
+                                                    "key": "catatan",
+                                                    "value": "Revisi data diklat",
+                                                    "type": "text"
+                                                }
+                                            ]
+                                        },
+                                        "url": {
+                                            "raw": "{{base_url}}/api/diklat/{{diklat_id}}",
+                                            "host": [
+                                                "{{base_url}}"
+                                            ],
+                                            "path": [
+                                                "api",
+                                                "diklat",
+                                                "{{diklat_id}}"
+                                            ]
+                                        }
+                                    },
+                                    "status": "OK",
+                                    "code": 200,
+                                    "_postman_previewlanguage": "json",
+                                    "header": [
+                                        {
+                                            "key": "Host",
+                                            "value": "127.0.0.1:8000"
+                                        },
+                                        {
+                                            "key": "Connection",
+                                            "value": "close"
+                                        },
+                                        {
+                                            "key": "X-Powered-By",
+                                            "value": "PHP/8.3.20"
+                                        },
+                                        {
+                                            "key": "Cache-Control",
+                                            "value": "no-cache, private"
+                                        },
+                                        {
+                                            "key": "Date",
+                                            "value": "Wed, 13 May 2026 07:51:15 GMT"
+                                        },
+                                        {
+                                            "key": "Content-Type",
+                                            "value": "application/json"
+                                        },
+                                        {
+                                            "key": "Access-Control-Allow-Origin",
+                                            "value": "*"
+                                        }
+                                    ],
+                                    "cookie": [],
+                                    "responseTime": "2026-05-13T07:51:49.121Z",
+                                    "body": "{\n    \"success\": true,\n    \"message\": \"Diklat berhasil diupdate.\",\n    \"data\": {\n        \"id_diklat\": 10,\n        \"id_jadwal_diklat\": 9,\n        \"nama_kegiatan\": \"Workshop Pelayanan Prima\",\n        \"kategori\": \"Teknis\",\n        \"jenis_diklat\": \"ASN\",\n        \"penyelenggara\": \"RS Kalisat\",\n        \"lokasi\": \"Aula RS Kalisat\",\n        \"tanggal_mulai\": \"2026-08-10\",\n        \"tanggal_selesai\": \"2026-08-12\",\n        \"status_diklat\": \"belum terlaksana\",\n        \"no_sertif\": \"SERTIF/SDM/2026/0099\",\n        \"sertif_file_path\": \"\",\n        \"jp\": 24,\n        \"jenis_biaya\": \"BLUD\",\n        \"total_biaya\": \"2500000.00\",\n        \"catatan\": \"Usulan pelatihan unit SDM\",\n        \"jenis_pelaksana\": \"internal\",\n        \"status_kelayakan\": \"layak\",\n        \"status_validasi\": null\n    }\n}"
+                                }
+                            ]
                         },
                         {
                             "name": "5. Get Diklat Menunggu Validasi (HRD)",
+                            "id": "c2d6522d-71db-4157-8618-bf261cd0bb8a",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4082,6 +4243,7 @@
                         },
                         {
                             "name": "6. Patch Status Validasi (HRD)",
+                            "id": "bbd9fb5f-34a7-47b7-908f-6c1342b676bf",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4127,13 +4289,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "016ca3d9-5a1a-42c8-a5f2-c44a1d136625"
                 },
                 {
                     "name": "Test Riwayat Karir (Pendidikan)",
                     "item": [
                         {
                             "name": "1. GET Riwayat Pendidikan",
+                            "id": "0b2f4a95-ea43-4ca7-bee5-d73ddf1ef55b",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4163,6 +4327,7 @@
                         },
                         {
                             "name": "2. POST Riwayat Pendidikan",
+                            "id": "38814b09-2e2b-4661-9ec3-d0312d601660",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4212,6 +4377,7 @@
                         },
                         {
                             "name": "3. PATCH Riwayat Pendidikan",
+                            "id": "ff102c25-b4c6-4ab9-9235-8bb0bb55263f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4252,6 +4418,7 @@
                         },
                         {
                             "name": "4. DELETE Riwayat Pendidikan",
+                            "id": "9f8f1dd7-9fc1-4d96-b9bc-68293ab7ae7f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4280,13 +4447,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "3980d37a-30fe-4cac-96db-ca791309bda0"
                 },
                 {
                     "name": "Test Keluarga (Anak)",
                     "item": [
                         {
                             "name": "1. Get Keluarga Anak",
+                            "id": "bbff28f2-9892-4756-b343-4aad8861964e",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4321,6 +4490,7 @@
                         },
                         {
                             "name": "2. Create Keluarga Anak",
+                            "id": "bd309300-e668-4279-a35b-d7333ca6b93b",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4382,6 +4552,7 @@
                         },
                         {
                             "name": "3. Update Keluarga Anak",
+                            "id": "ce9a081d-aca0-4f54-96c3-8bdf90291173",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4427,6 +4598,7 @@
                         },
                         {
                             "name": "4. Delete Keluarga Anak",
+                            "id": "84ed8c90-0ce3-42d2-81a4-73e096d77e46",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4460,13 +4632,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "ae89260a-da66-4e4d-ad19-994521d063e7"
                 },
                 {
                     "name": "Test Pegawai Management (Admin)",
                     "item": [
                         {
                             "name": "1. Create Pegawai (Admin)",
+                            "id": "be51996f-1766-4e7a-b06d-31c433986c7b",
                             "request": {
                                 "method": "POST",
                                 "header": [
@@ -4500,6 +4674,7 @@
                         },
                         {
                             "name": "2. Get Pegawai",
+                            "id": "081b09aa-4e90-4c9a-bc9f-fab715368683",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4528,6 +4703,7 @@
                         },
                         {
                             "name": "3. Get Pegawai Detail",
+                            "id": "3c8f88cd-a909-460c-a7e2-013a8a9c1b83",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4557,6 +4733,7 @@
                         },
                         {
                             "name": "4. Change Role Pegawai (Admin)",
+                            "id": "030d97ff-1058-4d2c-b83b-a188af301e5c",
                             "request": {
                                 "method": "PATCH",
                                 "header": [
@@ -4590,13 +4767,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "bdb18830-a346-4d4b-924a-8789067ef484"
                 },
                 {
                     "name": "Test Diklat Master Flow (HRD)",
                     "item": [
                         {
                             "name": "1. Create Master Diklat (HRD)",
+                            "id": "43cfac8e-150a-4f7a-ab2a-d6da4ea8d9fe",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4641,6 +4820,7 @@
                         },
                         {
                             "name": "2. Get Peserta Diklat (HRD)",
+                            "id": "fc71213e-9278-4719-b8d9-ae2eebe59db4",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4672,6 +4852,7 @@
                         },
                         {
                             "name": "3. Sync Peserta Diklat (HRD)",
+                            "id": "4b0a26fe-4222-4c6d-aedf-aab1d6a75e65",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4716,13 +4897,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "a069ed2b-1863-4a25-b4ab-70f98c38bcf4"
                 },
                 {
                     "name": "Test Generate CV Flow",
                     "item": [
                         {
                             "name": "1. Get Profile",
+                            "id": "1c527838-57ae-4f70-8014-1d1d1cbe2975",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4751,6 +4934,7 @@
                         },
                         {
                             "name": "2. Generate CV",
+                            "id": "5a1a1ff7-a8a6-41ab-8d94-af9645264b41",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4778,13 +4962,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "6b151f88-385b-4a99-b0ca-832dda822eb0"
                 },
                 {
                     "name": "Test Get Detail Pegawai",
                     "item": [
                         {
                             "name": "1. Get All Pegawai",
+                            "id": "a7d894d1-8081-4cf1-beaf-1b616deb6319",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4813,6 +4999,7 @@
                         },
                         {
                             "name": "2. Get Pegawai Detail",
+                            "id": "c3b61a58-0b23-4938-8007-06a195c0f432",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4840,13 +5027,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "c4450d28-8e48-4571-91f6-556c661bd4b0"
                 },
                 {
                     "name": "Test Riwayat Karir (Jabatan)",
                     "item": [
                         {
                             "name": "1. GET Riwayat Jabatan",
+                            "id": "3975fb82-d87a-424d-ab2e-43d94fe86616",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4876,6 +5065,7 @@
                         },
                         {
                             "name": "2. POST Riwayat Jabatan",
+                            "id": "b5d334e6-90ee-4d85-9654-12aa3bc2132f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4920,6 +5110,7 @@
                         },
                         {
                             "name": "3. PATCH Riwayat Jabatan",
+                            "id": "7f130505-ffda-40a8-b9a6-b12ee448e5f4",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4960,6 +5151,7 @@
                         },
                         {
                             "name": "4. DELETE Riwayat Jabatan",
+                            "id": "56e7468d-84ef-414b-9dea-b821591be6b2",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -4988,13 +5180,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "9642d102-a957-4a30-acc3-5557b1355b95"
                 },
                 {
                     "name": "Test Riwayat Karir (Pangkat)",
                     "item": [
                         {
                             "name": "1. GET Riwayat Pangkat",
+                            "id": "4a2c04cc-a348-4f0b-a48b-3213a1c5c5a1",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5024,6 +5218,7 @@
                         },
                         {
                             "name": "2. POST Riwayat Pangkat",
+                            "id": "84950383-cb21-4520-bdc2-fb548d4e431a",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5073,6 +5268,7 @@
                         },
                         {
                             "name": "3. PATCH Riwayat Pangkat",
+                            "id": "3282cc25-465e-4548-9efa-3d359778a064",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5113,6 +5309,7 @@
                         },
                         {
                             "name": "4. DELETE Riwayat Pangkat",
+                            "id": "e93cc993-e1fb-42ff-94da-dc1a93e76144",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5141,13 +5338,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "a6b4d813-72ef-493e-8644-ef39250a2b49"
                 },
                 {
                     "name": "Test Riwayat Karir (SIP)",
                     "item": [
                         {
                             "name": "1. GET Riwayat SIP",
+                            "id": "3a815ae8-4bff-44c9-807b-14417d6f2ae2",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5177,6 +5376,7 @@
                         },
                         {
                             "name": "2. POST Riwayat SIP",
+                            "id": "8486f9dd-bd6b-4e59-a40c-3a2b1801e970",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5231,6 +5431,7 @@
                         },
                         {
                             "name": "3. PATCH Riwayat SIP",
+                            "id": "e9b0f93a-901c-468a-86cf-f9acdb496126",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5271,6 +5472,7 @@
                         },
                         {
                             "name": "4. DELETE Riwayat SIP",
+                            "id": "7f21f4f6-6086-4374-b23a-9cfa18f6b67c",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5299,13 +5501,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "aa61876f-e115-41b5-975e-67e168585ef8"
                 },
                 {
                     "name": "Test Riwayat Karir (STR)",
                     "item": [
                         {
                             "name": "1. GET Riwayat STR",
+                            "id": "e51c6344-1f3f-4f97-abd9-019f55eb0811",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5335,6 +5539,7 @@
                         },
                         {
                             "name": "2. POST Riwayat STR",
+                            "id": "f23d9a32-c811-4fca-a923-1d2891d61a50",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5389,6 +5594,7 @@
                         },
                         {
                             "name": "3. PATCH Riwayat STR",
+                            "id": "ad4f819a-a018-4114-82b9-6620f22ad65f",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5429,6 +5635,7 @@
                         },
                         {
                             "name": "4. DELETE Riwayat STR",
+                            "id": "38080571-9e5c-41fc-bb18-a18ea2df2801",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5457,13 +5664,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "b867356e-e316-4b14-b885-7ef5c7b7be15"
                 },
                 {
                     "name": "Test Riwayat Karir (Penugasan Klinis)",
                     "item": [
                         {
                             "name": "1. GET Riwayat Penugasan Klinis",
+                            "id": "13c80bf9-d5cb-46a6-9057-dafc972344a1",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5493,6 +5702,7 @@
                         },
                         {
                             "name": "2. POST Riwayat Penugasan Klinis",
+                            "id": "0c85882a-25f6-4023-a774-60bde8e0b3b5",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5547,6 +5757,7 @@
                         },
                         {
                             "name": "3. PATCH Riwayat Penugasan Klinis",
+                            "id": "07b1459c-b6ab-4547-98d1-e9df3193cbf3",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5587,6 +5798,7 @@
                         },
                         {
                             "name": "4. DELETE Riwayat Penugasan Klinis",
+                            "id": "d1234834-5f3d-4107-846f-cba0ff33ab82",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5615,13 +5827,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "f94b3acc-e157-421e-a8ed-ea76d33c0b0c"
                 },
                 {
                     "name": "Test Keluarga (Pasangan)",
                     "item": [
                         {
                             "name": "1. Get Keluarga Pasangan",
+                            "id": "e09a9859-8509-4034-8665-9fd35cdee920",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5656,6 +5870,7 @@
                         },
                         {
                             "name": "2. Create Keluarga Pasangan",
+                            "id": "80149eaa-fcf8-4b2e-9695-657563b21f1c",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5712,6 +5927,7 @@
                         },
                         {
                             "name": "3. Update Keluarga Pasangan",
+                            "id": "4cb19434-76ee-4e3b-8e20-abd9a4eafff2",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5762,6 +5978,7 @@
                         },
                         {
                             "name": "4. Delete Keluarga Pasangan",
+                            "id": "9867e794-2f0b-4654-a4f9-553492952195",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5795,13 +6012,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "ff916d67-938c-4395-8bf2-03ddbe44a2ac"
                 },
                 {
                     "name": "Test Keluarga (Orang Tua)",
                     "item": [
                         {
                             "name": "1. Get Keluarga Orang Tua",
+                            "id": "7f3293f6-3e21-49da-8681-6a0c514af67e",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5836,6 +6055,7 @@
                         },
                         {
                             "name": "2. Create Keluarga Orang Tua",
+                            "id": "e066801d-e27c-4ac9-ae2f-fba3d297e878",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5895,6 +6115,7 @@
                         },
                         {
                             "name": "3. Update Keluarga Orang Tua",
+                            "id": "e454ed22-49fe-4027-9112-f025ee9d7aca",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5940,6 +6161,7 @@
                         },
                         {
                             "name": "4. Delete Keluarga Orang Tua",
+                            "id": "4ba2eb26-df68-4b37-92b3-691cca4a1bd7",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -5973,13 +6195,15 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "7b8af64b-a474-42a4-ab97-917ad42c2bd7"
                 },
                 {
                     "name": "Test Keluarga (Kontak Darurat)",
                     "item": [
                         {
                             "name": "1. Get Keluarga Kontak Darurat",
+                            "id": "5b40cfa5-a972-4ffc-aec1-8dc655977f4a",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -6014,6 +6238,7 @@
                         },
                         {
                             "name": "2. Create Keluarga Kontak Darurat",
+                            "id": "711ab15e-d890-4aa0-ac3c-0143c37f853a",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -6073,6 +6298,7 @@
                         },
                         {
                             "name": "3. Update Keluarga Kontak Darurat",
+                            "id": "904bcf80-57ae-4b2c-82f1-fabcf7ff6c95",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -6118,6 +6344,7 @@
                         },
                         {
                             "name": "4. Delete Keluarga Kontak Darurat",
+                            "id": "f4fde737-8406-44d3-a2cd-ea256c7e57aa",
                             "request": {
                                 "auth": {
                                     "type": "bearer",
@@ -6151,10 +6378,11 @@
                             },
                             "response": []
                         }
-                    ]
+                    ],
+                    "id": "fd44b7ee-9840-4eba-b674-b95160f5efbc"
                 }
             ],
-            "_postman_isSubFolder": true
+            "id": "d3739d15-b099-4452-afca-b9f0c22fda6e"
         }
     ],
     "variable": [

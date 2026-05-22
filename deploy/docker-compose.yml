@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    container_name: simpeg_app
+    ports:
+      - "8000:80"
+    env_file:
+      - ../.env
+    environment:
+      # Mengeset DB_HOST ke container DB di docker (override nilai 127.0.0.1 dari .env)
+      - DB_HOST=db
+    volumes:
+      # Mount folder project agar perubahan code bisa langsung terlihat (untuk development/testing)
+      - ..:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    # Perintah yang dijalankan saat container start: Migrate + Seed, lalu jalankan Apache
+    command: >
+      bash -c "php artisan migrate --seed --force && apache2-foreground"
+    networks:
+      - simpeg_network
+
+  db:
+    image: mysql:8.0
+    container_name: simpeg_db
+    ports:
+      - "3306:3306"
+    command: --skip-name-resolve
+    environment:
+      # Variabel ini akan otomatis di-set sesuai dengan .env lokal Anda yang menggunakan:
+      # DB_DATABASE=simpeg dan password kosong
+      MYSQL_DATABASE: simpeg
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 60s
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - simpeg_network
+
+networks:
+  simpeg_network:
+    driver: bridge
+
+volumes:
+  db_data:

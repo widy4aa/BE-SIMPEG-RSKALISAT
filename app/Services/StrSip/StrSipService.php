@@ -40,9 +40,9 @@ class StrSipService
                 'str_sip' => 'STR',
                 'jenis' => null,
                 'nomor' => $str->nomor_str,
-                'link_dokumen' => $this->resolveDokumenUrl($str->sk_file_path),
+                'link_pdf' => $this->resolveDokumenUrl($str->sk_file_path),
                 'tanggal_terbit' => $str->tanggal_terbit?->toDateString(),
-                'tanggal_habis' => $tanggalHabis?->toDateString(),
+                'tanggal_selesai' => $tanggalHabis?->toDateString(),
                 'status' => $this->resolveStatus($tanggalHabis),
                 'is_current' => (bool) $str->is_current,
             ];
@@ -60,9 +60,9 @@ class StrSipService
                 'str_sip' => 'SIP',
                 'jenis' => $sip->jenisSip?->nama,
                 'nomor' => $sip->nomor_sip,
-                'link_dokumen' => $this->resolveDokumenUrl($sip->sk_file_path),
+                'link_pdf' => $this->resolveDokumenUrl($sip->sk_file_path),
                 'tanggal_terbit' => $sip->tanggal_terbit?->toDateString(),
-                'tanggal_habis' => $tanggalHabis?->toDateString(),
+                'tanggal_selesai' => $tanggalHabis?->toDateString(),
                 'status' => $this->resolveStatus($tanggalHabis),
                 'is_current' => (bool) $sip->is_current,
             ];
@@ -70,7 +70,7 @@ class StrSipService
 
         return collect($items)
             ->sortBy(function (array $item) {
-                return $item['tanggal_habis'] ?? '9999-12-31';
+                return $item['tanggal_selesai'] ?? '9999-12-31';
             })
             ->values()
             ->all();

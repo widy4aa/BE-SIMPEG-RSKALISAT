@@ -141,6 +141,9 @@ Route::middleware([
     // Pegawai
     Route::get('/pegawai', [PegawaiController::class, 'index']);
     Route::get('/pegawai/{id}', [PegawaiController::class, 'show']);
+
+    // STR/SIP
+    Route::get('/str-sip', [StrSipController::class, 'index']);
 });
 
 // Admin only
@@ -166,9 +169,6 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':hrd',
 ])->group(function () {
-    // STR/SIP
-    Route::get('/str-sip', [StrSipController::class, 'index']);
-
     // Diklat - master HRD
     Route::get('/diklat/all', [DiklatController::class, 'all']);
     Route::post('/hrd/diklat', [DiklatController::class, 'storeMaster']);
