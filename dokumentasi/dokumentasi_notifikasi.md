@@ -4,6 +4,7 @@ Dokumen ini menjelaskan metode notifikasi yang berjalan saat ini, data apa yang 
 
 ## Ringkasan Arsitektur
 
+
 - Notifikasi disimpan di tabel `notification` (model: `App\\Models\\NotificationModel`).
 - Notifikasi dibagi menjadi dua tipe utama: `info` dan `action`.
 - `info` dipakai untuk notifikasi biasa (ditampilkan pada list notifikasi user).

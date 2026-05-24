@@ -450,36 +450,6 @@
                         }
                     },
                     "response": []
-                },
-                {
-                    "name": "Generate CV",
-                    "id": "780ba0e9-7ff9-4805-9164-450f7db618d6",
-                    "request": {
-                        "auth": {
-                            "type": "bearer",
-                            "bearer": [
-                                {
-                                    "key": "token",
-                                    "value": "{{token_admin}}",
-                                    "type": "string"
-                                }
-                            ]
-                        },
-                        "method": "GET",
-                        "header": [],
-                        "url": {
-                            "raw": "{{base_url}}/api/generate/cv",
-                            "host": [
-                                "{{base_url}}"
-                            ],
-                            "path": [
-                                "api",
-                                "generate",
-                                "cv"
-                            ]
-                        }
-                    },
-                    "response": []
                 }
             ],
             "id": "389edf66-24d6-4ec5-80e1-2a07e93dcfa8"
@@ -6056,36 +6026,6 @@
                                 }
                             },
                             "response": []
-                        },
-                        {
-                            "name": "2. Generate CV",
-                            "id": "5a1a1ff7-a8a6-41ab-8d94-af9645264b41",
-                            "request": {
-                                "auth": {
-                                    "type": "bearer",
-                                    "bearer": [
-                                        {
-                                            "key": "token",
-                                            "value": "{{token_admin}}",
-                                            "type": "string"
-                                        }
-                                    ]
-                                },
-                                "method": "GET",
-                                "header": [],
-                                "url": {
-                                    "raw": "{{base_url}}/api/generate/cv",
-                                    "host": [
-                                        "{{base_url}}"
-                                    ],
-                                    "path": [
-                                        "api",
-                                        "generate",
-                                        "cv"
-                                    ]
-                                }
-                            },
-                            "response": []
                         }
                     ],
                     "id": "6b151f88-385b-4a99-b0ca-832dda822eb0"
@@ -7514,6 +7454,83 @@
                 }
             ],
             "id": "d3739d15-b099-4452-afca-b9f0c22fda6e"
+        },
+        {
+            "name": "Generate",
+            "item": [
+                {
+                    "name": "Generate CV",
+                    "id": "780ba0e9-7ff9-4805-9164-450f7db618d6",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{token_admin}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/generate/cv",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "generate",
+                                "cv"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Generate Laporan Diklat",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{hrd_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/generate/laporan-diklat?bulan_awal=1&tahun_awal=2026&bulan_akhir=5&tahun_akhir=2026",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "generate",
+                                "laporan-diklat"
+                            ],
+                            "query": [
+                                {
+                                    "key": "bulan_awal",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "tahun_awal",
+                                    "value": "2026"
+                                },
+                                {
+                                    "key": "bulan_akhir",
+                                    "value": "5"
+                                },
+                                {
+                                    "key": "tahun_akhir",
+                                    "value": "2026"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
         }
     ],
     "variable": [

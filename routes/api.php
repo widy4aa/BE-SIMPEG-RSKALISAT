@@ -178,6 +178,9 @@ Route::middleware([
     Route::get('/hrd/diklat/status/validasi', [DiklatController::class, 'menungguValidasi']);
     Route::patch('/hrd/diklat/{id}/status/layak', [DiklatController::class, 'updateStatusKelayakan']);
     Route::patch('/hrd/diklat/{id}/status/validasi', [DiklatController::class, 'updateStatusValidasi']);
+
+    // Generate Laporan
+    Route::get('/generate/laporan-diklat', [\App\Http\Controllers\Api\LaporanController::class, 'laporanDiklat']);
 });
 
 // Authenticated - master data

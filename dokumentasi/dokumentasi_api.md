@@ -11,7 +11,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 2. [Authentication](#authentication)
 
 **BAB II — Endpoint Umum (Tanpa Login)**
-1. [Health Check](#1-health-check)
+1. [Health Check](#1-health-check)  
 2. [Login](#2-login)
 
 **BAB III — Endpoint Semua Role**
@@ -1201,6 +1201,79 @@ Contoh response gagal (`422`):
 {
   "success": false,
   "message": "Diklat tidak bisa dihapus karena sudah masuk kelayakan atau sudah validasi."
+}
+```
+
+#### Generate Laporan Diklat (HRD)
+
+- Method: `GET`
+- URL: `/api/generate/laporan-diklat`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Endpoint ini digunakan untuk men-generate laporan rekap diklat internal berdasarkan bulan dan tahun pembuatan (dari field `created_at`).
+
+Parameter Query:
+- `bulan_awal` (required, int 1-12)
+- `tahun_awal` (required, int e.g. 2026)
+- `bulan_akhir` (required, int 1-12)
+- `tahun_akhir` (required, int e.g. 2026)
+
+Contoh request:
+`GET /api/generate/laporan-diklat?bulan_awal=1&tahun_awal=2026&bulan_akhir=5&tahun_akhir=2026`
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Data rekap diklat berhasil diambil.",
+  "data": {
+    "periode_awal": "2026-01",
+    "periode_akhir": "2026-05",
+    "waktu_generate": "2026-05-24 23:16:24",
+    "Rekap Diklat": {
+      "total": 1,
+      "total_biaya keseluruhan": 2000000,
+      "list_diklat": [
+        {
+          "nama_kegiatan": "Pelatihan Bantuan Hidup Dasar",
+          "jenis_diklat": "Tenkes",
+          "penyelenggara": "Tim Code Blue RS",
+          "tanggal_mulai": "2026-05-15",
+          "tanggal_selesai": "2026-05-16",
+          "waktu": "08:00:00",
+          "JP": 16,
+          "jenis_biaya": "BLUD",
+          "Total Peserta": 25,
+          "Total Peserta yang udah Validasi": 20,
+          "total_biaya per peserta": 100000,
+          "Total Biaya Diklat": 2000000
+        }
+      ]
+    },
+    "rekap_pegawai": {
+      "total pegawai": 20,
+      "total biaya": 2000000,
+      "list_pegawai": [
+        {
+          "Nama Orang": "Budi Santoso",
+          "NIK": "3174010101010001",
+          "NIP": "198901012010011001",
+          "unit kerja": "IGD",
+          "nama_kegiatan": "Pelatihan Bantuan Hidup Dasar",
+          "jenis_diklat": "Tenkes",
+          "penyelenggara": "Tim Code Blue RS",
+          "tanggal_mulai": "2026-05-15",
+          "tanggal_selesai": "2026-05-16",
+          "waktu": "08:00:00",
+          "jp": 16,
+          "jenis_biaya": "BLUD",
+          "biaya": 100000
+        }
+      ]
+    }
+  }
 }
 ```
 

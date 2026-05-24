@@ -226,4 +226,29 @@ class PegawaiDiklatRepository
             ->orderByDesc('id')
             ->get();
     }
+
+    public function getRekapLaporanDiklatInternal(\Carbon\Carbon $startDate, \Carbon\Carbon $endDate): Collection
+    {
+        return Diklat::query()
+            ->with([
+                'jenisDiklat',
+                'jenisBiaya',
+                'jadwalPeserta' => function ($query) {
+                    $query->where('status_validasi', 'valid')
+                          ->whereNotNull('sertif_file_path')
+                          ->with('pegawai.jabatan.unitKerja');
+                }
+            ])
+            ->withCount([
+                'jadwalPeserta as total_peserta',
+                'jadwalPeserta as total_peserta_validasi' => function ($query) {
+                    $query->where('status_validasi', 'valid')
+                          ->whereNotNull('sertif_file_path');
+                }
+            ])
+            ->where('jenis_pelaksanaan', 'internal')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->orderByDesc('id')
+            ->get();
+    }
 }
