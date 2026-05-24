@@ -12,12 +12,12 @@ class DashboardService
     ) {
     }
 
-    public function getPayloadByRole(string $role, int $userId): ?array
+    public function getPayloadByRole(string $role, int $userId, ?string $type = null): ?array
     {
         return match ($role) {
             'admin' => $this->adminService->build($userId),
             'pegawai' => $this->pegawaiService->build($userId),
-            'hrd' => $this->hrdService->build($userId),
+            'hrd' => $this->hrdService->build($userId, $type),
             'direktur' => $this->direkturService->build($userId),
             default => null,
         };

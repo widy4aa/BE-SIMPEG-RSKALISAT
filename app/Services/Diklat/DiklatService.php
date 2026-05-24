@@ -40,7 +40,7 @@ class DiklatService
         return $this->pegawaiService->delete($diklatId, $userId);
     }
 
-    public function getAllDiklat(): array
+    public function getAllDiklat(): \Illuminate\Pagination\LengthAwarePaginator
     {
         return $this->hrdService->getAllDiklat();
     }

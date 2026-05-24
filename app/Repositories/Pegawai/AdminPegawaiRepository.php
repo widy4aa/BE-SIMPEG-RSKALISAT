@@ -21,6 +21,16 @@ class AdminPegawaiRepository
         ])->get();
     }
 
+    public function getPaginatedPegawai(int $perPage = 10)
+    {
+        return Pegawai::with([
+            'user',
+            'pribadi',
+            'profesi',
+            'jabatan.unitKerja'
+        ])->paginate($perPage);
+    }
+
     public function getPegawaiDetail(int $pegawaiId): ?Pegawai
     {
         return Pegawai::with([

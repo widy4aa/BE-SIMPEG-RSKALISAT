@@ -195,6 +195,44 @@ Route::middleware([
     Route::get('/jenis-sip', [MasterDataController::class, 'jenisSip']);
 });
 
+// HRD only - master data CRUD
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd',
+])->prefix('form')->group(function () {
+    Route::post('/kategori-diklat', [MasterDataController::class, 'storeKategoriDiklat']);
+    Route::patch('/kategori-diklat/{id}', [MasterDataController::class, 'updateKategoriDiklat']);
+    Route::delete('/kategori-diklat/{id}', [MasterDataController::class, 'destroyKategoriDiklat']);
+
+    Route::post('/tipe-diklat', [MasterDataController::class, 'storeTipeDiklat']);
+    Route::patch('/tipe-diklat/{id}', [MasterDataController::class, 'updateTipeDiklat']);
+    Route::delete('/tipe-diklat/{id}', [MasterDataController::class, 'destroyTipeDiklat']);
+
+    Route::post('/jenis-pegawai', [MasterDataController::class, 'storeJenisPegawai']);
+    Route::patch('/jenis-pegawai/{id}', [MasterDataController::class, 'updateJenisPegawai']);
+    Route::delete('/jenis-pegawai/{id}', [MasterDataController::class, 'destroyJenisPegawai']);
+
+    Route::post('/unit-kerja', [MasterDataController::class, 'storeUnitKerja']);
+    Route::patch('/unit-kerja/{id}', [MasterDataController::class, 'updateUnitKerja']);
+    Route::delete('/unit-kerja/{id}', [MasterDataController::class, 'destroyUnitKerja']);
+
+    Route::post('/jenis-biaya', [MasterDataController::class, 'storeJenisBiaya']);
+    Route::patch('/jenis-biaya/{id}', [MasterDataController::class, 'updateJenisBiaya']);
+    Route::delete('/jenis-biaya/{id}', [MasterDataController::class, 'destroyJenisBiaya']);
+
+    Route::post('/golongan-ruang', [MasterDataController::class, 'storeGolonganRuang']);
+    Route::patch('/golongan-ruang/{id}', [MasterDataController::class, 'updateGolonganRuang']);
+    Route::delete('/golongan-ruang/{id}', [MasterDataController::class, 'destroyGolonganRuang']);
+
+    Route::post('/profesi', [MasterDataController::class, 'storeProfesi']);
+    Route::patch('/profesi/{id}', [MasterDataController::class, 'updateProfesi']);
+    Route::delete('/profesi/{id}', [MasterDataController::class, 'destroyProfesi']);
+
+    Route::post('/jenis-sip', [MasterDataController::class, 'storeJenisSip']);
+    Route::patch('/jenis-sip/{id}', [MasterDataController::class, 'updateJenisSip']);
+    Route::delete('/jenis-sip/{id}', [MasterDataController::class, 'destroyJenisSip']);
+});
+
 // Authenticated - notifikasi
 Route::middleware([
     JwtAuthMiddleware::class,

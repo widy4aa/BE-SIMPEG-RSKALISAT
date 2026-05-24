@@ -66,6 +66,35 @@ class PegawaiDiklatRepository
             ->get();
     }
 
+    public function getPaginatedRiwayatDiklatByPegawaiId(int $pegawaiId, int $perPage = 7)
+    {
+        return ListJadwalDiklat::query()
+            ->with([
+                'diklat.kategoriDiklat',
+                'diklat.jenisDiklat',
+                'diklat.jenisBiaya',
+                'diklat.createdByPegawai',
+            ])
+            ->where('pegawai_id', $pegawaiId)
+            ->orderByDesc('id')
+            ->paginate($perPage);
+    }
+
+    public function getPaginatedMasterDiklat(int $perPage = 7)
+    {
+        return Diklat::query()
+            ->with([
+                'kategoriDiklat',
+                'jenisDiklat',
+                'jenisBiaya',
+                'createdByPegawai',
+            ])
+            ->withCount('jadwalPeserta')
+            ->orderByDesc('id')
+            ->paginate($perPage);
+    }
+
+
     public function firstOrCreateKategoriByNama(string $nama): KategoriDiklat
     {
         return KategoriDiklat::query()->firstOrCreate([

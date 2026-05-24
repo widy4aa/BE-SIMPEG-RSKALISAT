@@ -307,6 +307,7 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 - URL: `/api/dashboard`
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+- Parameter URL (Opsional, khusus role HRD): `?type=pegawai`, `?type=diklat_asn`, atau `?type=diklat_tenkes`
 
 Contoh header:
 
@@ -503,7 +504,7 @@ Keterangan implementasi saat ini:
 - Role `admin`, `direktur`: payload ringkasan tetap dibedakan per role.
 - Role `hrd`: data diambil dari database berdasarkan peserta (hanya diklat yang diikuti HRD login).
 
-Contoh response role `pegawai`:
+Contoh response role `pegawai` (dengan pagination 7 item, parameter `?page=1`):
 
 ```json
 {
@@ -518,32 +519,64 @@ Contoh response role `pegawai`:
         "selesai": 4,
         "akan_datang": 2
       },
-      "riwayat_diklat": [
-        {
-          "nama": "Pelatihan Komunikasi Efektif",
-          "kategori": "Soft Skill",
-          "jenis": "Workshop",
-          "pelaksana": "RS Kalisat",
-          "tanggal_mulai": "2025-11-15",
-          "tanggal_selesai": "2025-11-17",
-          "status": "selesai",
-          "tempat": "Aula Utama",
-          "waktu": "08:00 - 16:00",
-          "created_by": "Admin SIMPEG",
-          "jp": 24,
-          "total_biaya": 250000,
-          "jenis_biaya": "Mandiri",
-          "jenis_pelaksana": "internal",
-          "catatan": "Workshop peningkatan komunikasi lintas unit.",
-          "sertif_file_path": "dokumen/sertif-diklat/budi-audit-internal.pdf",
-          "no_sertif": "SERTIF/SDM/2026/0001",
-          "status_validasi": "diklat valid"
-        }
-      ]
+      "riwayat_diklat": {
+        "current_page": 1,
+        "data": [
+          {
+            "id": 12,
+            "nama": "Pelatihan Komunikasi Efektif",
+            "kategori": "Soft Skill",
+            "jenis": "Workshop",
+            "pelaksana": "RS Kalisat",
+            "tanggal_mulai": "2025-11-15",
+            "tanggal_selesai": "2025-11-17",
+            "status": "selesai",
+            "tempat": "Aula Utama",
+            "waktu": "08:00 - 16:00",
+            "created_by": "Admin SIMPEG",
+            "jp": 24,
+            "total_biaya": 250000,
+            "jenis_biaya": "Mandiri",
+            "jenis_pelaksana": "internal",
+            "catatan": "Workshop peningkatan komunikasi lintas unit.",
+            "sertif_file_path": "dokumen/sertif-diklat/budi-audit-internal.pdf",
+            "no_sertif": "SERTIF/SDM/2026/0001",
+            "status_validasi": "diklat valid"
+          }
+        ],
+        "first_page_url": "http://localhost:8000/api/diklat?page=1",
+        "from": 1,
+        "last_page": 1,
+        "last_page_url": "http://localhost:8000/api/diklat?page=1",
+        "links": [
+          {
+            "url": null,
+            "label": "&laquo; Previous",
+            "active": false
+          },
+          {
+            "url": "http://localhost:8000/api/diklat?page=1",
+            "label": "1",
+            "active": true
+          },
+          {
+            "url": null,
+            "label": "Next &raquo;",
+            "active": false
+          }
+        ],
+        "next_page_url": null,
+        "path": "http://localhost:8000/api/diklat",
+        "per_page": 7,
+        "prev_page_url": null,
+        "to": 1,
+        "total": 1
+      }
     }
   }
 }
 ```
+
 
 Keterangan field `riwayat_diklat` (role `pegawai`):
 
@@ -607,17 +640,17 @@ Catatan field `status`:
 
 Endpoint ini menampilkan seluruh data diklat beserta atributnya untuk role HRD.
 
-Contoh response `200 OK`:
+Contoh response `200 OK` (dengan pagination 7 item, parameter `?page=1`):
 
 ```json
 {
   "success": true,
   "message": "Data semua diklat berhasil diambil.",
   "data": {
-    "total": 2,
-    "list": [
+    "current_page": 1,
+    "data": [
       {
-        "id": 12,
+        "id_diklat": 12,
         "nama": "Workshop Pelayanan Prima",
         "kategori": "Teknis",
         "jenis": "ASN",
@@ -635,12 +668,39 @@ Contoh response `200 OK`:
         "catatan": "Usulan pelatihan unit SDM",
         "jumlah_peserta": 5
       }
-    ]
+    ],
+    "first_page_url": "http://localhost:8000/api/diklat/all?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://localhost:8000/api/diklat/all?page=1",
+    "links": [
+      {
+        "url": null,
+        "label": "&laquo; Previous",
+        "active": false
+      },
+      {
+        "url": "http://localhost:8000/api/diklat/all?page=1",
+        "label": "1",
+        "active": true
+      },
+      {
+        "url": null,
+        "label": "Next &raquo;",
+        "active": false
+      }
+    ],
+    "next_page_url": null,
+    "path": "http://localhost:8000/api/diklat/all",
+    "per_page": 7,
+    "prev_page_url": null,
+    "to": 1,
+    "total": 1
   }
 }
 ```
 
-Keterangan field `list`:
+Keterangan field `data` (di dalam pagination):
 
 - `id`: ID master diklat.
 - `nama`: nama kegiatan.
@@ -2665,10 +2725,14 @@ Dokumentasi CRUD Data Keluarga yang terbagi menjadi entitas: **Pasangan**, **Ana
 
 ### 17. Master Data (Form Dropdowns)
 
-Semua endpoint master data diakses menggunakan metode `GET` dan wajib menyertakan Header `Authorization: Bearer <token>`.
-Respons mengembalikan array `data` yang memuat `id` dan `nama` untuk keperluan opsi *dropdown* form di antarmuka frontend.
+Endpoint master data menyediakan opsi dropdown untuk form dan CRUD master data (khusus HRD).
 
-### List Endpoint Master Data
+#### 17.1 List Master Data (Semua Role Login)
+
+Semua endpoint list master data diakses menggunakan metode `GET` dan wajib menyertakan Header `Authorization: Bearer <token>`.
+Respons mengembalikan array `data` yang memuat `id` dan `nama` untuk keperluan opsi *dropdown*.
+
+**List Endpoint (GET):**
 
 - `GET /api/form/kategori-diklat`
 - `GET /api/form/tipe-diklat`
@@ -2679,7 +2743,7 @@ Respons mengembalikan array `data` yang memuat `id` dan `nama` untuk keperluan o
 - `GET /api/form/profesi`
 - `GET /api/form/jenis-sip`
 
-**Contoh Response Master Data (`GET /api/form/jenis-pegawai`):**
+**Contoh Response (`GET /api/form/jenis-pegawai`):**
 ```json
 {
   "success": true,
@@ -2700,17 +2764,105 @@ Respons mengembalikan array `data` yang memuat `id` dan `nama` untuk keperluan o
 }
 ```
 
+#### 17.2 CRUD Master Data (Khusus HRD)
+
+Endpoint CRUD hanya untuk role `hrd` dan wajib menyertakan `Authorization: Bearer <token_hrd>`.
+
+**List Endpoint (POST / PATCH / DELETE):**
+
+- `POST /api/form/kategori-diklat`
+- `PATCH /api/form/kategori-diklat/{id}`
+- `DELETE /api/form/kategori-diklat/{id}`
+- `POST /api/form/tipe-diklat`
+- `PATCH /api/form/tipe-diklat/{id}`
+- `DELETE /api/form/tipe-diklat/{id}`
+- `POST /api/form/jenis-pegawai`
+- `PATCH /api/form/jenis-pegawai/{id}`
+- `DELETE /api/form/jenis-pegawai/{id}`
+- `POST /api/form/unit-kerja`
+- `PATCH /api/form/unit-kerja/{id}`
+- `DELETE /api/form/unit-kerja/{id}`
+- `POST /api/form/jenis-biaya`
+- `PATCH /api/form/jenis-biaya/{id}`
+- `DELETE /api/form/jenis-biaya/{id}`
+- `POST /api/form/golongan-ruang`
+- `PATCH /api/form/golongan-ruang/{id}`
+- `DELETE /api/form/golongan-ruang/{id}`
+- `POST /api/form/profesi`
+- `PATCH /api/form/profesi/{id}`
+- `DELETE /api/form/profesi/{id}`
+- `POST /api/form/jenis-sip`
+- `PATCH /api/form/jenis-sip/{id}`
+- `DELETE /api/form/jenis-sip/{id}`
+
+**Validasi Umum:**
+
+- `nama`: wajib, string, maksimal 255, unik per master data.
+- `kategori_tenaga`: opsional (khusus `profesi`), string, maksimal 100.
+
+**Contoh Request (POST /api/form/jenis-sip):**
+```json
+{
+  "nama": "SIP Praktik Mandiri"
+}
+```
+
+**Contoh Response (201 Created):**
+```json
+{
+  "success": true,
+  "message": "Jenis SIP berhasil dibuat.",
+  "data": {
+    "id": 12,
+    "nama": "SIP Praktik Mandiri"
+  }
+}
+```
+
+**Contoh Request (PATCH /api/form/profesi/3):**
+```json
+{
+  "nama": "Perawat",
+  "kategori_tenaga": "Tenaga Kesehatan"
+}
+```
+
+**Contoh Response (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Profesi berhasil diperbarui.",
+  "data": {
+    "id": 3,
+    "nama": "Perawat",
+    "kategori_tenaga": "Tenaga Kesehatan"
+  }
+}
+```
+
+**Contoh Response Delete (200 OK):**
+```json
+{
+  "success": true,
+  "message": "Jenis SIP berhasil dihapus.",
+  "data": {
+    "deleted_id": 12
+  }
+}
+```
+
 
 ### 18. Pegawai
 
 - Method: `GET`
 - URL: `/api/pegawai`
+- Parameter URL (Opsional): `?page=1`
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `admin`, `hrd`, `direktur`
 
-Mengambil daftar seluruh pegawai beserta ringkasan jumlahnya. Saat ini implementasi detail hanya tersedia untuk role `admin`, sedangkan role lain akan menerima balasan dummy sementara.
+Mengambil daftar seluruh pegawai beserta ringkasan jumlahnya secara ter-paginasi (10 item per halaman).
 
-Contoh response `200 OK` (Untuk role `admin`):
+Contoh response `200 OK`:
 
 ```json
 {
@@ -2721,19 +2873,54 @@ Contoh response `200 OK` (Untuk role `admin`):
     "jumlah_dokter": 10,
     "jumlah_perawat": 30,
     "jumlah_profesi": 15,
-    "pegawai": [
-      {
-        "id_pegawai": 1,
-        "nama": "Dr. Andi",
-        "nip": "198001012005011001",
-        "link_photo_profil": "http://localhost:8000/storage/photos/andi.jpg",
-        "jabatan": "Dokter Spesialis",
-        "unit_kerja": "Poli Penyakit Dalam",
-        "email": "andi@example.com",
-        "no_telp": "08123456789",
-        "status": "aktif"
-      }
-    ]
+    "pegawai": {
+      "current_page": 1,
+      "data": [
+        {
+          "id_pegawai": 1,
+          "nama": "Dr. Andi",
+          "nip": "198001012005011001",
+          "link_photo_profil": "http://localhost:8000/storage/photos/andi.jpg",
+          "jabatan": "Dokter Spesialis",
+          "unit_kerja": "Poli Penyakit Dalam",
+          "email": "andi@example.com",
+          "no_telp": "08123456789",
+          "status": "aktif"
+        }
+      ],
+      "first_page_url": "http://localhost:8000/api/pegawai?page=1",
+      "from": 1,
+      "last_page": 10,
+      "last_page_url": "http://localhost:8000/api/pegawai?page=10",
+      "links": [
+        {
+          "url": null,
+          "label": "&laquo; Previous",
+          "active": false
+        },
+        {
+          "url": "http://localhost:8000/api/pegawai?page=1",
+          "label": "1",
+          "active": true
+        },
+        {
+          "url": "http://localhost:8000/api/pegawai?page=2",
+          "label": "2",
+          "active": false
+        },
+        {
+          "url": "http://localhost:8000/api/pegawai?page=2",
+          "label": "Next &raquo;",
+          "active": false
+        }
+      ],
+      "next_page_url": "http://localhost:8000/api/pegawai?page=2",
+      "path": "http://localhost:8000/api/pegawai",
+      "per_page": 10,
+      "prev_page_url": null,
+      "to": 10,
+      "total": 100
+    }
   }
 }
 ```

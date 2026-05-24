@@ -155,8 +155,8 @@
                     "response": []
                 },
                 {
-                    "name": "Dashboard (HRD) || Pisah Jadi 3",
-                    "id": "fceda218-dee0-4463-9d14-e8c3409c335f",
+                    "name": "Dashboard (HRD) - Pegawai",
+                    "id": "req-6a130e201fe21",
                     "request": {
                         "method": "GET",
                         "header": [
@@ -167,13 +167,81 @@
                             }
                         ],
                         "url": {
-                            "raw": "{{base_url}}/api/dashboard",
+                            "raw": "{{base_url}}/api/dashboard?type=pegawai",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "dashboard"
+                            ],
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "pegawai"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Dashboard (HRD) - Diklat ASN",
+                    "id": "req-6a130e201fe30",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_hrd}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dashboard?type=diklat_asn",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dashboard"
+                            ],
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "diklat_asn"
+                                }
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Dashboard (HRD) - Diklat Tenkes",
+                    "id": "req-6a130e201fe32",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token_hrd}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/dashboard?type=diklat_tenkes",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "dashboard"
+                            ],
+                            "query": [
+                                {
+                                    "key": "type",
+                                    "value": "diklat_tenkes"
+                                }
                             ]
                         }
                     },
@@ -1450,6 +1518,988 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Master Data CRUD (HRD)",
+                    "item": [
+                        {
+                            "name": "Create Kategori Diklat (HRD)",
+                            "id": "1f2c7f2f-3b0b-4f2e-9e25-28f6b6bf0a21",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Manajemen\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/kategori-diklat",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "kategori-diklat"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Kategori Diklat (HRD)",
+                            "id": "2a3e9827-590a-4c39-8f24-327c74258a10",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Manajemen Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/kategori-diklat/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "kategori-diklat",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Kategori Diklat (HRD)",
+                            "id": "9b0cc9e7-c3a7-4cbe-9ca4-642d8f635ac9",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/kategori-diklat/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "kategori-diklat",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Tipe Diklat (HRD)",
+                            "id": "35f88a0e-3b50-4e3d-b386-8c5e2fd4c2e8",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Workshop\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/tipe-diklat",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "tipe-diklat"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Tipe Diklat (HRD)",
+                            "id": "f5db2b0e-2a44-4010-87e1-9f49fc77d0d4",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Workshop Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/tipe-diklat/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "tipe-diklat",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Tipe Diklat (HRD)",
+                            "id": "7f7b523a-5d1b-4cbf-9dd6-160df7d6a708",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/tipe-diklat/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "tipe-diklat",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Jenis Pegawai (HRD)",
+                            "id": "4fcd7f93-32b5-4f75-8a6d-1b9c3d12a4ff",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"BLUD\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-pegawai",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-pegawai"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Jenis Pegawai (HRD)",
+                            "id": "62c6a2d8-0d74-4c6c-8c19-6f53fbad72b6",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"BLUD Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-pegawai/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-pegawai",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Jenis Pegawai (HRD)",
+                            "id": "5cfe8491-4fd2-42f6-aee5-5c8999dcfa8c",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-pegawai/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-pegawai",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Unit Kerja (HRD)",
+                            "id": "b7d0cf83-bc8f-4d6a-9d4a-9861a3b2f1c1",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Pelayanan Medis\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/unit-kerja",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "unit-kerja"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Unit Kerja (HRD)",
+                            "id": "ea7a6e3a-85d3-4f32-8a11-cf519f70f6bc",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Pelayanan Medis Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/unit-kerja/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "unit-kerja",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Unit Kerja (HRD)",
+                            "id": "7e5075cc-5b11-413f-9a4b-e1a2154a4e53",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/unit-kerja/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "unit-kerja",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Jenis Biaya (HRD)",
+                            "id": "b3346ed6-3d9a-4a2b-8b97-9b7f3f872d0d",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Hibah\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-biaya",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-biaya"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Jenis Biaya (HRD)",
+                            "id": "233b7dd3-63d3-4fbf-bc1a-9d0f9c9f5c21",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Hibah Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-biaya/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-biaya",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Jenis Biaya (HRD)",
+                            "id": "e8a6df19-fd16-46fb-9bb2-79d5c06c4b0a",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-biaya/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-biaya",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Golongan Ruang (HRD)",
+                            "id": "c1a19b5e-d3c1-4e42-a701-882b1e063dd8",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"III/a\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/golongan-ruang",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "golongan-ruang"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Golongan Ruang (HRD)",
+                            "id": "7d4c7552-6a85-4b31-a02b-46d6048c6596",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"III/a Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/golongan-ruang/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "golongan-ruang",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Golongan Ruang (HRD)",
+                            "id": "2e12c2ce-9b12-4047-a749-1a3c3e7f0a1d",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/golongan-ruang/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "golongan-ruang",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Profesi (HRD)",
+                            "id": "f3d7d8c3-7a5c-4492-b813-14f9f5e27327",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Perawat\",\n  \"kategori_tenaga\": \"Tenaga Kesehatan\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/profesi",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "profesi"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Profesi (HRD)",
+                            "id": "a4b1b9bb-2d66-48db-9f4f-e3416dca0c45",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"Perawat Update\",\n  \"kategori_tenaga\": \"Tenaga Kesehatan\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/profesi/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "profesi",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Profesi (HRD)",
+                            "id": "35c4b640-9ad8-4c8f-9d58-7ef77dcb7f8f",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/profesi/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "profesi",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Create Jenis SIP (HRD)",
+                            "id": "0e0b507c-1fd5-4bd6-a2e7-4c46e4f4f3a0",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"SIP Praktik Mandiri\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-sip",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-sip"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Jenis SIP (HRD)",
+                            "id": "4a7c58cd-0703-494d-a4ed-4f80c0873c8e",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PATCH",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json",
+                                        "type": "text"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"nama\": \"SIP Praktik Mandiri Update\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-sip/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-sip",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Jenis SIP (HRD)",
+                            "id": "0f5b7a95-8761-4eb0-8b33-71fd2a07fb0b",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{token_hrd}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{base_url}}/api/form/jenis-sip/1",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "form",
+                                        "jenis-sip",
+                                        "1"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ],
+                    "id": "5e2a1a3d-6d73-4c59-9df4-65cbe3b42e1f"
                 }
             ],
             "id": "ca1d21b0-250f-4842-aa07-8739f9542313"
@@ -2537,13 +3587,20 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/diklat",
+                                    "raw": "{{base_url}}/api/diklat?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
                                     "path": [
                                         "api",
                                         "diklat"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -2795,13 +3852,20 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/diklat",
+                                    "raw": "{{base_url}}/api/diklat?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
                                     "path": [
                                         "api",
                                         "diklat"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -2911,7 +3975,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/diklat/all",
+                                    "raw": "{{base_url}}/api/diklat/all?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -2919,6 +3983,13 @@
                                         "api",
                                         "diklat",
                                         "all"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -2986,7 +4057,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/hrd/diklat/1/peserta",
+                                    "raw": "{{base_url}}/api/hrd/diklat/1/peserta?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -2996,6 +4067,13 @@
                                         "diklat",
                                         "1",
                                         "peserta"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -3065,7 +4143,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/hrd/diklat/status/layak",
+                                    "raw": "{{base_url}}/api/hrd/diklat/status/layak?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -3075,6 +4153,13 @@
                                         "diklat",
                                         "status",
                                         "layak"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -3145,7 +4230,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/hrd/diklat/status/validasi",
+                                    "raw": "{{base_url}}/api/hrd/diklat/status/validasi?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -3155,6 +4240,13 @@
                                         "diklat",
                                         "status",
                                         "validasi"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -3218,7 +4310,7 @@
             "name": "09. Pegawai Management",
             "item": [
                 {
-                    "name": "Get Pegawai",
+                    "name": "Get Pegawai (Pagination)",
                     "id": "1f2e6d26-07a0-4858-a497-25cb7456d9de",
                     "request": {
                         "auth": {
@@ -3234,13 +4326,19 @@
                         "method": "GET",
                         "header": [],
                         "url": {
-                            "raw": "{{base_url}}/api/pegawai",
+                            "raw": "{{base_url}}/api/pegawai?page=1",
                             "host": [
                                 "{{base_url}}"
                             ],
                             "path": [
                                 "api",
                                 "pegawai"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                }
                             ]
                         }
                     },
@@ -3946,7 +5044,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/hrd/diklat/status/layak",
+                                    "raw": "{{base_url}}/api/hrd/diklat/status/layak?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -3956,6 +5054,13 @@
                                         "diklat",
                                         "status",
                                         "layak"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -4226,7 +5331,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/hrd/diklat/status/validasi",
+                                    "raw": "{{base_url}}/api/hrd/diklat/status/validasi?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -4236,6 +5341,13 @@
                                         "diklat",
                                         "status",
                                         "validasi"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -4673,7 +5785,7 @@
                             "response": []
                         },
                         {
-                            "name": "2. Get Pegawai",
+                            "name": "2. Get Pegawai (Pagination)",
                             "id": "081b09aa-4e90-4c9a-bc9f-fab715368683",
                             "request": {
                                 "auth": {
@@ -4689,13 +5801,19 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/pegawai",
+                                    "raw": "{{base_url}}/api/pegawai?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
                                     "path": [
                                         "api",
                                         "pegawai"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        }
                                     ]
                                 }
                             },
@@ -4835,7 +5953,7 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/hrd/diklat/1/peserta",
+                                    "raw": "{{base_url}}/api/hrd/diklat/1/peserta?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
@@ -4845,6 +5963,13 @@
                                         "diklat",
                                         "1",
                                         "peserta"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1",
+                                            "description": "Pagination page number"
+                                        }
                                     ]
                                 }
                             },
@@ -4969,7 +6094,7 @@
                     "name": "Test Get Detail Pegawai",
                     "item": [
                         {
-                            "name": "1. Get All Pegawai",
+                            "name": "1. Get All Pegawai (Pagination)",
                             "id": "a7d894d1-8081-4cf1-beaf-1b616deb6319",
                             "request": {
                                 "auth": {
@@ -4985,13 +6110,19 @@
                                 "method": "GET",
                                 "header": [],
                                 "url": {
-                                    "raw": "{{base_url}}/api/pegawai",
+                                    "raw": "{{base_url}}/api/pegawai?page=1",
                                     "host": [
                                         "{{base_url}}"
                                     ],
                                     "path": [
                                         "api",
                                         "pegawai"
+                                    ],
+                                    "query": [
+                                        {
+                                            "key": "page",
+                                            "value": "1"
+                                        }
                                     ]
                                 }
                             },

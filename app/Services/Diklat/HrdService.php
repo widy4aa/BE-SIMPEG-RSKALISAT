@@ -17,11 +17,21 @@ class HrdService
     {
         $pegawai = $this->pegawaiDiklatRepository->findPegawaiByUserId($userId);
 
-        $riwayatDiklat = $pegawai === null
-            ? collect()
-            : $this->pegawaiDiklatRepository->getRiwayatDiklatByPegawaiId((int) $pegawai->id);
+        if ($pegawai === null) {
+            $totalRiwayat = 0;
+            $selesai = 0;
+            $akanDatang = 0;
+            $paginatedRiwayat = \App\Models\ListJadwalDiklat::query()->whereRaw('1 = 0')->paginate(7);
+        } else {
+            $riwayatQuery = \App\Models\ListJadwalDiklat::query()->where('pegawai_id', $pegawai->id);
+            $totalRiwayat = $riwayatQuery->count();
+            $selesai = (clone $riwayatQuery)->where('status_diklat', 'sudah terlaksana')->count();
+            $akanDatang = (clone $riwayatQuery)->where('status_diklat', 'belum terlaksana')->count();
 
-        $riwayat = $riwayatDiklat->map(function ($jadwal): array {
+            $paginatedRiwayat = $this->pegawaiDiklatRepository->getPaginatedRiwayatDiklatByPegawaiId((int) $pegawai->id, 7);
+        }
+
+        $riwayat = $paginatedRiwayat->getCollection()->map(function ($jadwal): array {
             $diklat = $jadwal->diklat;
             $tanggalMulai = $diklat?->tanggal_mulai;
             $tanggalSelesai = $diklat?->tanggal_selesai;
@@ -51,27 +61,29 @@ class HrdService
                     $jadwal->status_validasi
                 ),
             ];
-        })->values()->all();
+        });
+
+        $paginatedRiwayat->setCollection($riwayat);
 
         return [
             'welcome' => 'Daftar diklat untuk HRD berhasil diambil.',
             'summary' => [
                 'label' => 'Diklat hrd',
                 'ringkasan' => [
-                    'total_riwayat' => $riwayatDiklat->count(),
-                    'selesai' => $riwayatDiklat->where('status_diklat', 'sudah terlaksana')->count(),
-                    'akan_datang' => $riwayatDiklat->where('status_diklat', 'belum terlaksana')->count(),
+                    'total_riwayat' => $totalRiwayat,
+                    'selesai' => $selesai,
+                    'akan_datang' => $akanDatang,
                 ],
-                'riwayat_diklat' => $riwayat,
+                'riwayat_diklat' => $paginatedRiwayat,
             ],
         ];
     }
 
-    public function getAllDiklat(): array
+    public function getAllDiklat(): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $diklatList = $this->pegawaiDiklatRepository->getAllMasterDiklat();
+        $paginatedDiklat = $this->pegawaiDiklatRepository->getPaginatedMasterDiklat(7);
 
-        $items = $diklatList->map(function ($diklat): array {
+        $items = $paginatedDiklat->getCollection()->map(function ($diklat): array {
             $tanggalMulai = $diklat->tanggal_mulai;
             $tanggalSelesai = $diklat->tanggal_selesai;
 
@@ -94,12 +106,11 @@ class HrdService
                 'catatan' => (string) ($diklat->catatan ?? ''),
                 'jumlah_peserta' => $diklat->jadwal_peserta_count ?? 0,
             ];
-        })->values()->all();
+        });
 
-        return [
-            'total' => count($items),
-            'list' => $items,
-        ];
+        $paginatedDiklat->setCollection($items);
+
+        return $paginatedDiklat;
     }
 
     public function createMasterDiklat(int $userId, array $payload): array

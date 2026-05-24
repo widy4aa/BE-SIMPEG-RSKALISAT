@@ -10,9 +10,9 @@ class HrdService
     {
     }
 
-    public function build(int $userId): array
+    public function build(int $userId, ?string $type = null): array
     {
-        $stats = $this->repository->getDashboardStats();
+        $stats = $this->repository->getDashboardStats($type);
 
         return [
             'welcome' => 'Selamat datang hrd',

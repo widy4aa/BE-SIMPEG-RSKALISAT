@@ -14,34 +14,22 @@ class AdminPegawaiService
 
     public function getPegawaiData(): array
     {
-        $pegawaiList = $this->repository->getAllPegawai();
+        $totalPegawai = \App\Models\Pegawai::count();
+        $jumlahDokter = \App\Models\Pegawai::whereHas('profesi', function($q) {
+            $q->where('nama', 'like', '%dokter%');
+        })->count();
+        $jumlahPerawat = \App\Models\Pegawai::whereHas('profesi', function($q) {
+            $q->where('nama', 'like', '%perawat%');
+        })->count();
+        $jumlahProfesi = \Illuminate\Support\Facades\DB::table('pegawai')->whereNotNull('profesi_id')->distinct('profesi_id')->count('profesi_id');
 
-        $totalPegawai = $pegawaiList->count();
+        $paginatedPegawai = $this->repository->getPaginatedPegawai(10);
         
-        $jumlahDokter = 0;
-        $jumlahPerawat = 0;
-        $uniqueProfesiIds = [];
-        
-        $mappedData = [];
-
-        foreach ($pegawaiList as $pegawai) {
-            $profesiNama = strtolower($pegawai->profesi?->nama ?? '');
-            
-            if (str_contains($profesiNama, 'dokter')) {
-                $jumlahDokter++;
-            }
-            if (str_contains($profesiNama, 'perawat')) {
-                $jumlahPerawat++;
-            }
-
-            if ($pegawai->profesi_id) {
-                $uniqueProfesiIds[$pegawai->profesi_id] = true;
-            }
-
+        $mappedData = $paginatedPegawai->getCollection()->map(function ($pegawai) {
             $fotoPath = $pegawai->pribadi?->foto_path;
             $linkPhotoProfil = $fotoPath ? url(Storage::url($fotoPath)) : null;
 
-            $mappedData[] = [
+            return [
                 'id_pegawai' => $pegawai->id,
                 'nama' => $pegawai->nama,
                 'nip' => $pegawai->nip,
@@ -52,14 +40,16 @@ class AdminPegawaiService
                 'no_telp' => $pegawai->pribadi?->no_hp ?? $pegawai->pribadi?->no_telp,
                 'status' => $pegawai->status_pegawai,
             ];
-        }
+        });
+
+        $paginatedPegawai->setCollection($mappedData);
 
         return [
             'total_pegawai' => $totalPegawai,
             'jumlah_dokter' => $jumlahDokter,
             'jumlah_perawat' => $jumlahPerawat,
-            'jumlah_profesi' => count($uniqueProfesiIds),
-            'pegawai' => $mappedData,
+            'jumlah_profesi' => $jumlahProfesi,
+            'pegawai' => $paginatedPegawai,
         ];
     }
 

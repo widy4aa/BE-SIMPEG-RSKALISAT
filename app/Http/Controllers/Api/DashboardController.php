@@ -18,8 +18,9 @@ class DashboardController extends Controller
         $claims = $request->input('_jwt_claims', []);
         $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+        $type = $request->query('type');
 
-        $payload = $this->dashboardService->getPayloadByRole($role, $userId);
+        $payload = $this->dashboardService->getPayloadByRole($role, $userId, $type);
 
         if ($payload === null) {
             return response()->json([
