@@ -30,6 +30,7 @@ class StorePegawaiDiklatRequest extends FormRequest
             'total_biaya' => ['required_if:jenis_pelaksana,internal', 'nullable', 'numeric', 'min:0'],
             'catatan' => ['nullable', 'string', 'max:1000'],
             'jenis_pelaksana' => ['required', 'in:internal,external'],
+            'waktu' => ['nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/'],
         ];
     }
 

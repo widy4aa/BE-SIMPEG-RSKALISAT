@@ -501,7 +501,8 @@ Authorization: Bearer <jwt_token>
 Keterangan implementasi saat ini:
 
 - Role `pegawai`: data diambil dari database melalui repository.
-- Role `admin`, `direktur`: payload ringkasan tetap dibedakan per role.
+- Role `admin`: payload ringkasan tersendiri.
+- Role `direktur`: mengembalikan struktur dan payload yang persis sama dengan role `hrd`.
 - Role `hrd`: data diambil dari database berdasarkan peserta (hanya diklat yang diikuti HRD login).
 
 Contoh response role `pegawai` (dengan pagination 7 item, parameter `?page=1`):
@@ -532,7 +533,7 @@ Contoh response role `pegawai` (dengan pagination 7 item, parameter `?page=1`):
             "tanggal_selesai": "2025-11-17",
             "status": "selesai",
             "tempat": "Aula Utama",
-            "waktu": "08:00 - 16:00",
+            "waktu": "08:00:00",
             "created_by": "Admin SIMPEG",
             "jp": 24,
             "total_biaya": 250000,
@@ -739,6 +740,7 @@ Field request:
 - `lokasi` (required, string)
 - `tanggal_mulai` (required, date)
 - `tanggal_selesai` (required, date)
+- `waktu` (nullable, string, format: `HH:MM` or `HH:MM:SS`)
 - `jp` (required, integer)
 - `jenis_biaya` (required jika `jenis_pelaksana=internal`)
 - `total_biaya` (required jika `jenis_pelaksana=internal`)
@@ -756,6 +758,7 @@ Contoh request payload (JSON):
   "lokasi": "Aula RS",
   "tanggal_mulai": "2026-08-10",
   "tanggal_selesai": "2026-08-12",
+  "waktu": "08:00:00",
   "jp": 24,
   "jenis_biaya": "BLUD",
   "total_biaya": 1500000,
@@ -779,6 +782,7 @@ Contoh response sukses (`201`):
     "lokasi": "Aula RS",
     "tanggal_mulai": "2026-08-10",
     "tanggal_selesai": "2026-08-12",
+    "waktu": "08:00:00",
     "jp": 24,
     "jenis_biaya": "BLUD",
     "total_biaya": 1500000,
@@ -1057,6 +1061,7 @@ Field request:
 - `lokasi` (required)
 - `tanggal_mulai` (required, date)
 - `tanggal_selesai` (required, date)
+- `waktu` (nullable, string, format: `HH:MM` or `HH:MM:SS`)
 - `no_sertif` (nullable)
 - `upload_sertif` (nullable, file: pdf/jpg/jpeg/png/webp, max 5MB)
 - `jp` (required)
@@ -1092,6 +1097,7 @@ Contoh response sukses (`201`):
     "lokasi": "Aula RS",
     "tanggal_mulai": "2026-05-10",
     "tanggal_selesai": "2026-05-12",
+    "waktu": "08:00:00",
     "status_diklat": "belum terlaksana",
     "no_sertif": "SERTIF/SDM/2026/0099",
     "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",
@@ -1123,6 +1129,7 @@ Field request (opsional / partial update):
 - `lokasi`
 - `tanggal_mulai`
 - `tanggal_selesai`
+- `waktu`
 - `no_sertif`
 - `upload_sertif`
 - `jp`
@@ -1134,8 +1141,8 @@ Field request (opsional / partial update):
 Aturan bisnis edit:
 
 - `jenis_pelaksana` (`internal`/`external`) tidak bisa diubah.
-- Jika diklat `internal` dan `status_validasi = valid`, data tidak bisa diedit.
-- Jika diklat `external` dan `status_kelayakan = layak`, data tidak bisa diedit.
+- Jika diklat `internal` and `status_validasi = valid`, data tidak bisa diedit.
+- Jika diklat `external` and `status_kelayakan = layak`, data tidak bisa diedit.
 - Untuk diklat `internal`, `status_kelayakan` dipertahankan `layak`, dan `status_validasi` bisa tetap `valid` atau `tidak valid` sesuai proses verifikasi.
 - Untuk diklat `external`, `jenis_biaya`, `total_biaya`, dan `status_validasi` diset `null`.
 
@@ -1155,6 +1162,7 @@ Contoh response sukses (`200`):
     "lokasi": "Aula RS",
     "tanggal_mulai": "2026-05-10",
     "tanggal_selesai": "2026-05-12",
+    "waktu": "08:00:00",
     "status_diklat": "belum terlaksana",
     "no_sertif": "SERTIF/SDM/2026/0099",
     "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",

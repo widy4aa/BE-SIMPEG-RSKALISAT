@@ -18,7 +18,7 @@ class DashboardService
             'admin' => $this->adminService->build($userId),
             'pegawai' => $this->pegawaiService->build($userId),
             'hrd' => $this->hrdService->build($userId, $type),
-            'direktur' => $this->direkturService->build($userId),
+            'direktur' => $this->direkturService->build($userId, $type),
             default => null,
         };
     }

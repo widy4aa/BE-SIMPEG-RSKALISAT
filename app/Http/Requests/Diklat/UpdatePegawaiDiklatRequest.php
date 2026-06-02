@@ -30,6 +30,7 @@ class UpdatePegawaiDiklatRequest extends FormRequest
             'total_biaya' => ['sometimes', 'nullable', 'numeric', 'min:0'],
             'catatan' => ['sometimes', 'nullable', 'string', 'max:1000'],
             'jenis_pelaksana' => ['sometimes', 'nullable', 'in:internal,external'],
+            'waktu' => ['sometimes', 'nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/'],
         ];
     }
 

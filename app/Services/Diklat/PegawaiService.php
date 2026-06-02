@@ -174,7 +174,7 @@ class PegawaiService
                 'tanggal_mulai' => $tanggalMulai->toDateString(),
                 'tanggal_selesai' => $tanggalSelesai->toDateString(),
                 'tempat' => (string) $payload['lokasi'],
-                'waktu' => null,
+                'waktu' => $payload['waktu'] ?? null,
                 'jp' => (int) $payload['jp'],
                 'total_biaya' => $totalBiaya,
                 'jenis_biaya_id' => $jenisBiayaId,
@@ -206,6 +206,7 @@ class PegawaiService
             'lokasi' => (string) ($diklat->tempat ?? ''),
             'tanggal_mulai' => optional($diklat->tanggal_mulai)?->toDateString(),
             'tanggal_selesai' => optional($diklat->tanggal_selesai)?->toDateString(),
+            'waktu' => optional($diklat->waktu)?->format('H:i:s'),
             'status_diklat' => (string) $jadwal->status_diklat,
             'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
             'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
@@ -240,9 +241,10 @@ class PegawaiService
         }
 
         $diklat = $jadwal->diklat;
+        $isOwner = (int) $diklat->created_by === (int) $pegawai->id;
         $jenisPelaksanaCurrent = (string) ($diklat->jenis_pelaksanaan ?? '');
 
-        if (array_key_exists('jenis_pelaksana', $payload)) {
+        if ($isOwner && array_key_exists('jenis_pelaksana', $payload)) {
             $jenisPelaksanaNew = strtolower((string) ($payload['jenis_pelaksana'] ?? ''));
             if ($jenisPelaksanaNew !== '' && $jenisPelaksanaNew !== $jenisPelaksanaCurrent) {
                 throw new InvalidArgumentException('Jenis pelaksana internal/external tidak bisa diubah.');
@@ -257,69 +259,79 @@ class PegawaiService
             throw new InvalidArgumentException('Diklat eksternal yang sudah layak tidak bisa diedit.');
         }
 
-        $tanggalMulai = array_key_exists('tanggal_mulai', $payload)
-            ? Carbon::parse((string) $payload['tanggal_mulai'])->startOfDay()
-            : optional($diklat->tanggal_mulai)?->copy()?->startOfDay();
-
-        $tanggalSelesai = array_key_exists('tanggal_selesai', $payload)
-            ? Carbon::parse((string) $payload['tanggal_selesai'])->startOfDay()
-            : optional($diklat->tanggal_selesai)?->copy()?->startOfDay();
-
-        if ($tanggalMulai === null || $tanggalSelesai === null) {
-            throw new InvalidArgumentException('Tanggal mulai dan tanggal selesai harus tersedia.');
-        }
-
         $kategori = $diklat->kategoriDiklat;
-        if (array_key_exists('kategori', $payload) && trim((string) $payload['kategori']) !== '') {
-            $kategori = $this->pegawaiDiklatRepository->firstOrCreateKategoriByNama((string) $payload['kategori']);
-            $diklat->kategori_diklat_id = (int) $kategori->id;
-        }
-
         $jenisDiklat = $diklat->jenisDiklat;
-        if (array_key_exists('jenis_diklat', $payload) && trim((string) $payload['jenis_diklat']) !== '') {
-            $jenisDiklat = $this->pegawaiDiklatRepository->firstOrCreateJenisByNama((string) $payload['jenis_diklat']);
-            $diklat->jenis_diklat_id = (int) $jenisDiklat->id;
-        }
 
-        if (array_key_exists('nama_kegiatan', $payload)) {
-            $diklat->nama_kegiatan = (string) ($payload['nama_kegiatan'] ?? '');
-        }
+        if ($isOwner) {
+            $tanggalMulai = array_key_exists('tanggal_mulai', $payload)
+                ? Carbon::parse((string) $payload['tanggal_mulai'])->startOfDay()
+                : optional($diklat->tanggal_mulai)?->copy()?->startOfDay();
 
-        if (array_key_exists('penyelenggara', $payload)) {
-            $diklat->penyelenggara = (string) ($payload['penyelenggara'] ?? '');
-        }
+            $tanggalSelesai = array_key_exists('tanggal_selesai', $payload)
+                ? Carbon::parse((string) $payload['tanggal_selesai'])->startOfDay()
+                : optional($diklat->tanggal_selesai)?->copy()?->startOfDay();
 
-        if (array_key_exists('lokasi', $payload)) {
-            $diklat->tempat = (string) ($payload['lokasi'] ?? '');
-        }
+            if ($tanggalMulai === null || $tanggalSelesai === null) {
+                throw new InvalidArgumentException('Tanggal mulai dan tanggal selesai harus tersedia.');
+            }
 
-        if (array_key_exists('jp', $payload) && $payload['jp'] !== null && $payload['jp'] !== '') {
-            $diklat->jp = (int) $payload['jp'];
-        }
+            if (array_key_exists('kategori', $payload) && trim((string) $payload['kategori']) !== '') {
+                $kategori = $this->pegawaiDiklatRepository->firstOrCreateKategoriByNama((string) $payload['kategori']);
+                $diklat->kategori_diklat_id = (int) $kategori->id;
+            }
 
-        if (array_key_exists('catatan', $payload)) {
-            $diklat->catatan = (string) ($payload['catatan'] ?? '');
-        }
+            if (array_key_exists('jenis_diklat', $payload) && trim((string) $payload['jenis_diklat']) !== '') {
+                $jenisDiklat = $this->pegawaiDiklatRepository->firstOrCreateJenisByNama((string) $payload['jenis_diklat']);
+                $diklat->jenis_diklat_id = (int) $jenisDiklat->id;
+            }
 
-        $diklat->tanggal_mulai = $tanggalMulai->toDateString();
-        $diklat->tanggal_selesai = $tanggalSelesai->toDateString();
+            if (array_key_exists('nama_kegiatan', $payload)) {
+                $diklat->nama_kegiatan = (string) ($payload['nama_kegiatan'] ?? '');
+            }
+
+            if (array_key_exists('penyelenggara', $payload)) {
+                $diklat->penyelenggara = (string) ($payload['penyelenggara'] ?? '');
+            }
+
+            if (array_key_exists('lokasi', $payload)) {
+                $diklat->tempat = (string) ($payload['lokasi'] ?? '');
+            }
+
+            if (array_key_exists('jp', $payload) && $payload['jp'] !== null && $payload['jp'] !== '') {
+                $diklat->jp = (int) $payload['jp'];
+            }
+
+            if (array_key_exists('catatan', $payload)) {
+                $diklat->catatan = (string) ($payload['catatan'] ?? '');
+            }
+
+            if (array_key_exists('waktu', $payload)) {
+                $diklat->waktu = $payload['waktu'];
+            }
+
+            $diklat->tanggal_mulai = $tanggalMulai->toDateString();
+            $diklat->tanggal_selesai = $tanggalSelesai->toDateString();
+
+            if ($jenisPelaksanaCurrent === 'internal') {
+                if (array_key_exists('jenis_biaya', $payload) && trim((string) ($payload['jenis_biaya'] ?? '')) !== '') {
+                    $jenisBiaya = $this->pegawaiDiklatRepository->firstOrCreateJenisBiayaByNama((string) $payload['jenis_biaya']);
+                    $diklat->jenis_biaya_id = (int) $jenisBiaya->id;
+                }
+
+                if (array_key_exists('total_biaya', $payload) && $payload['total_biaya'] !== null && $payload['total_biaya'] !== '') {
+                    $diklat->total_biaya = (float) $payload['total_biaya'];
+                }
+            } else {
+                $diklat->jenis_biaya_id = null;
+                $diklat->total_biaya = null;
+            }
+        }
 
         if ($jenisPelaksanaCurrent === 'internal') {
             // Internal selalu layak; status validasi bisa valid/tidak valid/null sesuai proses verifikasi.
             $jadwal->status_kelayakan = 'layak';
-
-            if (array_key_exists('jenis_biaya', $payload) && trim((string) ($payload['jenis_biaya'] ?? '')) !== '') {
-                $jenisBiaya = $this->pegawaiDiklatRepository->firstOrCreateJenisBiayaByNama((string) $payload['jenis_biaya']);
-                $diklat->jenis_biaya_id = (int) $jenisBiaya->id;
-            }
-
-            if (array_key_exists('total_biaya', $payload) && $payload['total_biaya'] !== null && $payload['total_biaya'] !== '') {
-                $diklat->total_biaya = (float) $payload['total_biaya'];
-            }
         } else {
             // External tidak memerlukan validasi valid/tidak valid.
-            $diklat->jenis_biaya_id = null;
-            $diklat->total_biaya = null;
             $jadwal->status_validasi = null;
         }
 
@@ -345,10 +357,15 @@ class PegawaiService
             $jadwal->uploaded_at = now();
         }
 
-        $jadwal->status_diklat = $this->resolveStatusDiklatByTanggal($tanggalMulai, $tanggalSelesai);
+        $jadwal->status_diklat = $this->resolveStatusDiklatByTanggal(
+            Carbon::parse($diklat->tanggal_mulai)->startOfDay(),
+            Carbon::parse($diklat->tanggal_selesai)->startOfDay()
+        );
 
-        DB::transaction(function () use ($diklat, $jadwal): void {
-            $this->pegawaiDiklatRepository->saveDiklat($diklat);
+        DB::transaction(function () use ($diklat, $jadwal, $isOwner): void {
+            if ($isOwner) {
+                $this->pegawaiDiklatRepository->saveDiklat($diklat);
+            }
             $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
         });
 
@@ -362,6 +379,7 @@ class PegawaiService
             'lokasi' => (string) ($diklat->tempat ?? ''),
             'tanggal_mulai' => optional($diklat->tanggal_mulai)?->toDateString(),
             'tanggal_selesai' => optional($diklat->tanggal_selesai)?->toDateString(),
+            'waktu' => optional($diklat->waktu)?->format('H:i:s'),
             'status_diklat' => (string) ($jadwal->status_diklat ?? ''),
             'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
             'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
@@ -396,6 +414,11 @@ class PegawaiService
         }
 
         $diklat = $jadwal->diklat;
+
+        if ((int) $diklat->created_by !== (int) $pegawai->id) {
+            throw new InvalidArgumentException('Anda tidak berhak menghapus diklat yang bukan buatan Anda.');
+        }
+
         $statusKelayakan = strtolower((string) ($jadwal->status_kelayakan ?? ''));
         $statusValidasi = strtolower((string) ($jadwal->status_validasi ?? ''));
 
