@@ -3233,25 +3233,27 @@ Digunakan oleh Admin untuk membuat data pegawai baru dengan informasi yang sanga
   }
   ```
 
-#### Ubah Role Pegawai (Hanya Admin)
+#### Ubah Role / Status Pegawai (Hanya Admin)
 
 - **Route:** `PATCH /api/pegawai/{id}/change-role`
 - **Body Type:** `application/json`
 - **Auth:** Wajib Bearer token
 - **Role yang diizinkan:** `admin`
 
-Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada. Catatan: Admin tidak dapat mengubah rolenya sendiri.
+Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada, serta mengubah status pegawainya. Catatan: Admin tidak dapat mengubah role/statusnya sendiri.
 
 - **Request Payload:**
 
 | Field | Type | Wajib | Keterangan |
 |-------|------|-------|------------|
-| `role` | String | Ya | Salah satu dari: `pegawai`, `admin`, `hrd`, `direktur` |
+| `role` | String | Opsional | Salah satu dari: `pegawai`, `admin`, `hrd`, `direktur` |
+| `status_pegawai` | String | Opsional | Salah satu dari: `aktif`, `cuti`, `berhenti`, `pensiun` |
 
 - **Contoh Request Payload (JSON):**
   ```json
   {
-    "role": "hrd"
+    "role": "hrd",
+    "status_pegawai": "aktif"
   }
   ```
 
@@ -3259,12 +3261,13 @@ Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada. Catatan: A
   ```json
   {
     "success": true,
-    "message": "Role pegawai berhasil diubah",
+    "message": "Role/status pegawai berhasil diubah",
     "data": {
       "id": 101,
       "nik": "3509191234567890",
       "nama": "Ahmad Subarjo",
-      "role": "hrd"
+      "role": "hrd",
+      "status_pegawai": "aktif"
     }
   }
   ```
@@ -3273,7 +3276,7 @@ Digunakan oleh Admin untuk mengubah role akun Pegawai yang sudah ada. Catatan: A
   ```json
   {
     "success": false,
-    "message": "Tidak dapat mengubah role diri sendiri."
+    "message": "Tidak dapat mengubah role/status diri sendiri."
   }
   ```
 

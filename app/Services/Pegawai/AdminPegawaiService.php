@@ -200,7 +200,7 @@ class AdminPegawaiService
         ];
     }
 
-    public function changeRole(int $pegawaiId, string $newRole, int $adminUserId): array
+    public function changeRole(int $pegawaiId, array $data, int $adminUserId): array
     {
         $pegawai = $this->repository->getAllPegawai()->where('id', $pegawaiId)->first();
         if (!$pegawai) {
@@ -208,16 +208,17 @@ class AdminPegawaiService
         }
 
         if ($pegawai->user_id === $adminUserId) {
-            throw new \RuntimeException('Tidak dapat mengubah role diri sendiri.');
+            throw new \RuntimeException('Tidak dapat mengubah role/status diri sendiri.');
         }
 
-        $updatedPegawai = $this->repository->changeRole($pegawaiId, $newRole);
+        $updatedPegawai = $this->repository->changeRole($pegawaiId, $data);
 
         return [
             'id' => $updatedPegawai->id,
             'nik' => $updatedPegawai->nik,
             'nama' => $updatedPegawai->nama,
             'role' => $updatedPegawai->user?->role,
+            'status_pegawai' => $updatedPegawai->status_pegawai,
         ];
     }
 }

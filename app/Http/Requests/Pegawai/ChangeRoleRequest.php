@@ -23,7 +23,8 @@ class ChangeRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => 'required|string|in:pegawai,admin,hrd,direktur',
+            'role' => 'sometimes|required|string|in:pegawai,admin,hrd,direktur',
+            'status_pegawai' => 'sometimes|required|string|in:aktif,cuti,berhenti,pensiun',
         ];
     }
 }

@@ -79,13 +79,18 @@ class AdminPegawaiRepository
         });
     }
 
-    public function changeRole(int $pegawaiId, string $newRole): Pegawai
+    public function changeRole(int $pegawaiId, array $data): Pegawai
     {
         $pegawai = Pegawai::with('user')->findOrFail($pegawaiId);
         
-        if ($pegawai->user) {
-            $pegawai->user->role = $newRole;
+        if (isset($data['role']) && $pegawai->user) {
+            $pegawai->user->role = $data['role'];
             $pegawai->user->save();
+        }
+
+        if (isset($data['status_pegawai'])) {
+            $pegawai->status_pegawai = $data['status_pegawai'];
+            $pegawai->save();
         }
 
         return $pegawai;

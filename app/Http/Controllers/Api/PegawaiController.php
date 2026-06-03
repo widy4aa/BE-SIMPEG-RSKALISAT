@@ -80,12 +80,12 @@ class PegawaiController extends Controller
         $adminUserId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
         try {
-            $result = $this->pegawaiService->changeRole($adminRole, $id, $request->validated('role'), $adminUserId);
+            $result = $this->pegawaiService->changeRole($adminRole, $id, $request->validated(), $adminUserId);
 
             if (!$result) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Role tidak memiliki akses untuk mengubah role pegawai.',
+                    'message' => 'Role tidak memiliki akses untuk mengubah role/status pegawai.',
                 ], 403);
             }
 

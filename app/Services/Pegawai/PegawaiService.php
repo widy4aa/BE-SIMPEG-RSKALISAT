@@ -35,10 +35,10 @@ class PegawaiService
         };
     }
 
-    public function changeRole(string $adminRole, int $pegawaiId, string $newRole, int $adminUserId): ?array
+    public function changeRole(string $adminRole, int $pegawaiId, array $data, int $adminUserId): ?array
     {
         return match ($adminRole) {
-            'admin' => $this->adminService->changeRole($pegawaiId, $newRole, $adminUserId),
+            'admin' => $this->adminService->changeRole($pegawaiId, $data, $adminUserId),
             default => null,
         };
     }
