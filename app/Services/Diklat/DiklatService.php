@@ -50,6 +50,11 @@ class DiklatService
         return $this->hrdService->createMasterDiklat($userId, $payload);
     }
 
+    public function updateHrdDiklat(int $diklatId, int $userId, array $payload): array
+    {
+        return $this->hrdService->updateMasterDiklat($diklatId, $userId, $payload);
+    }
+
     public function getPesertaDiklat(int $diklatId): array
     {
         return $this->hrdService->getPesertaDiklat($diklatId);

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StoreHrdDiklatRequest;
+use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
 use App\Http\Requests\Diklat\StorePegawaiDiklatRequest;
 use App\Http\Requests\Diklat\UpdatePegawaiDiklatRequest;
 use App\Services\Diklat\DiklatService;
@@ -47,7 +48,7 @@ class DiklatController extends Controller
         $claims = $request->input('_jwt_claims', []);
         $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
 
-        if ($role !== 'hrd') {
+        if ($role !== 'hrd' && $role !== 'direktur') {
             return response()->json([
                 'success' => false,
                 'message' => 'Role tidak memiliki akses untuk melihat semua data diklat.',
@@ -87,6 +88,33 @@ class DiklatController extends Controller
             'message' => 'Master Diklat berhasil dibuat.',
             'data' => $result,
         ], 201);
+    }
+
+    public function updateMaster(UpdateHrdDiklatRequest $request, int $id): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        $payload = $request->validated();
+
+        try {
+            $result = $this->diklatService->updateHrdDiklat(
+                diklatId: $id,
+                userId: $userId,
+                payload: $payload,
+            );
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Master Diklat berhasil diupdate.',
+            'data' => $result,
+        ]);
     }
 
     public function peserta(Request $request, int $id): JsonResponse

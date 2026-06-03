@@ -632,14 +632,14 @@ Catatan field `status`:
 - Status hitung by tanggal (`mendatang`, `berlangsung`, `selesai`) saat ini diterapkan pada item role `pegawai` dan `hrd`.
 - Item role `admin` dan `direktur` saat ini belum menggunakan field `status`.
 
-#### GET Diklat (All - HRD)
+#### GET Diklat (All - HRD & Direktur)
 
 - Method: `GET`
 - URL: `/api/diklat/all`
 - Auth: Wajib Bearer token
-- Role yang diizinkan: `hrd`
+- Role yang diizinkan: `hrd`, `direktur`
 
-Endpoint ini menampilkan seluruh data diklat beserta atributnya untuk role HRD.
+Endpoint ini menampilkan seluruh data diklat beserta atributnya untuk role HRD dan Direktur.
 
 Contoh response `200 OK` (dengan pagination 7 item, parameter `?page=1`):
 
@@ -776,6 +776,78 @@ Contoh response sukses (`201`):
   "data": {
     "id_diklat": 13,
     "nama_kegiatan": "Workshop Kepemimpinan",
+    "kategori": "Manajemen",
+    "jenis_diklat": "Workshop",
+    "penyelenggara": "RS Kalisat",
+    "lokasi": "Aula RS",
+    "tanggal_mulai": "2026-08-10",
+    "tanggal_selesai": "2026-08-12",
+    "waktu": "08:00:00",
+    "jp": 24,
+    "jenis_biaya": "BLUD",
+    "total_biaya": 1500000,
+    "catatan": "Diklat khusus manajerial",
+    "jenis_pelaksana": "internal"
+  }
+}
+```
+
+#### Edit Master Diklat (HRD)
+
+- Method: `PUT`
+- URL: `/api/hrd/diklat/{id}`
+- Parameter URL: `id` (required, int) - ID dari Master Diklat
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+- Content-Type: `application/json` atau `multipart/form-data`
+
+Endpoint ini digunakan oleh HRD untuk mengubah data master diklat.
+
+Field request:
+
+- `nama_kegiatan` (required, string)
+- `kategori` (required, string)
+- `jenis_diklat` (required, string)
+- `penyelenggara` (required, string)
+- `lokasi` (required, string)
+- `tanggal_mulai` (required, date)
+- `tanggal_selesai` (required, date)
+- `waktu` (nullable, string, format: `HH:MM` or `HH:MM:SS`)
+- `jp` (required, integer)
+- `jenis_biaya` (required jika `jenis_pelaksana=internal`)
+- `total_biaya` (required jika `jenis_pelaksana=internal`)
+- `catatan` (nullable, string)
+- `jenis_pelaksana` (required: `internal|external`)
+
+Contoh request payload (JSON):
+
+```json
+{
+  "nama_kegiatan": "Workshop Kepemimpinan Update",
+  "kategori": "Manajemen",
+  "jenis_diklat": "Workshop",
+  "penyelenggara": "RS Kalisat",
+  "lokasi": "Aula RS",
+  "tanggal_mulai": "2026-08-10",
+  "tanggal_selesai": "2026-08-12",
+  "waktu": "08:00:00",
+  "jp": 24,
+  "jenis_biaya": "BLUD",
+  "total_biaya": 1500000,
+  "jenis_pelaksana": "internal",
+  "catatan": "Diklat khusus manajerial"
+}
+```
+
+Contoh response sukses (`200`):
+
+```json
+{
+  "success": true,
+  "message": "Master Diklat berhasil diupdate.",
+  "data": {
+    "id_diklat": 13,
+    "nama_kegiatan": "Workshop Kepemimpinan Update",
     "kategori": "Manajemen",
     "jenis_diklat": "Workshop",
     "penyelenggara": "RS Kalisat",

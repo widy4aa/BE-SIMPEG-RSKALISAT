@@ -164,14 +164,23 @@ Route::middleware([
     });
 });
 
+// HRD and Direktur
+Route::middleware([
+    JwtAuthMiddleware::class,
+    RoleMiddleware::class.':hrd,direktur',
+])->group(function () {
+    // Diklat - all
+    Route::get('/diklat/all', [DiklatController::class, 'all']);
+});
+
 // HRD only
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':hrd',
 ])->group(function () {
     // Diklat - master HRD
-    Route::get('/diklat/all', [DiklatController::class, 'all']);
     Route::post('/hrd/diklat', [DiklatController::class, 'storeMaster']);
+    Route::put('/hrd/diklat/{id}', [DiklatController::class, 'updateMaster']);
     Route::get('/hrd/diklat/{id}/peserta', [DiklatController::class, 'peserta']);
     Route::post('/hrd/diklat/{id}/peserta', [DiklatController::class, 'syncPeserta']);
     Route::get('/hrd/diklat/status/layak', [DiklatController::class, 'menungguKelayakan']);
