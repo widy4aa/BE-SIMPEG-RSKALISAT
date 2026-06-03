@@ -328,11 +328,13 @@ class PegawaiService
         }
 
         if ($jenisPelaksanaCurrent === 'internal') {
-            // Internal selalu layak; status validasi bisa valid/tidak valid/null sesuai proses verifikasi.
+            // Internal selalu layak; status validasi di-reset ke null agar divalidasi ulang jika diedit
             $jadwal->status_kelayakan = 'layak';
-        } else {
-            // External tidak memerlukan validasi valid/tidak valid.
             $jadwal->status_validasi = null;
+        } else {
+            // External tidak memerlukan validasi valid/tidak valid. Status kelayakan di-reset agar dievaluasi ulang.
+            $jadwal->status_validasi = null;
+            $jadwal->status_kelayakan = null;
         }
 
         if (array_key_exists('no_sertif', $payload)) {

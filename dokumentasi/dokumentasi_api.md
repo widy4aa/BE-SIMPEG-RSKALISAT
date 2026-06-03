@@ -1213,10 +1213,10 @@ Field request (opsional / partial update):
 Aturan bisnis edit:
 
 - `jenis_pelaksana` (`internal`/`external`) tidak bisa diubah.
-- Jika diklat `internal` and `status_validasi = valid`, data tidak bisa diedit.
-- Jika diklat `external` and `status_kelayakan = layak`, data tidak bisa diedit.
-- Untuk diklat `internal`, `status_kelayakan` dipertahankan `layak`, dan `status_validasi` bisa tetap `valid` atau `tidak valid` sesuai proses verifikasi.
-- Untuk diklat `external`, `jenis_biaya`, `total_biaya`, dan `status_validasi` diset `null`.
+- Jika diklat `internal` and `status_validasi = valid`, data tidak bisa diedit. (Jika status validasi nya `null` atau `tidak valid`/ditolak, data bisa diedit lagi).
+- Jika diklat `external` and `status_kelayakan = layak`, data tidak bisa diedit. (Jika status kelayakan nya `null` atau `tidak layak`/ditolak, data bisa diedit lagi).
+- Untuk diklat `internal`, saat diedit `status_kelayakan` dipertahankan `layak`, dan `status_validasi` akan di-reset menjadi `null` agar divalidasi ulang oleh HRD.
+- Untuk diklat `external`, saat diedit `jenis_biaya`, `total_biaya`, dan `status_validasi` diset `null`, serta `status_kelayakan` akan di-reset menjadi `null` agar dievaluasi ulang.
 
 Contoh response sukses (`200`):
 
