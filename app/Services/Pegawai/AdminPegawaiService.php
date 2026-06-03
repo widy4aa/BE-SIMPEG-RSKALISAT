@@ -36,7 +36,7 @@ class AdminPegawaiService
                 'link_photo_profil' => $linkPhotoProfil,
                 'jabatan' => $pegawai->jabatan?->nama,
                 'unit_kerja' => $pegawai->jabatan?->unitKerja?->nama,
-                'email' => $pegawai->user?->email,
+                'email' => $pegawai->pribadi?->email,
                 'no_telp' => $pegawai->pribadi?->no_hp ?? $pegawai->pribadi?->no_telp,
                 'status' => $pegawai->status_pegawai,
             ];
@@ -62,8 +62,6 @@ class AdminPegawaiService
         }
 
         $pribadi = $pegawai->pribadi;
-        $user = $pegawai->user;
-
         $fotoPath = $pribadi?->foto_path;
         $linkPhotoProfil = $fotoPath ? url(Storage::url($fotoPath)) : null;
 
@@ -73,7 +71,7 @@ class AdminPegawaiService
                 'nik' => $pegawai->nik,
                 'nip' => $pegawai->nip,
                 'nama' => $pegawai->nama,
-                'email' => $user?->email,
+                'email' => $pribadi?->email,
                 'link_photo_profil' => $linkPhotoProfil,
                 'jabatan' => $pegawai->jabatan?->nama,
                 'unit_kerja' => $pegawai->jabatan?->unitKerja?->nama,
@@ -93,7 +91,7 @@ class AdminPegawaiService
                 'agama' => $pribadi?->agama,
                 'status_perkawinan' => $pribadi?->status_perkawinan,
                 'alamat' => $pribadi?->alamat,
-                'no_hp' => $pribadi?->no_hp,
+                'no_hp' => $pribadi?->no_hp ?? $pribadi?->no_telp,
                 'no_telp' => $pribadi?->no_telp,
                 'npwp' => $pribadi?->npwp,
                 'bpjs_kesehatan' => $pribadi?->bpjs_kesehatan,
@@ -102,64 +100,65 @@ class AdminPegawaiService
             'keluarga' => [
                 'pasangan' => $pegawai->pasangan?->map(fn($p) => [
                     'id' => $p->id,
-                    'nama' => $p->nama,
-                    'status_hubungan' => $p->status_hubungan,
+                    'nama' => $p->nama_lengkap,
+                    'status_hubungan' => $p->status_pernikahan,
                     'pekerjaan' => $p->pekerjaan,
-                    'no_hp' => $p->no_hp,
+                    'no_hp' => null,
                 ]) ?? [],
                 'anak' => $pegawai->anak?->map(fn($a) => [
                     'id' => $a->id,
-                    'nama' => $a->nama,
-                    'tanggal_lahir' => $a->tanggal_lahir,
-                    'pendidikan' => $a->pendidikan,
+                    'nama' => $a->nama_lengkap,
+                    'tanggal_lahir' => $a->tanggal_lahir?->format('Y-m-d'),
+                    'pendidikan' => $a->pendidikan_terakhir,
                 ]) ?? [],
                 'orang_tua' => $pegawai->orangTua?->map(fn($o) => [
                     'id' => $o->id,
-                    'nama' => $o->nama,
-                    'status_hubungan' => $o->status_hubungan,
-                    'no_hp' => $o->no_hp,
+                    'nama_ayah' => $o->nama_ayah,
+                    'nama_ibu' => $o->nama_ibu,
+                    'status_hidup' => $o->status_hidup,
+                    'alamat' => $o->alamat,
                 ]) ?? [],
                 'kontak_darurat' => $pegawai->kontakDarurat?->map(fn($k) => [
                     'id' => $k->id,
-                    'nama' => $k->nama,
-                    'hubungan' => $k->hubungan,
-                    'no_hp' => $k->no_hp,
+                    'nama' => $k->nama_kontak,
+                    'hubungan' => $k->hubungan_keluarga,
+                    'no_hp' => $k->nomor_hp,
                 ]) ?? [],
                 'tanggungan_lain' => $pegawai->tanggunganLain?->map(fn($t) => [
                     'id' => $t->id,
                     'nama' => $t->nama,
-                    'hubungan' => $t->hubungan,
+                    'hubungan' => $t->hubungan_keluarga,
                 ]) ?? [],
             ],
             'riwayat_karir' => [
                 'jabatan' => $pegawai->jabatanPegawai?->map(fn($jp) => [
                     'id' => $jp->id,
                     'jabatan' => $jp->jabatan?->nama,
-                    'unit_kerja' => $jp->jabatan?->unitKerja?->nama,
-                    'tanggal_mulai' => $jp->started_at,
-                    'tanggal_selesai' => $jp->ended_at,
+                    'unit_kerja' => $jp->jabatan?->unitKerja?->nama ?? ($jp->is_current ? $pegawai->jabatan?->unitKerja?->nama : null),
+                    'tanggal_mulai' => $jp->started_at?->format('Y-m-d'),
+                    'tanggal_selesai' => $jp->ended_at?->format('Y-m-d'),
                     'is_current' => (bool)$jp->is_current,
                 ]) ?? [],
                 'str' => $pegawai->str?->map(fn($s) => [
                     'id' => $s->id,
                     'nomor_str' => $s->nomor_str,
-                    'tanggal_terbit' => $s->tanggal_terbit,
-                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa,
+                    'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
+                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
                     'is_current' => (bool)$s->is_current,
                 ]) ?? [],
                 'sip' => $pegawai->sip?->map(fn($s) => [
                     'id' => $s->id,
                     'jenis_sip' => $s->jenisSip?->nama,
                     'nomor_sip' => $s->nomor_sip,
-                    'tanggal_terbit' => $s->tanggal_terbit,
-                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa,
+                    'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
+                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
                     'is_current' => (bool)$s->is_current,
                 ]) ?? [],
                 'penugasan_klinis' => $pegawai->penugasanKlinis?->map(fn($pk) => [
                     'id' => $pk->id,
                     'nomor_surat' => $pk->nomor_surat,
-                    'tanggal_mulai' => $pk->tgl_mulai,
-                    'tanggal_kadaluarsa' => $pk->tgl_kadaluarsa,
+                    'tanggal_mulai' => $pk->tgl_mulai?->format('Y-m-d'),
+                    'tanggal_kadaluarsa' => $pk->tgl_kadaluarsa?->format('Y-m-d'),
                     'is_current' => (bool)$pk->is_current,
                 ]) ?? [],
             ],

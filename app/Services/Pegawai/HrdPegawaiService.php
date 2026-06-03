@@ -36,7 +36,7 @@ class HrdPegawaiService
                 'link_photo_profil' => $linkPhotoProfil,
                 'jabatan' => $pegawai->jabatan?->nama,
                 'unit_kerja' => $pegawai->jabatan?->unitKerja?->nama,
-                'email' => $pegawai->user?->email,
+                'email' => $pegawai->pribadi?->email,
                 'no_telp' => $pegawai->pribadi?->no_hp ?? $pegawai->pribadi?->no_telp,
                 'status' => $pegawai->status_pegawai,
             ];
