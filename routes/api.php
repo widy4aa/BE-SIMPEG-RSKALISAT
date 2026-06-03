@@ -131,6 +131,7 @@ Route::middleware([
     Route::post('/diklat', [DiklatController::class, 'store']);
     Route::patch('/diklat/{id}', [DiklatController::class, 'update']);
     Route::delete('/diklat/{id}', [DiklatController::class, 'destroy']);
+    Route::post('/diklat/{id}/upload-laporan', [DiklatController::class, 'uploadLaporan']);
 });
 
 // Shared - admin, hrd, direktur

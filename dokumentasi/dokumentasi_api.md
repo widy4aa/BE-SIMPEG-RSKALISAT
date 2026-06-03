@@ -1249,6 +1249,43 @@ Contoh response sukses (`200`):
 }
 ```
 
+#### Upload Laporan Diklat Pegawai
+
+- Method: `POST`
+- URL: `/api/diklat/{id}/upload-laporan`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `pegawai`, `hrd`, `direktur`
+- Content-Type: `multipart/form-data`
+
+Endpoint ini digunakan khusus untuk mengupload laporan (sertifikat) atau mengedit nomor sertifikat ketika status validasi bukan `valid` (misalnya karena `tidak valid` atau masih `null`). Endpoint ini hanya memproses file sertifikat dan no_sertif.
+
+Field request:
+
+- `upload_laporan` (nullable, file: pdf/jpg/jpeg/png/webp, max 2MB)
+- `no_sertif` (nullable, string)
+
+Aturan bisnis:
+
+- Jika `status_validasi = valid`, maka laporan tidak dapat diupload/diedit.
+- Jika diklat berjenis `internal`, proses upload laporan akan mereset `status_validasi` menjadi `null` agar divalidasi ulang oleh HRD.
+
+Contoh response sukses (`200`):
+
+```json
+{
+  "success": true,
+  "message": "Laporan berhasil diupload/diedit.",
+  "data": {
+    "id_diklat": 12,
+    "id_jadwal_diklat": 9,
+    "no_sertif": "SERTIF/SDM/2026/0099",
+    "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",
+    "status_validasi": null,
+    "uploaded_at": "2026-06-03 10:00:00"
+  }
+}
+```
+
 #### Delete Diklat Pegawai
 
 - Method: `DELETE`

@@ -40,6 +40,11 @@ class DiklatService
         return $this->pegawaiService->delete($diklatId, $userId);
     }
 
+    public function uploadLaporanPegawai(int $diklatId, int $userId, array $payload, ?UploadedFile $laporanFile = null): array
+    {
+        return $this->pegawaiService->uploadLaporan($diklatId, $userId, $payload, $laporanFile);
+    }
+
     public function getAllDiklat(): \Illuminate\Pagination\LengthAwarePaginator
     {
         return $this->hrdService->getAllDiklat();

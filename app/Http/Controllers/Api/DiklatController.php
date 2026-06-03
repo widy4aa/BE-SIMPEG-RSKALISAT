@@ -338,4 +338,37 @@ class DiklatController extends Controller
             'data' => $result,
         ]);
     }
+    public function uploadLaporan(Request $request, int $id): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        $request->validate([
+            'upload_laporan' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
+            'no_sertif' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $payload = $request->only('no_sertif');
+        $laporanFile = $request->file('upload_laporan');
+
+        try {
+            $result = $this->diklatService->uploadLaporanPegawai(
+                diklatId: $id,
+                userId: $userId,
+                payload: $payload,
+                laporanFile: $laporanFile,
+            );
+        } catch (InvalidArgumentException $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Laporan berhasil diupload/diedit.',
+            'data' => $result,
+        ]);
+    }
 }
