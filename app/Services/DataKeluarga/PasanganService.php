@@ -18,7 +18,7 @@ class PasanganService
         $items = $pasangan->map(function ($item) {
             $data = $item->toArray();
             if (!empty($item->buku_nikah_file_path)) {
-                $data['link_buku_nikah'] = url('/' . $item->buku_nikah_file_path);
+                $data['link_buku_nikah'] = '/'.$item->buku_nikah_file_path;
             } else {
                 $data['link_buku_nikah'] = null;
             }

@@ -18,7 +18,7 @@ class AnakService
         $items = $anak->map(function ($item) {
             $data = $item->toArray();
             if (!empty($item->akta_kelahiran_file_path)) {
-                $data['link_akta_kelahiran'] = url('/' . $item->akta_kelahiran_file_path);
+                $data['link_akta_kelahiran'] = '/'.$item->akta_kelahiran_file_path;
             } else {
                 $data['link_akta_kelahiran'] = null;
             }

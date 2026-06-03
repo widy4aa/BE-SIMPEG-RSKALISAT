@@ -155,7 +155,7 @@ class PangkatService
             'tmt_sk' => $item->pangkat?->tmt_sk?->format('Y-m-d'),
             'started_at' => $item->started_at?->format('Y-m-d'),
             'ended_at' => $item->ended_at?->format('Y-m-d'),
-            'link_sk' => $item->pangkat?->sk_file_path ? url('/'.$item->pangkat->sk_file_path) : null,
+            'link_sk' => $item->pangkat?->sk_file_path ? '/'.$item->pangkat->sk_file_path : null,
             'note' => $item->note ?? '',
         ];
     }

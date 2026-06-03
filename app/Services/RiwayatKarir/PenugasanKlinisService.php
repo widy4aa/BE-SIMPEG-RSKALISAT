@@ -142,7 +142,7 @@ class PenugasanKlinisService
             'tgl_mulai' => $item->tgl_mulai?->format('Y-m-d'),
             'tgl_kadaluarsa' => $item->tgl_kadaluarsa?->format('Y-m-d'),
             'is_current' => (bool) $item->is_current,
-            'link_dokumen' => $item->dokumen_file_path ? url('/'.$item->dokumen_file_path) : null,
+            'link_dokumen' => $item->dokumen_file_path ? '/'.$item->dokumen_file_path : null,
         ];
     }
 }

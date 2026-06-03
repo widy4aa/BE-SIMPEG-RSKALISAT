@@ -219,7 +219,7 @@ class ProfileService
 
         return [
             'foto_path' => $newPath,
-            'link_photo_profile' => url('/'.$newPath),
+            'link_photo_profile' => '/'.$newPath,
             'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
         ];
     }
@@ -275,7 +275,7 @@ class ProfileService
 
         return [
             'ktp_file_path' => $newPath,
-            'link_ktp_file' => url('/'.$newPath),
+            'link_ktp_file' => '/'.$newPath,
             'updated_at' => optional($pribadi->updated_at)?->toDateTimeString(),
         ];
     }
@@ -327,7 +327,7 @@ class ProfileService
         }
 
         $pribadi->kk_file_path = $newPath;
-        $pribadi->link_kk = url('/'.$newPath);
+        $pribadi->link_kk = '/'.$newPath;
         $this->pegawaiProfileRepository->savePegawaiPribadi($pribadi);
 
         return [

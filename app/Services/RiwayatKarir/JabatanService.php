@@ -157,7 +157,7 @@ class JabatanService
             'is_current' => (bool) $item->is_current,
             'tmt_mulai' => $item->jabatan?->tmt_mulai?->format('Y-m-d') ?? $item->started_at?->format('Y-m-d'),
             'tmt_selesai' => $item->jabatan?->tmt_selesai?->format('Y-m-d') ?? $item->ended_at?->format('Y-m-d'),
-            'link_sk' => $item->jabatan?->sk_file_path ? url('/'.$item->jabatan->sk_file_path) : null,
+            'link_sk' => $item->jabatan?->sk_file_path ? '/'.$item->jabatan->sk_file_path : null,
             'note' => $item->note ?? '',
         ];
     }

@@ -43,7 +43,7 @@ class DataKeluargaService
         return $pasangan->map(function ($p) {
             $data = $p->toArray();
             if (!empty($p->buku_nikah_file_path)) {
-                $data['link_buku_nikah'] = url('/' . $p->buku_nikah_file_path);
+                $data['link_buku_nikah'] = '/'.$p->buku_nikah_file_path;
             } else {
                 $data['link_buku_nikah'] = null;
             }
@@ -56,7 +56,7 @@ class DataKeluargaService
         return $anak->map(function ($a) {
             $data = $a->toArray();
             if (!empty($a->akta_kelahiran_file_path)) {
-                $data['link_akta_kelahiran'] = url('/' . $a->akta_kelahiran_file_path);
+                $data['link_akta_kelahiran'] = '/'.$a->akta_kelahiran_file_path;
             } else {
                 $data['link_akta_kelahiran'] = null;
             }

@@ -114,6 +114,6 @@ class PegawaiService
             return $path;
         }
 
-        return url('/'.$path);
+        return '/'.$path;
     }
 }

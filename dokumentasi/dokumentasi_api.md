@@ -32,6 +32,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
   - [Update Status Validasi (HRD)](#update-status-validasi-hrd)
   - [Create Diklat Pegawai](#create-diklat-pegawai)
   - [Edit Diklat Pegawai](#edit-diklat-pegawai)
+  - [Upload Laporan Diklat Pegawai](#upload-laporan-diklat-pegawai)
   - [Delete Diklat Pegawai](#delete-diklat-pegawai)
 4. [Profile](#6-profile)
   - [Response Profile Untuk Role Pegawai](#response-profile-untuk-role-pegawai)
@@ -1435,8 +1436,8 @@ Contoh response `200 OK`:
       "no_telp": "081234567890",
       "email": "budi.santoso@example.com",
       "no_kk": "3506123456789012",
-      "link_kk": "http://127.0.0.1:8000/dokumen/kk/kk-4-1713500000.pdf",
-      "link_photo_profile": "http://127.0.0.1:8000/dokumen/foto/budi-santoso.jpg",
+      "link_kk": "/dokumen/kk/kk-4-1713500000.pdf",
+      "link_photo_profile": "/dokumen/foto/budi-santoso.jpg",
       "status_pegawai": "aktif",
       "tgl_masuk": "2020-01-01",
       "pangkat": "Penata Muda",
@@ -1580,7 +1581,7 @@ Contoh response `200 OK`:
   "message": "Foto profile berhasil diupdate.",
   "data": {
     "foto_path": "dokumen/foto/profile-4-1713500000.jpg",
-    "link_photo_profile": "http://127.0.0.1:8000/dokumen/foto/profile-4-1713500000.jpg",
+    "link_photo_profile": "/dokumen/foto/profile-4-1713500000.jpg",
     "updated_at": "2026-04-19 12:30:00"
   }
 }
@@ -1612,7 +1613,7 @@ Contoh response `200 OK`:
   "message": "File KTP berhasil diupload.",
   "data": {
     "ktp_file_path": "dokumen/ktp/ktp-4-1713500000.pdf",
-    "link_ktp_file": "http://127.0.0.1:8000/dokumen/ktp/ktp-4-1713500000.pdf",
+    "link_ktp_file": "/dokumen/ktp/ktp-4-1713500000.pdf",
     "updated_at": "2026-04-19 12:45:00"
   }
 }
@@ -1659,7 +1660,7 @@ Contoh response `200 OK`:
   "message": "File KK berhasil diupload.",
   "data": {
     "kk_file_path": "dokumen/kk/kk-4-1713500000.pdf",
-    "link_kk": "http://127.0.0.1:8000/dokumen/kk/kk-4-1713500000.pdf",
+    "link_kk": "/dokumen/kk/kk-4-1713500000.pdf",
     "updated_at": "2026-04-22 12:45:00"
   }
 }
@@ -1763,7 +1764,7 @@ Contoh response `200 OK`:
         "jurusan": "Teknik Informatika",
         "tahun_lulus": 2012,
         "nomor_ijazah": "IJZ-2012-001",
-        "link_ijazah": "http://127.0.0.1:8000/dokumen/ijazah/ijazah-4-1713500000.pdf"
+        "link_ijazah": "/dokumen/ijazah/ijazah-4-1713500000.pdf"
       }
     ]
   }
@@ -1796,7 +1797,7 @@ Contoh response `201 Created`:
     "jurusan": "Ilmu Komputer",
     "tahun_lulus": 2015,
     "nomor_ijazah": "IJZ-S2-2015",
-    "link_ijazah": "http://127.0.0.1:8000/dokumen/ijazah/ijazah-4-1713500001.pdf"
+    "link_ijazah": "/dokumen/ijazah/ijazah-4-1713500001.pdf"
   }
 }
 ```
@@ -1827,7 +1828,7 @@ Contoh response `200 OK`:
     "jurusan": "Ilmu Komputer",
     "tahun_lulus": 2016,
     "nomor_ijazah": "IJZ-S2-2016",
-    "link_ijazah": "http://127.0.0.1:8000/dokumen/ijazah/ijazah-4-1713500001.pdf"
+    "link_ijazah": "/dokumen/ijazah/ijazah-4-1713500001.pdf"
   }
 }
 ```
@@ -1874,7 +1875,7 @@ Contoh response `200 OK`:
         "is_current": false,
         "tmt_mulai": "2020-01-01",
         "tmt_selesai": "2023-12-31",
-        "link_sk": "http://127.0.0.1:8000/dokumen/jabatan/sk-jabatan-1-123456789.pdf",
+        "link_sk": "/dokumen/jabatan/sk-jabatan-1-123456789.pdf",
         "note": "Awal masuk"
       }
     ]
@@ -1910,7 +1911,7 @@ Contoh response `201 Created`:
     "is_current": true,
     "tmt_mulai": "2024-01-01",
     "tmt_selesai": null,
-    "link_sk": "http://127.0.0.1:8000/dokumen/jabatan/sk-jabatan-2-123456789.pdf",
+    "link_sk": "/dokumen/jabatan/sk-jabatan-2-123456789.pdf",
     "note": "Promosi"
   }
 }
@@ -1993,7 +1994,7 @@ Response `200 OK`:
         "tmt_sk": "2020-01-01",
         "started_at": "2020-01-01",
         "ended_at": null,
-        "link_sk": "http://127.0.0.1:8000/dokumen/pangkat/sk-pangkat-1-123456789.pdf",
+        "link_sk": "/dokumen/pangkat/sk-pangkat-1-123456789.pdf",
         "note": "Pangkat pertama"
       }
     ]
@@ -2044,7 +2045,7 @@ Response `201 Created`:
     "tmt_sk": "2024-01-01",
     "started_at": "2024-01-01",
     "ended_at": null,
-    "link_sk": "http://127.0.0.1:8000/dokumen/pangkat/sk-pangkat-2-123456789.pdf",
+    "link_sk": "/dokumen/pangkat/sk-pangkat-2-123456789.pdf",
     "note": "Promosi"
   }
 }
@@ -2134,7 +2135,7 @@ Response `200 OK`:
         "tanggal_terbit": "2023-01-01",
         "tanggal_kadaluarsa": "2028-01-01",
         "is_current": true,
-        "link_sk": "http://127.0.0.1:8000/dokumen/sip/sk-sip-1-123456789.pdf"
+        "link_sk": "/dokumen/sip/sk-sip-1-123456789.pdf"
       }
     ]
   }
@@ -2181,7 +2182,7 @@ Response `201 Created`:
     "tanggal_terbit": "2024-01-01",
     "tanggal_kadaluarsa": "2029-01-01",
     "is_current": true,
-    "link_sk": "http://127.0.0.1:8000/dokumen/sip/sk-sip-2-123456789.pdf"
+    "link_sk": "/dokumen/sip/sk-sip-2-123456789.pdf"
   }
 }
 ```
@@ -2266,7 +2267,7 @@ Response `200 OK`:
         "tanggal_terbit": "2023-01-01",
         "tanggal_kadaluarsa": "2028-01-01",
         "is_current": true,
-        "link_sk": "http://127.0.0.1:8000/dokumen/str/sk-str-1-123456789.pdf"
+        "link_sk": "/dokumen/str/sk-str-1-123456789.pdf"
       }
     ]
   }
@@ -2309,7 +2310,7 @@ Response `201 Created`:
     "tanggal_terbit": "2024-01-01",
     "tanggal_kadaluarsa": "2029-01-01",
     "is_current": true,
-    "link_sk": "http://127.0.0.1:8000/dokumen/str/sk-str-2-123456789.pdf"
+    "link_sk": "/dokumen/str/sk-str-2-123456789.pdf"
   }
 }
 ```
@@ -2391,7 +2392,7 @@ Response `200 OK`:
         "tgl_mulai": "2023-01-01",
         "tgl_kadaluarsa": "2028-01-01",
         "is_current": true,
-        "link_dokumen": "http://127.0.0.1:8000/dokumen/penugasan-klinis/sk-penugasan-klinis-1-123456789.pdf"
+        "link_dokumen": "/dokumen/penugasan-klinis/sk-penugasan-klinis-1-123456789.pdf"
       }
     ]
   }
@@ -2434,7 +2435,7 @@ Response `201 Created`:
     "tgl_mulai": "2024-01-01",
     "tgl_kadaluarsa": "2029-01-01",
     "is_current": true,
-    "link_dokumen": "http://127.0.0.1:8000/dokumen/penugasan-klinis/sk-penugasan-klinis-2-123456789.pdf"
+    "link_dokumen": "/dokumen/penugasan-klinis/sk-penugasan-klinis-2-123456789.pdf"
   }
 }
 ```
@@ -3069,13 +3070,14 @@ Contoh response `200 OK`:
         {
           "id_pegawai": 1,
           "nama": "Dr. Andi",
-          "nip": "198001012005011001",
-          "link_photo_profil": "http://localhost:8000/storage/photos/andi.jpg",
+          "nik": "198001012005011001",
+          "link_photo_profil": "/dokumen/foto/andi.jpg",
           "jabatan": "Dokter Spesialis",
           "unit_kerja": "Poli Penyakit Dalam",
           "email": "andi@example.com",
           "no_telp": "08123456789",
-          "status": "aktif"
+          "status": "aktif",
+          "status_kelengkapan": "Lengkap"
         }
       ],
       "first_page_url": "http://localhost:8000/api/pegawai?page=1",
@@ -3313,7 +3315,7 @@ Contoh response `200 OK`:
         "str_sip": "STR",
         "jenis": null,
         "nomor": "123415161717",
-        "link_pdf": "http://localhost:8000/dokumen/str/sk-str-1-1715778987.pdf",
+        "link_pdf": "/dokumen/str/sk-str-1-1715778987.pdf",
         "tanggal_terbit": "2026-03-25",
         "tanggal_selesai": "2026-03-30",
         "status": "Aktif",
@@ -3328,7 +3330,7 @@ Contoh response `200 OK`:
         "str_sip": "SIP",
         "jenis": "SIP Dokter",
         "nomor": "123415161717",
-        "link_pdf": "http://localhost:8000/dokumen/sip/sk-sip-1-1715778987.pdf",
+        "link_pdf": "/dokumen/sip/sk-sip-1-1715778987.pdf",
         "tanggal_terbit": "2026-03-25",
         "tanggal_selesai": "2026-03-30",
         "status": "Hampir Habis",

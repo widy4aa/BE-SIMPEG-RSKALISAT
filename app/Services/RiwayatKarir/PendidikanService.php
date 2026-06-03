@@ -28,7 +28,7 @@ class PendidikanService
                     'jurusan' => (string) ($item->jurusan ?? ''),
                     'tahun_lulus' => $item->tahun_lulus !== null ? (int) $item->tahun_lulus : null,
                     'nomor_ijazah' => (string) ($item->nomor_ijazah ?? ''),
-                    'link_ijazah' => $item->ijazah_file_path ? url('/'.$item->ijazah_file_path) : null,
+                    'link_ijazah' => $item->ijazah_file_path ? '/'.$item->ijazah_file_path : null,
                 ];
             })
             ->all() ?? [];
@@ -94,7 +94,7 @@ class PendidikanService
             'jurusan' => (string) ($pendidikan->jurusan ?? ''),
             'tahun_lulus' => $pendidikan->tahun_lulus !== null ? (int) $pendidikan->tahun_lulus : null,
             'nomor_ijazah' => (string) ($pendidikan->nomor_ijazah ?? ''),
-            'link_ijazah' => $pendidikan->ijazah_file_path ? url('/'.$pendidikan->ijazah_file_path) : null,
+            'link_ijazah' => $pendidikan->ijazah_file_path ? '/'.$pendidikan->ijazah_file_path : null,
         ];
     }
 
@@ -160,7 +160,7 @@ class PendidikanService
             'jurusan' => (string) ($pendidikan->jurusan ?? ''),
             'tahun_lulus' => $pendidikan->tahun_lulus !== null ? (int) $pendidikan->tahun_lulus : null,
             'nomor_ijazah' => (string) ($pendidikan->nomor_ijazah ?? ''),
-            'link_ijazah' => $pendidikan->ijazah_file_path ? url('/'.$pendidikan->ijazah_file_path) : null,
+            'link_ijazah' => $pendidikan->ijazah_file_path ? '/'.$pendidikan->ijazah_file_path : null,
         ];
     }
 

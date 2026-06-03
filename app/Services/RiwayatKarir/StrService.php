@@ -142,7 +142,7 @@ class StrService
             'tanggal_terbit' => $item->tanggal_terbit?->format('Y-m-d'),
             'tanggal_kadaluarsa' => $item->tanggal_kadaluarsa?->format('Y-m-d'),
             'is_current' => (bool) $item->is_current,
-            'link_sk' => $item->sk_file_path ? url('/'.$item->sk_file_path) : null,
+            'link_sk' => $item->sk_file_path ? '/'.$item->sk_file_path : null,
         ];
     }
 }

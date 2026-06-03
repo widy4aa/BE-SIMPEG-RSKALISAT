@@ -132,6 +132,6 @@ class StrSipService
             return null;
         }
 
-        return url('/'.$path);
+        return '/'.$path;
     }
 }
