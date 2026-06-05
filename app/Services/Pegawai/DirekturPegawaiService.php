@@ -12,7 +12,7 @@ class DirekturPegawaiService
     ) {
     }
 
-    public function getPegawaiData(): array
+    public function getPegawaiData(array $filters = []): array
     {
         $totalPegawai = \App\Models\Pegawai::count();
         $jumlahDokter = \App\Models\Pegawai::whereHas('profesi', function($q) {
@@ -23,7 +23,8 @@ class DirekturPegawaiService
         })->count();
         $jumlahProfesi = \Illuminate\Support\Facades\DB::table('pegawai')->whereNotNull('profesi_id')->distinct('profesi_id')->count('profesi_id');
 
-        $paginatedPegawai = $this->repository->getPaginatedPegawai(10);
+        $perPage = $this->resolvePerPage($filters['per_page'] ?? null, 10);
+        $paginatedPegawai = $this->repository->getPaginatedPegawai($perPage, $filters);
         
         $mappedData = $paginatedPegawai->getCollection()->map(function ($pegawai) {
             $fotoPath = $pegawai->pribadi?->foto_path;
@@ -45,6 +46,7 @@ class DirekturPegawaiService
                 'id_pegawai' => $pegawai->id,
                 'nama' => $pegawai->nama,
                 'nik' => $pegawai->nik,
+                'role' => $pegawai->user?->role,
                 'link_photo_profil' => $linkPhotoProfil,
                 'jabatan' => $pegawai->jabatan?->nama,
                 'unit_kerja' => $pegawai->jabatan?->unitKerja?->nama,
@@ -62,7 +64,17 @@ class DirekturPegawaiService
             'jumlah_dokter' => $jumlahDokter,
             'jumlah_perawat' => $jumlahPerawat,
             'jumlah_profesi' => $jumlahProfesi,
+            'jumlah_admin' => $this->repository->countUsersByRole('admin'),
+            'jumlah_hrd' => $this->repository->countUsersByRole('hrd'),
+            'jumlah_direktur' => $this->repository->countUsersByRole('direktur'),
             'pegawai' => $paginatedPegawai,
         ];
+    }
+
+    private function resolvePerPage(mixed $value, int $default): int
+    {
+        $perPage = is_numeric($value) ? (int) $value : $default;
+
+        return max(1, min($perPage, 100));
     }
 }

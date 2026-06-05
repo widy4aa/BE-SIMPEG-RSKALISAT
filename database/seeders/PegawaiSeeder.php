@@ -54,16 +54,25 @@ class PegawaiSeeder extends Seeder
             ['tmt_mulai' => now()->toDateString(), 'unit_kerja_id' => $unitKerja->id]
         );
 
-        $jenisPegawai = JenisPegawai::query()->firstOrCreate(['nama' => 'PNS']);
+        $jenisPns = JenisPegawai::query()->firstOrCreate(['nama' => 'PNS']);
+        $jenisBlud = JenisPegawai::query()->firstOrCreate(['nama' => 'BLUD']);
         DB::table('golongan_ruang')->updateOrInsert(['nama' => 'III/a'], [
             'created_at' => now(),
             'updated_at' => now(),
         ]);
         $golonganRuang = DB::table('golongan_ruang')->where('nama', 'III/a')->first();
 
-        $profesi = Profesi::query()->firstOrCreate(
+        $profesiAnalisSdm = Profesi::query()->firstOrCreate(
             ['nama' => 'Analis SDM'],
             ['kategori_tenaga' => 'Non Kesehatan']
+        );
+        $profesiPerawat = Profesi::query()->firstOrCreate(
+            ['nama' => 'Perawat'],
+            ['kategori_tenaga' => 'Tenaga Kesehatan']
+        );
+        $profesiDokter = Profesi::query()->firstOrCreate(
+            ['nama' => 'Dokter'],
+            ['kategori_tenaga' => 'Tenaga Kesehatan']
         );
 
         $jenisSip = JenisSip::query()->firstOrCreate(['nama' => 'SIP Praktik Rumah Sakit']);
@@ -74,11 +83,22 @@ class PegawaiSeeder extends Seeder
                 'nip' => '198501012008011001',
                 'nama' => 'Admin SIMPEG',
                 'role' => 'admin',
+                'jenis_pegawai_id' => $jenisPns->id,
+                'profesi_id' => $profesiAnalisSdm->id,
+                'pendidikan_terakhir' => 'S1/D4',
+                'tanggal_lahir' => '1985-01-01',
                 'jenis_kelamin' => 'L',
+                'agama' => 'Islam',
+                'status_perkawinan' => 'kawin',
+                'alamat' => 'Jl. Melati No. 10, Kalisat',
+                'no_telp' => '081234560099',
+                'email' => 'admin.simpeg@rskalisat.test',
+                'no_kk' => '3174010101019099',
                 'jabatan_id' => $jabatanAdmin->id,
                 'foto_path' => 'dokumen/foto/admin-simpeg.jpg',
                 'ktp_file_path' => 'dokumen/ktp/admin-simpeg.pdf',
                 'kk_file_path' => 'dokumen/kk/admin-simpeg.pdf',
+                'link_kk' => 'dokumen/kk/admin-simpeg.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/admin-simpeg.pdf',
                 'pasangan' => [
                     [
@@ -131,11 +151,22 @@ class PegawaiSeeder extends Seeder
                 'nip' => '198601022009012002',
                 'nama' => 'HRD SIMPEG',
                 'role' => 'hrd',
+                'jenis_pegawai_id' => $jenisPns->id,
+                'profesi_id' => $profesiAnalisSdm->id,
+                'pendidikan_terakhir' => 'S1/D4',
+                'tanggal_lahir' => '1986-01-02',
                 'jenis_kelamin' => 'P',
+                'agama' => 'Islam',
+                'status_perkawinan' => 'kawin',
+                'alamat' => 'Jl. Kenanga No. 21, Kalisat',
+                'no_telp' => '081234560098',
+                'email' => 'hrd.simpeg@rskalisat.test',
+                'no_kk' => '3174010101019098',
                 'jabatan_id' => $jabatanHrd->id,
                 'foto_path' => 'dokumen/foto/hrd-simpeg.jpg',
                 'ktp_file_path' => 'dokumen/ktp/hrd-simpeg.pdf',
                 'kk_file_path' => 'dokumen/kk/hrd-simpeg.pdf',
+                'link_kk' => 'dokumen/kk/hrd-simpeg.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/hrd-simpeg.pdf',
                 'pasangan' => [
                     [
@@ -188,11 +219,22 @@ class PegawaiSeeder extends Seeder
                 'nip' => '198901012010011001',
                 'nama' => 'Budi Santoso',
                 'role' => 'pegawai',
+                'jenis_pegawai_id' => $jenisBlud->id,
+                'profesi_id' => $profesiPerawat->id,
+                'pendidikan_terakhir' => 'D3',
+                'tanggal_lahir' => '1989-01-01',
                 'jenis_kelamin' => 'L',
+                'agama' => 'Islam',
+                'status_perkawinan' => 'kawin',
+                'alamat' => 'Jl. Mawar No. 5, Kalisat',
+                'no_telp' => '081234560001',
+                'email' => 'budi.santoso@rskalisat.test',
+                'no_kk' => '3174010101019001',
                 'jabatan_id' => $jabatan->id,
                 'foto_path' => 'dokumen/foto/budi-santoso.jpg',
                 'ktp_file_path' => 'dokumen/ktp/budi-santoso.pdf',
                 'kk_file_path' => 'dokumen/kk/budi-santoso.pdf',
+                'link_kk' => 'dokumen/kk/budi-santoso.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/budi-santoso.pdf',
                 'pasangan' => [
                     [
@@ -245,11 +287,22 @@ class PegawaiSeeder extends Seeder
                 'nip' => '198807072009011003',
                 'nama' => 'Agus Priyanto',
                 'role' => 'direktur',
+                'jenis_pegawai_id' => $jenisPns->id,
+                'profesi_id' => $profesiDokter->id,
+                'pendidikan_terakhir' => 'S2',
+                'tanggal_lahir' => '1988-07-07',
                 'jenis_kelamin' => 'L',
+                'agama' => 'Islam',
+                'status_perkawinan' => 'kawin',
+                'alamat' => 'Jl. Wijaya Kusuma No. 1, Kalisat',
+                'no_telp' => '081234560003',
+                'email' => 'agus.priyanto@rskalisat.test',
+                'no_kk' => '3174010101019003',
                 'jabatan_id' => $jabatanDirektur->id,
                 'foto_path' => 'dokumen/foto/agus-priyanto.jpg',
                 'ktp_file_path' => 'dokumen/ktp/agus-priyanto.pdf',
                 'kk_file_path' => 'dokumen/kk/agus-priyanto.pdf',
+                'link_kk' => 'dokumen/kk/agus-priyanto.pdf',
                 'buku_nikah_file_path' => 'dokumen/buku_nikah/agus-priyanto.pdf',
                 'pasangan' => [
                     [
@@ -309,8 +362,8 @@ class PegawaiSeeder extends Seeder
                     'user_id' => $user->id,
                     'nip' => $seed['nip'],
                     'nama' => $seed['nama'],
-                    'jenis_pegawai_id' => $jenisPegawai->id,
-                    'profesi_id' => $profesi->id,
+                    'jenis_pegawai_id' => $seed['jenis_pegawai_id'],
+                    'profesi_id' => $seed['profesi_id'],
                     'jabatan_id' => $seed['jabatan_id'],
                     'status_pegawai' => 'aktif',
                     'tgl_masuk' => '2020-01-01',
@@ -322,27 +375,31 @@ class PegawaiSeeder extends Seeder
                 ]
             );
 
-            $newPangkat = \App\Models\Pangkat::query()->create([
-                'nama' => 'Penata Muda',
-                'pejabat_penetap' => 'Gubernur',
-                'tmt_sk' => '2020-01-01'
-            ]);
+            $newPangkat = Pangkat::query()->updateOrCreate(
+                ['nama' => 'Penata Muda'],
+                [
+                    'pejabat_penetap' => 'Gubernur',
+                    'tmt_sk' => '2020-01-01',
+                ]
+            );
 
             $pegawai->update(['pangkat_id' => $newPangkat->id]);
 
             $pegawaiPribadi = PegawaiPribadi::query()->updateOrCreate(
                 ['pegawai_id' => $pegawai->id],
                 [
-                    'pendidikan_terakhir' => 'S1/D4',
-                    'tanggal_lahir' => '1990-01-01',
+                    'pendidikan_terakhir' => $seed['pendidikan_terakhir'],
+                    'tanggal_lahir' => $seed['tanggal_lahir'],
                     'jenis_kelamin' => $seed['jenis_kelamin'],
-                    'agama' => 'Islam',
-                    'status_perkawinan' => 'kawin',
-                    'alamat' => 'Jakarta',
-                    'no_telp' => '081234567890',
-                    'email' => strtolower(str_replace(' ', '.', $seed['nama'])).'@example.com',
+                    'agama' => $seed['agama'],
+                    'status_perkawinan' => $seed['status_perkawinan'],
+                    'alamat' => $seed['alamat'],
+                    'no_kk' => $seed['no_kk'],
+                    'no_telp' => $seed['no_telp'],
+                    'email' => $seed['email'],
                     'foto_path' => $seed['foto_path'],
                     'ktp_file_path' => $seed['ktp_file_path'],
+                    'link_kk' => $seed['link_kk'],
                     'kk_file_path' => $seed['kk_file_path'],
                     'buku_nikah_file_path' => $seed['buku_nikah_file_path'],
                 ]
@@ -418,7 +475,7 @@ class PegawaiSeeder extends Seeder
                     'is_current' => true,
                 ],
                 [
-                    'profesi_id' => $profesi->id,
+                    'profesi_id' => $seed['profesi_id'],
                     'started_at' => '2020-01-01',
                     'note' => 'Data awal dari seeder',
                 ]

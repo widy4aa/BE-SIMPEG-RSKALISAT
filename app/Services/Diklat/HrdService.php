@@ -13,22 +13,23 @@ class HrdService
     {
     }
 
-    public function build(int $userId): array
+    public function build(int $userId, array $filters = []): array
     {
         $pegawai = $this->pegawaiDiklatRepository->findPegawaiByUserId($userId);
+        $perPage = $this->resolvePerPage($filters['per_page'] ?? null, 7);
 
         if ($pegawai === null) {
             $totalRiwayat = 0;
             $selesai = 0;
             $akanDatang = 0;
-            $paginatedRiwayat = \App\Models\ListJadwalDiklat::query()->whereRaw('1 = 0')->paginate(7);
+            $paginatedRiwayat = \App\Models\ListJadwalDiklat::query()->whereRaw('1 = 0')->paginate($perPage);
         } else {
             $riwayatQuery = \App\Models\ListJadwalDiklat::query()->where('pegawai_id', $pegawai->id);
             $totalRiwayat = $riwayatQuery->count();
             $selesai = (clone $riwayatQuery)->where('status_diklat', 'sudah terlaksana')->count();
             $akanDatang = (clone $riwayatQuery)->where('status_diklat', 'belum terlaksana')->count();
 
-            $paginatedRiwayat = $this->pegawaiDiklatRepository->getPaginatedRiwayatDiklatByPegawaiId((int) $pegawai->id, 7);
+            $paginatedRiwayat = $this->pegawaiDiklatRepository->getPaginatedRiwayatDiklatByPegawaiId((int) $pegawai->id, $perPage, $filters);
         }
 
         $riwayat = $paginatedRiwayat->getCollection()->map(function ($jadwal): array {
@@ -60,6 +61,12 @@ class HrdService
                     $jadwal->sertif_file_path,
                     $jadwal->status_validasi
                 ),
+                'uploadlaporan' => $this->shouldUploadLaporan(
+                    $diklat?->jenis_pelaksanaan,
+                    $jadwal->sertif_file_path,
+                    $jadwal->no_sertif,
+                    $jadwal->status_validasi
+                ),
             ];
         });
 
@@ -79,9 +86,10 @@ class HrdService
         ];
     }
 
-    public function getAllDiklat(): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllDiklat(array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
     {
-        $paginatedDiklat = $this->pegawaiDiklatRepository->getPaginatedMasterDiklat(7);
+        $perPage = $this->resolvePerPage($filters['per_page'] ?? null, 7);
+        $paginatedDiklat = $this->pegawaiDiklatRepository->getPaginatedMasterDiklat($perPage, $filters);
 
         $items = $paginatedDiklat->getCollection()->map(function ($diklat): array {
             $tanggalMulai = $diklat->tanggal_mulai;
@@ -426,6 +434,14 @@ class HrdService
             throw new InvalidArgumentException('Jadwal diklat tidak ditemukan.');
         }
 
+        if (
+            $isLayak
+            && strtolower((string) ($jadwal->diklat?->jenis_pelaksanaan ?? '')) === 'external'
+            && $this->hasMissingLaporan($jadwal->sertif_file_path, $jadwal->no_sertif)
+        ) {
+            throw new InvalidArgumentException('belum upload laporan');
+        }
+
         $jadwal->status_kelayakan = $isLayak ? 'layak' : 'tidak layak';
         $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
 
@@ -442,6 +458,14 @@ class HrdService
         $jadwal = $this->pegawaiDiklatRepository->findJadwalById($jadwalId);
         if ($jadwal === null) {
             throw new InvalidArgumentException('Jadwal diklat tidak ditemukan.');
+        }
+
+        if (
+            $isValid
+            && strtolower((string) ($jadwal->diklat?->jenis_pelaksanaan ?? '')) === 'internal'
+            && $this->hasMissingLaporan($jadwal->sertif_file_path, $jadwal->no_sertif)
+        ) {
+            throw new InvalidArgumentException('belum upload laporan');
         }
 
         $jadwal->status_validasi = $isValid ? 'valid' : 'tidak valid';
@@ -478,6 +502,13 @@ class HrdService
         return 'berlangsung';
     }
 
+    private function resolvePerPage(mixed $value, int $default): int
+    {
+        $perPage = is_numeric($value) ? (int) $value : $default;
+
+        return max(1, min($perPage, 100));
+    }
+
     private function resolveStatusDiklatByTanggal(Carbon $tanggalMulai, Carbon $tanggalSelesai): string
     {
         $today = Carbon::today();
@@ -512,6 +543,28 @@ class HrdService
         }
 
         return 'diklat valid';
+    }
+
+    private function shouldUploadLaporan(?string $jenisPelaksana, ?string $sertifFilePath, ?string $noSertif, ?string $statusValidasi): bool
+    {
+        $jenisPelaksana = strtolower(trim((string) $jenisPelaksana));
+        $statusValidasi = strtolower(trim((string) $statusValidasi));
+        $hasMissingLaporan = $this->hasMissingLaporan($sertifFilePath, $noSertif);
+
+        if ($jenisPelaksana === 'external') {
+            return $hasMissingLaporan;
+        }
+
+        if ($jenisPelaksana === 'internal') {
+            return $hasMissingLaporan || in_array($statusValidasi, ['', 'tidak valid', 'di tolak', 'pending'], true);
+        }
+
+        return $hasMissingLaporan;
+    }
+
+    private function hasMissingLaporan(?string $sertifFilePath, ?string $noSertif): bool
+    {
+        return trim((string) $sertifFilePath) === '' || trim((string) $noSertif) === '';
     }
 
     public function generateLaporanDiklat(int $bulanAwal, int $tahunAwal, int $bulanAkhir, int $tahunAkhir): array

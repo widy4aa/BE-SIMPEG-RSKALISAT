@@ -24,7 +24,7 @@ class DiklatController extends Controller
         $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
-        $payload = $this->diklatService->getPayloadByRole($role, $userId);
+        $payload = $this->diklatService->getPayloadByRole($role, $userId, $request->query());
 
         if ($payload === null) {
             return response()->json([
@@ -55,7 +55,7 @@ class DiklatController extends Controller
             ], 403);
         }
 
-        $diklat = $this->diklatService->getAllDiklat();
+        $diklat = $this->diklatService->getAllDiklat($request->query());
 
         return response()->json([
             'success' => true,

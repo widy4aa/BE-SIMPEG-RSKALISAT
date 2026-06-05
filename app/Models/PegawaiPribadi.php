@@ -20,10 +20,12 @@ class PegawaiPribadi extends Model
         'agama',
         'status_perkawinan',
         'alamat',
+        'no_kk',
         'no_telp',
         'email',
         'foto_path',
         'ktp_file_path',
+        'link_kk',
         'kk_file_path',
         'buku_nikah_file_path',
     ];

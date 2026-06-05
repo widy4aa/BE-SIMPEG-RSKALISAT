@@ -11,12 +11,12 @@ class PegawaiService
     ) {
     }
 
-    public function getPayloadByRole(string $role): ?array
+    public function getPayloadByRole(string $role, array $filters = []): ?array
     {
         return match ($role) {
-            'admin' => $this->adminService->getPegawaiData(),
-            'hrd' => $this->hrdService->getPegawaiData(),
-            'direktur' => $this->direkturService->getPegawaiData(),
+            'admin' => $this->adminService->getPegawaiData($filters),
+            'hrd' => $this->hrdService->getPegawaiData($filters),
+            'direktur' => $this->direkturService->getPegawaiData($filters),
             default => null,
         };
     }

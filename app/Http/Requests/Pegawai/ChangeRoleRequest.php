@@ -24,7 +24,16 @@ class ChangeRoleRequest extends FormRequest
     {
         return [
             'role' => 'sometimes|required|string|in:pegawai,admin,hrd,direktur',
-            'status_pegawai' => 'sometimes|required|string|in:aktif,cuti,berhenti,pensiun',
+            'status_pegawai' => 'sometimes|required|string|in:aktif,tidak aktif',
         ];
+    }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator): void {
+            if (! $this->hasAny(['role', 'status_pegawai'])) {
+                $validator->errors()->add('payload', 'Minimal role atau status_pegawai harus diisi.');
+            }
+        });
     }
 }

@@ -6,6 +6,7 @@ use App\Models\Pegawai;
 use App\Models\User;
 use App\Models\PegawaiPribadi;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -21,14 +22,20 @@ class AdminPegawaiRepository
         ])->get();
     }
 
-    public function getPaginatedPegawai(int $perPage = 10)
+    public function getPaginatedPegawai(int $perPage = 10, array $filters = [])
     {
-        return Pegawai::with([
+        $query = Pegawai::query()->with([
             'user',
             'pribadi',
+            'jenisPegawai',
             'profesi',
+            'profesiPegawai.profesi',
             'jabatan.unitKerja'
-        ])->paginate($perPage);
+        ]);
+
+        $this->applyPegawaiFilters($query, $filters);
+
+        return $query->orderByDesc('id')->paginate($perPage);
     }
 
     public function getPegawaiDetail(int $pegawaiId): ?Pegawai
@@ -94,5 +101,114 @@ class AdminPegawaiRepository
         }
 
         return $pegawai;
+    }
+
+    public function countUsersByRole(string $role): int
+    {
+        return User::query()->where('role', $role)->count();
+    }
+
+    private function applyPegawaiFilters(Builder $query, array $filters): void
+    {
+        $search = $this->filledString($filters['search'] ?? null);
+        if ($search !== null) {
+            $query->where(function (Builder $query) use ($search): void {
+                $query->where('nama', 'like', "%{$search}%")
+                    ->orWhere('nik', 'like', "%{$search}%")
+                    ->orWhereHas('profesi', function (Builder $query) use ($search): void {
+                        $query->where('nama', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('profesiPegawai.profesi', function (Builder $query) use ($search): void {
+                        $query->where('nama', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $statusKelengkapan = $this->filledString($filters['status_kelengkapan'] ?? null);
+        if ($statusKelengkapan === 'lengkap') {
+            $this->whereProfileComplete($query);
+        } elseif ($statusKelengkapan === 'belum-lengkap') {
+            $this->whereProfileIncomplete($query);
+        }
+
+        $jenisPegawai = $this->filledString($filters['jenis_pegawai'] ?? null);
+        if ($jenisPegawai !== null) {
+            $query->whereHas('jenisPegawai', function (Builder $query) use ($jenisPegawai): void {
+                $query->where('nama', 'like', "%{$jenisPegawai}%");
+            });
+        }
+
+        $pendidikan = $this->filledString($filters['pendidikan'] ?? null);
+        if ($pendidikan !== null) {
+            $query->whereHas('pribadi', function (Builder $query) use ($pendidikan): void {
+                $query->where('pendidikan_terakhir', 'like', "%{$pendidikan}%");
+            });
+        }
+
+        $statusPegawai = $this->filledString($filters['status_pegawai'] ?? null);
+        if ($statusPegawai !== null) {
+            $query->where('status_pegawai', $statusPegawai);
+        }
+
+        $profesi = $this->filledString($filters['profesi'] ?? null);
+        if ($profesi !== null) {
+            $query->where(function (Builder $query) use ($profesi): void {
+                $query->whereHas('profesi', function (Builder $query) use ($profesi): void {
+                    $query->where('nama', 'like', "%{$profesi}%");
+                })->orWhereHas('profesiPegawai.profesi', function (Builder $query) use ($profesi): void {
+                    $query->where('nama', 'like', "%{$profesi}%");
+                });
+            });
+        }
+    }
+
+    private function whereProfileComplete(Builder $query): void
+    {
+        $query->whereNotNull('nik')
+            ->where('nik', '!=', '')
+            ->whereNotNull('jenis_pegawai_id')
+            ->whereNotNull('profesi_id')
+            ->whereNotNull('tgl_masuk');
+
+        $query->whereHas('pribadi', function (Builder $query): void {
+            $query->whereNotNull('tanggal_lahir');
+
+            foreach (['jenis_kelamin', 'agama', 'alamat', 'no_telp', 'pendidikan_terakhir'] as $field) {
+                $query->whereNotNull($field)
+                    ->where($field, '!=', '');
+            }
+        });
+    }
+
+    private function whereProfileIncomplete(Builder $query): void
+    {
+        $query->where(function (Builder $query): void {
+            $query->orWhereNull('nik')
+                ->orWhere('nik', '')
+                ->orWhereNull('jenis_pegawai_id')
+                ->orWhereNull('profesi_id')
+                ->orWhereNull('tgl_masuk');
+
+            $query->orWhereDoesntHave('pribadi')
+                ->orWhereHas('pribadi', function (Builder $query): void {
+                    $query->orWhereNull('tanggal_lahir');
+
+                    foreach (['jenis_kelamin', 'agama', 'alamat', 'no_telp', 'pendidikan_terakhir'] as $field) {
+                        $query->orWhereNull($field)
+                            ->orWhere($field, '');
+                    }
+                });
+        });
+    }
+
+    private function filledString(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
     }
 }

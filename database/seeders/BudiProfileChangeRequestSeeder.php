@@ -9,71 +9,98 @@ use Illuminate\Database\Seeder;
 class BudiProfileChangeRequestSeeder extends Seeder
 {
     /**
-     * Seed 1 pengajuan perubahan profile milik Budi untuk ditinjau admin.
+     * Seed pengajuan perubahan profile untuk akun inti agar response profile lengkap.
      */
     public function run(): void
     {
-        $budi = User::query()
-            ->with('pegawai.pribadi')
-            ->where('username', '3174010101010001')
-            ->first();
+        $requests = [
+            [
+                'username' => '3174010101010001',
+                'status' => 'pending',
+                'note' => 'Seeder: Pengajuan perubahan profile Budi',
+                'changes' => [
+                    ['target_table' => 'pegawai', 'kolom' => 'nama', 'value' => 'Budi Santoso, A.Md.Kep'],
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'alamat', 'value' => 'Jl. Kalisat Raya No. 123, Jember'],
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'no_telp', 'value' => '081355551234'],
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'email', 'value' => 'budi.santoso+update@rskalisat.test'],
+                    ['target_table' => 'pegawai', 'kolom' => 'tmt_pns', 'value' => '2021-06-01'],
+                ],
+            ],
+            [
+                'username' => '3174010101010099',
+                'status' => 'approved',
+                'note' => 'Seeder: Riwayat perubahan profile Admin SIMPEG',
+                'changes' => [
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'no_telp', 'value' => '081234560199'],
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'alamat', 'value' => 'Jl. Melati No. 10A, Kalisat'],
+                ],
+            ],
+            [
+                'username' => '3174010101010098',
+                'status' => 'pending',
+                'note' => 'Seeder: Pengajuan perubahan profile HRD SIMPEG',
+                'changes' => [
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'email', 'value' => 'hrd.simpeg+update@rskalisat.test'],
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'alamat', 'value' => 'Jl. Kenanga No. 21B, Kalisat'],
+                ],
+            ],
+            [
+                'username' => '3174010101010003',
+                'status' => 'approved',
+                'note' => 'Seeder: Riwayat perubahan profile Direktur',
+                'changes' => [
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'no_telp', 'value' => '081234560303'],
+                    ['target_table' => 'pegawai_pribadi', 'kolom' => 'email', 'value' => 'agus.priyanto+update@rskalisat.test'],
+                ],
+            ],
+        ];
 
-        if ($budi === null || $budi->pegawai === null) {
-            return;
+        foreach ($requests as $seed) {
+            $user = User::query()
+                ->with('pegawai.pribadi')
+                ->where('username', $seed['username'])
+                ->first();
+
+            if ($user === null || $user->pegawai === null) {
+                continue;
+            }
+
+            $request = PerubahanData::query()->updateOrCreate(
+                [
+                    'by_user' => $user->id,
+                    'fitur' => 'profile',
+                    'note' => $seed['note'],
+                ],
+                [
+                    'status' => $seed['status'],
+                ]
+            );
+
+            $request->details()->delete();
+
+            $details = collect($seed['changes'])
+                ->map(fn (array $change): array => [
+                    'target_table' => $change['target_table'],
+                    'kolom' => $change['kolom'],
+                    'old_value' => $this->resolveOldValue($user, $change['target_table'], $change['kolom']),
+                    'value' => $change['value'],
+                ])
+                ->all();
+
+            $request->details()->createMany($details);
         }
+    }
 
-        $pegawai = $budi->pegawai;
-        $pribadi = $pegawai->pribadi;
+    private function resolveOldValue(User $user, string $targetTable, string $column): ?string
+    {
+        $source = match ($targetTable) {
+            'pegawai' => $user->pegawai,
+            'pegawai_pribadi' => $user->pegawai?->pribadi,
+            default => null,
+        };
 
-        $request = PerubahanData::query()->firstOrCreate(
-            [
-                'by_user' => $budi->id,
-                'fitur' => 'profile',
-                'status' => 'pending',
-                'note' => 'Seeder: Pengajuan perubahan profile Budi',
-            ],
-            [
-                'by_user' => $budi->id,
-                'fitur' => 'profile',
-                'status' => 'pending',
-                'note' => 'Seeder: Pengajuan perubahan profile Budi',
-            ]
-        );
+        $value = $source?->{$column} ?? null;
 
-        // Reset detail agar hasil seeding konsisten saat dijalankan ulang.
-        $request->details()->delete();
-
-        $request->details()->createMany([
-            [
-                'target_table' => 'pegawai',
-                'kolom' => 'nama',
-                'old_value' => (string) ($pegawai->nama ?? ''),
-                'value' => 'Budi Santoso, S.Kom',
-            ],
-            [
-                'target_table' => 'pegawai_pribadi',
-                'kolom' => 'alamat',
-                'old_value' => (string) ($pribadi->alamat ?? ''),
-                'value' => 'Jl. Kalisat Raya No. 123, Jember',
-            ],
-            [
-                'target_table' => 'pegawai_pribadi',
-                'kolom' => 'no_telp',
-                'old_value' => (string) ($pribadi->no_telp ?? ''),
-                'value' => '081355551234',
-            ],
-            [
-                'target_table' => 'pegawai_pribadi',
-                'kolom' => 'email',
-                'old_value' => (string) ($pribadi->email ?? ''),
-                'value' => 'budi.santoso+update@example.com',
-            ],
-            [
-                'target_table' => 'pegawai',
-                'kolom' => 'tmt_pns',
-                'old_value' => optional($pegawai->tmt_pns)?->toDateString(),
-                'value' => '2021-06-01',
-            ],
-        ]);
+        return $value === null ? null : (string) $value;
     }
 }

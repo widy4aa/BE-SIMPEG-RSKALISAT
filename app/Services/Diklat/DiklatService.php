@@ -14,12 +14,12 @@ class DiklatService
     ) {
     }
 
-    public function getPayloadByRole(string $role, int $userId): ?array
+    public function getPayloadByRole(string $role, int $userId, array $filters = []): ?array
     {
         return match ($role) {
             'admin' => $this->adminService->build($userId),
-            'pegawai' => $this->pegawaiService->build($userId),
-            'hrd' => $this->hrdService->build($userId),
+            'pegawai' => $this->pegawaiService->build($userId, $filters),
+            'hrd' => $this->hrdService->build($userId, $filters),
             'direktur' => $this->direkturService->build($userId),
             default => null,
         };
@@ -45,9 +45,9 @@ class DiklatService
         return $this->pegawaiService->uploadLaporan($diklatId, $userId, $payload, $laporanFile);
     }
 
-    public function getAllDiklat(): \Illuminate\Pagination\LengthAwarePaginator
+    public function getAllDiklat(array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
     {
-        return $this->hrdService->getAllDiklat();
+        return $this->hrdService->getAllDiklat($filters);
     }
 
     public function createHrdDiklat(int $userId, array $payload): array

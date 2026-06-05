@@ -8,6 +8,8 @@ use App\Models\JenisDiklat;
 use App\Models\KategoriDiklat;
 use App\Models\ListJadwalDiklat;
 use App\Models\Pegawai;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class PegawaiDiklatRepository
@@ -66,30 +68,38 @@ class PegawaiDiklatRepository
             ->get();
     }
 
-    public function getPaginatedRiwayatDiklatByPegawaiId(int $pegawaiId, int $perPage = 7)
+    public function getPaginatedRiwayatDiklatByPegawaiId(int $pegawaiId, int $perPage = 7, array $filters = [])
     {
-        return ListJadwalDiklat::query()
+        $query = ListJadwalDiklat::query()
             ->with([
                 'diklat.kategoriDiklat',
                 'diklat.jenisDiklat',
                 'diklat.jenisBiaya',
                 'diklat.createdByPegawai',
             ])
-            ->where('pegawai_id', $pegawaiId)
+            ->where('pegawai_id', $pegawaiId);
+
+        $this->applyDiklatRelationFilters($query, $filters);
+
+        return $query
             ->orderByDesc('id')
             ->paginate($perPage);
     }
 
-    public function getPaginatedMasterDiklat(int $perPage = 7)
+    public function getPaginatedMasterDiklat(int $perPage = 7, array $filters = [])
     {
-        return Diklat::query()
+        $query = Diklat::query()
             ->with([
                 'kategoriDiklat',
                 'jenisDiklat',
                 'jenisBiaya',
                 'createdByPegawai',
             ])
-            ->withCount('jadwalPeserta')
+            ->withCount('jadwalPeserta');
+
+        $this->applyDiklatFilters($query, $filters);
+
+        return $query
             ->orderByDesc('id')
             ->paginate($perPage);
     }
@@ -250,5 +260,61 @@ class PegawaiDiklatRepository
             ->whereBetween('created_at', [$startDate, $endDate])
             ->orderByDesc('id')
             ->get();
+    }
+
+    private function applyDiklatRelationFilters(Builder $query, array $filters): void
+    {
+        $query->whereHas('diklat', function (Builder $query) use ($filters): void {
+            $this->applyDiklatFilters($query, $filters);
+        });
+    }
+
+    private function applyDiklatFilters(Builder $query, array $filters): void
+    {
+        $search = $this->filledString($filters['search'] ?? null);
+        if ($search !== null) {
+            $query->where(function (Builder $query) use ($search): void {
+                $query->where('nama_kegiatan', 'like', "%{$search}%")
+                    ->orWhere('penyelenggara', 'like', "%{$search}%")
+                    ->orWhereHas('kategoriDiklat', function (Builder $query) use ($search): void {
+                        $query->where('nama', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('jenisDiklat', function (Builder $query) use ($search): void {
+                        $query->where('nama', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $jenis = $this->filledString($filters['jenis'] ?? null);
+        if ($jenis !== null) {
+            $query->whereHas('jenisDiklat', function (Builder $query) use ($jenis): void {
+                $query->where('nama', 'like', "%{$jenis}%");
+            });
+        }
+
+        $status = $this->filledString($filters['status'] ?? null);
+        if ($status !== null) {
+            $today = Carbon::today()->toDateString();
+
+            if ($status === 'mendatang') {
+                $query->whereDate('tanggal_mulai', '>', $today);
+            } elseif ($status === 'selesai') {
+                $query->whereDate('tanggal_selesai', '<', $today);
+            } elseif ($status === 'berlangsung') {
+                $query->whereDate('tanggal_mulai', '<=', $today)
+                    ->whereDate('tanggal_selesai', '>=', $today);
+            }
+        }
+    }
+
+    private function filledString(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
     }
 }

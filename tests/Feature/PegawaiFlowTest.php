@@ -2,14 +2,20 @@
 
 namespace Tests\Feature;
 
+use App\Models\Pegawai;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PegawaiFlowTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_admin_can_create_user_and_user_can_update_profile(): void
     {
+        $this->createAdminUser();
+
         // Setup: Admin logs in
         $adminLogin = $this->postJson('/api/login', [
             'nik' => '3174010101010099',
@@ -63,16 +69,29 @@ class PegawaiFlowTest extends TestCase
         $updateResponse->assertStatus(200);
         $this->assertTrue($updateResponse->json('success'));
 
-        // Admin changes the new user's role to 'hrd'
+        // Admin changes the new user's role and employee status.
         $pegawaiId = $createResponse->json('data.id');
         $changeRoleResponse = $this->patchJson("/api/pegawai/{$pegawaiId}/change-role", [
-            'role' => 'hrd'
+            'role' => 'hrd',
+            'status_pegawai' => 'tidak aktif',
         ], [
             'Authorization' => "Bearer $adminToken"
         ]);
 
         $changeRoleResponse->assertStatus(200);
         $this->assertEquals('hrd', $changeRoleResponse->json('data.role'));
+        $this->assertEquals('tidak aktif', $changeRoleResponse->json('data.status_pegawai'));
+
+        $listPegawaiResponse = $this->getJson('/api/pegawai?page=1', [
+            'Authorization' => "Bearer $adminToken"
+        ]);
+
+        $listPegawaiResponse->assertStatus(200);
+        $listedPegawai = collect($listPegawaiResponse->json('data.pegawai.data'))
+            ->firstWhere('id_pegawai', $pegawaiId);
+
+        $this->assertNotNull($listedPegawai);
+        $this->assertEquals('hrd', $listedPegawai['role']);
 
         // Admin attempts to change their own role (Should fail)
         $adminPegawaiQuery = \App\Models\Pegawai::where('nik', '3174010101010099')->first();
@@ -85,7 +104,24 @@ class PegawaiFlowTest extends TestCase
             ]);
             
             $changeSelfRoleResponse->assertStatus(400);
-            $this->assertStringContainsString('Tidak dapat mengubah role diri sendiri', $changeSelfRoleResponse->json('message'));
+            $this->assertStringContainsString('Tidak dapat mengubah role/status diri sendiri', $changeSelfRoleResponse->json('message'));
         }
+    }
+
+    private function createAdminUser(): void
+    {
+        $user = User::query()->create([
+            'username' => '3174010101010099',
+            'password' => Hash::make('password'),
+            'role' => 'admin',
+            'is_active' => true,
+        ]);
+
+        Pegawai::query()->create([
+            'user_id' => $user->id,
+            'nik' => '3174010101010099',
+            'nama' => 'Admin SIMPEG',
+            'status_pegawai' => 'aktif',
+        ]);
     }
 }

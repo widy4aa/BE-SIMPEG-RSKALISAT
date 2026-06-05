@@ -14,6 +14,11 @@ class PegawaiService
 
     public function build(int $userId): array
     {
+        return $this->buildForRole($userId, 'pegawai');
+    }
+
+    public function buildForRole(int $userId, string $role): array
+    {
         $user = $this->profileRepository->findUserWithPegawaiProfileRelations($userId);
 
         $pegawai = $user?->pegawai;
@@ -46,40 +51,40 @@ class PegawaiService
         $latestChangeRequest = $this->profileRepository->findLatestProfileChangeRequestByUserId($userId);
 
         return [
-            'welcome' => 'Selamat datang pegawai',
+            'welcome' => 'Selamat datang '.$role,
             'summary' => [
-                'label' => 'Profile pegawai',
-                'nip' => (string) ($pegawai?->nip ?? ''),
-                'nik' => (string) ($pegawai?->nik ?? ''),
-                'nama' => (string) ($pegawai?->nama ?? ''),
-                'jenis_pegawai' => (string) ($pegawai?->jenisPegawai?->nama ?? ''),
-                'profesi' => (string) ($currentProfesi?->profesi?->nama ?? $pegawai?->profesi?->nama ?? ''),
-                'pendidikan_terakhir' => (string) ($pegawai?->pribadi?->pendidikan_terakhir ?? ''),
-                'unit_kerja' => (string) ($currentJabatan?->jabatan?->unitKerja?->nama ?? $pegawai?->jabatan?->unitKerja?->nama ?? ''),
-                'jk' => (string) ($pegawai?->pribadi?->jenis_kelamin ?? ''),
+                'label' => 'Profile '.$role,
+                'nip' => $this->stringOrNull($pegawai?->nip),
+                'nik' => $this->stringOrNull($pegawai?->nik),
+                'nama' => $this->stringOrNull($pegawai?->nama),
+                'jenis_pegawai' => $this->stringOrNull($pegawai?->jenisPegawai?->nama),
+                'profesi' => $this->stringOrNull($currentProfesi?->profesi?->nama ?? $pegawai?->profesi?->nama),
+                'pendidikan_terakhir' => $this->stringOrNull($pegawai?->pribadi?->pendidikan_terakhir),
+                'unit_kerja' => $this->stringOrNull($currentJabatan?->jabatan?->unitKerja?->nama ?? $pegawai?->jabatan?->unitKerja?->nama),
+                'jk' => $this->stringOrNull($pegawai?->pribadi?->jenis_kelamin),
                 'tanggal_lahir' => optional($pegawai?->pribadi?->tanggal_lahir)?->toDateString(),
-                'jabatan_sekarang' => (string) ($currentJabatan?->jabatan?->nama ?? $pegawai?->jabatan?->nama ?? ''),
-                'agama' => (string) ($pegawai?->pribadi?->agama ?? ''),
-                'status_kawin' => (string) ($pegawai?->pribadi?->status_perkawinan ?? ''),
-                'alamat' => (string) ($pegawai?->pribadi?->alamat ?? ''),
-                'no_telp' => (string) ($pegawai?->pribadi?->no_telp ?? ''),
-                'email' => (string) ($pegawai?->pribadi?->email ?? ''),
-                'no_kk' => (string) ($pegawai?->pribadi?->no_kk ?? ''),
-                'link_kk' => (string) ($pegawai?->pribadi?->link_kk ?? ''),
+                'jabatan_sekarang' => $this->stringOrNull($currentJabatan?->jabatan?->nama ?? $pegawai?->jabatan?->nama),
+                'agama' => $this->stringOrNull($pegawai?->pribadi?->agama),
+                'status_kawin' => $this->stringOrNull($pegawai?->pribadi?->status_perkawinan),
+                'alamat' => $this->stringOrNull($pegawai?->pribadi?->alamat),
+                'no_telp' => $this->stringOrNull($pegawai?->pribadi?->no_telp),
+                'email' => $this->stringOrNull($pegawai?->pribadi?->email),
+                'no_kk' => $this->stringOrNull($pegawai?->pribadi?->no_kk),
+                'link_kk' => $this->stringOrNull($pegawai?->pribadi?->link_kk),
                 'link_photo_profile' => $this->buildPhotoProfileUrl((string) ($pegawai?->pribadi?->foto_path ?? '')),
-                'ktp_file_path' => (string) ($pegawai?->pribadi?->ktp_file_path ?? ''),
-                'status_pegawai' => (string) ($pegawai?->status_pegawai ?? ''),
+                'ktp_file_path' => $this->stringOrNull($pegawai?->pribadi?->ktp_file_path),
+                'status_pegawai' => $this->stringOrNull($pegawai?->status_pegawai),
                 'tgl_masuk' => optional($pegawai?->tgl_masuk)?->toDateString(),
-                'pangkat' => (string) ($currentPangkat?->pangkat?->nama ?? $pegawai?->pangkat?->nama ?? ''),
-                'golongan_ruang' => (string) ($currentGolonganRuang?->golonganRuang?->nama ?? $pegawai?->golonganRuang?->nama ?? ''),
+                'pangkat' => $this->stringOrNull($currentPangkat?->pangkat?->nama ?? $pegawai?->pangkat?->nama),
+                'golongan_ruang' => $this->stringOrNull($currentGolonganRuang?->golonganRuang?->nama ?? $pegawai?->golonganRuang?->nama),
                 'tmt_cpns' => optional($pegawai?->tmt_cpns)?->toDateString(),
                 'tmt_pns' => optional($pegawai?->tmt_pns)?->toDateString(),
                 'tmt_pangkat' => optional($currentPangkat?->started_at ?? $pegawai?->tmt_pangkat_akhir)?->toDateString(),
                 'masa_kerja' => $this->calculateMasaKerja($pegawai?->tgl_masuk),
                 'status_perubahan' => [
-                    'fitur' => (string) ($latestChangeRequest?->fitur ?? ''),
-                    'status' => (string) ($latestChangeRequest?->status ?? ''),
-                    'note' => (string) ($latestChangeRequest?->note ?? ''),
+                    'fitur' => $this->stringOrNull($latestChangeRequest?->fitur),
+                    'status' => $this->stringOrNull($latestChangeRequest?->status),
+                    'note' => $this->stringOrNull($latestChangeRequest?->note),
                     'last_update' => optional($lastUpdate)->toDateTimeString(),
                 ],
             ],
@@ -115,5 +120,16 @@ class PegawaiService
         }
 
         return '/'.$path;
+    }
+
+    private function stringOrNull(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
     }
 }

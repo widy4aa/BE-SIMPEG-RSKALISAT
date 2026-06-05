@@ -19,7 +19,7 @@ class PegawaiController extends Controller
         $claims = $request->input('_jwt_claims', []);
         $role = strtolower((string) (is_array($claims) ? ($claims['role'] ?? '') : ''));
 
-        $payload = $this->pegawaiService->getPayloadByRole($role);
+        $payload = $this->pegawaiService->getPayloadByRole($role, $request->query());
 
         if (!$payload) {
             return response()->json([
