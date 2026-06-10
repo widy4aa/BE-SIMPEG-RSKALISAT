@@ -4,6 +4,7 @@ namespace App\Services\Diklat;
 
 use App\Repositories\Diklat\PegawaiDiklatRepository;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
@@ -22,12 +23,12 @@ class HrdService
             $totalRiwayat = 0;
             $selesai = 0;
             $akanDatang = 0;
-            $paginatedRiwayat = \App\Models\ListJadwalDiklat::query()->whereRaw('1 = 0')->paginate($perPage);
+            $paginatedRiwayat = new LengthAwarePaginator(collect(), 0, $perPage);
         } else {
-            $riwayatQuery = \App\Models\ListJadwalDiklat::query()->where('pegawai_id', $pegawai->id);
-            $totalRiwayat = $riwayatQuery->count();
-            $selesai = (clone $riwayatQuery)->where('status_diklat', 'sudah terlaksana')->count();
-            $akanDatang = (clone $riwayatQuery)->where('status_diklat', 'belum terlaksana')->count();
+            $summary = $this->pegawaiDiklatRepository->getJadwalSummaryByPegawaiId((int) $pegawai->id);
+            $totalRiwayat = $summary['total_riwayat'];
+            $selesai = $summary['selesai'];
+            $akanDatang = $summary['akan_datang'];
 
             $paginatedRiwayat = $this->pegawaiDiklatRepository->getPaginatedRiwayatDiklatByPegawaiId((int) $pegawai->id, $perPage, $filters);
         }

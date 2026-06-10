@@ -14,14 +14,11 @@ class AdminPegawaiService
 
     public function getPegawaiData(array $filters = []): array
     {
-        $totalPegawai = \App\Models\Pegawai::count();
-        $jumlahDokter = \App\Models\Pegawai::whereHas('profesi', function($q) {
-            $q->where('nama', 'like', '%dokter%');
-        })->count();
-        $jumlahPerawat = \App\Models\Pegawai::whereHas('profesi', function($q) {
-            $q->where('nama', 'like', '%perawat%');
-        })->count();
-        $jumlahProfesi = \Illuminate\Support\Facades\DB::table('pegawai')->whereNotNull('profesi_id')->distinct('profesi_id')->count('profesi_id');
+        $overviewCounts = $this->repository->getPegawaiOverviewCounts();
+        $totalPegawai = $overviewCounts['total_pegawai'];
+        $jumlahDokter = $overviewCounts['jumlah_dokter'];
+        $jumlahPerawat = $overviewCounts['jumlah_perawat'];
+        $jumlahProfesi = $overviewCounts['jumlah_profesi'];
 
         $perPage = $this->resolvePerPage($filters['per_page'] ?? null, 10);
         $paginatedPegawai = $this->repository->getPaginatedPegawai($perPage, $filters);

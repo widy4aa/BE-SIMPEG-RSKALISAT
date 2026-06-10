@@ -2,11 +2,10 @@
 
 namespace App\Repositories\Pegawai;
 
-use App\Models\Pegawai;
-use App\Models\User;
-use App\Models\PegawaiPribadi;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Builder;
+use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -14,191 +13,511 @@ class AdminPegawaiRepository
 {
     public function getAllPegawai(): Collection
     {
-        return Pegawai::with([
-            'user',
-            'pribadi',
-            'profesi',
-            'jabatan.unitKerja'
-        ])->get();
+        return collect(DB::select('
+            SELECT
+                p.*,
+                u.role AS user_role
+            FROM pegawai p
+            LEFT JOIN users u ON u.id = p.user_id
+            WHERE p.deleted_at IS NULL
+            ORDER BY p.id DESC
+        '))->map(fn ($row) => $this->mapPegawaiListRow($row));
     }
 
-    public function getPaginatedPegawai(int $perPage = 10, array $filters = [])
+    public function getPegawaiOverviewCounts(): array
     {
-        $query = Pegawai::query()->with([
-            'user',
-            'pribadi',
-            'jenisPegawai',
-            'profesi',
-            'profesiPegawai.profesi',
-            'jabatan.unitKerja'
-        ]);
+        $row = DB::selectOne('
+            SELECT
+                COUNT(*) AS total_pegawai,
+                SUM(CASE WHEN pr.nama LIKE ? THEN 1 ELSE 0 END) AS jumlah_dokter,
+                SUM(CASE WHEN pr.nama LIKE ? THEN 1 ELSE 0 END) AS jumlah_perawat,
+                COUNT(DISTINCT p.profesi_id) AS jumlah_profesi
+            FROM pegawai p
+            LEFT JOIN profesi pr ON pr.id = p.profesi_id
+            WHERE p.deleted_at IS NULL
+        ', ['%dokter%', '%perawat%']);
 
-        $this->applyPegawaiFilters($query, $filters);
-
-        return $query->orderByDesc('id')->paginate($perPage);
+        return [
+            'total_pegawai' => (int) ($row->total_pegawai ?? 0),
+            'jumlah_dokter' => (int) ($row->jumlah_dokter ?? 0),
+            'jumlah_perawat' => (int) ($row->jumlah_perawat ?? 0),
+            'jumlah_profesi' => (int) ($row->jumlah_profesi ?? 0),
+        ];
     }
 
-    public function getPegawaiDetail(int $pegawaiId): ?Pegawai
+    public function getPaginatedPegawai(int $perPage = 10, array $filters = []): LengthAwarePaginator
     {
-        return Pegawai::with([
-            'user',
-            'pribadi',
-            'profesi',
-            'jabatan.unitKerja',
-            'jenisPegawai',
-            'golonganRuang',
-            'pangkat',
-            'jadwalDiklat.diklat.kategoriDiklat',
-            'jadwalDiklat.diklat.jenisDiklat',
-            'jabatanPegawai.jabatan.unitKerja',
-            'str',
-            'sip.jenisSip',
-            'penugasanKlinis',
-            'pasangan',
-            'anak',
-            'orangTua',
-            'kontakDarurat',
-            'tanggunganLain'
-        ])->find($pegawaiId);
+        $page = Paginator::resolveCurrentPage();
+        $offset = ($page - 1) * $perPage;
+        [$whereSql, $bindings] = $this->buildPegawaiFilterSql($filters);
+
+        $totalRow = DB::selectOne("
+            SELECT COUNT(*) AS total
+            FROM pegawai p
+            LEFT JOIN users u ON u.id = p.user_id
+            LEFT JOIN pegawai_pribadi pp ON pp.pegawai_id = p.id AND pp.deleted_at IS NULL
+            LEFT JOIN jenis_pegawai jp ON jp.id = p.jenis_pegawai_id
+            LEFT JOIN profesi pr ON pr.id = p.profesi_id
+            LEFT JOIN jabatan j ON j.id = p.jabatan_id AND j.deleted_at IS NULL
+            LEFT JOIN unit_kerja uk ON uk.id = j.unit_kerja_id
+            WHERE {$whereSql}
+        ", $bindings);
+
+        $rows = DB::select("
+            SELECT
+                p.*,
+                u.role AS user_role,
+                pp.id AS pribadi_id,
+                pp.pendidikan_terakhir AS pribadi_pendidikan_terakhir,
+                pp.tanggal_lahir AS pribadi_tanggal_lahir,
+                pp.jenis_kelamin AS pribadi_jenis_kelamin,
+                pp.agama AS pribadi_agama,
+                pp.status_perkawinan AS pribadi_status_perkawinan,
+                pp.alamat AS pribadi_alamat,
+                pp.no_telp AS pribadi_no_telp,
+                pp.email AS pribadi_email,
+                pp.foto_path AS pribadi_foto_path,
+                j.id AS jabatan_id_detail,
+                j.nama AS jabatan_nama,
+                uk.id AS unit_kerja_id,
+                uk.nama AS unit_kerja_nama,
+                jp.nama AS jenis_pegawai_nama,
+                pr.nama AS profesi_nama
+            FROM pegawai p
+            LEFT JOIN users u ON u.id = p.user_id
+            LEFT JOIN pegawai_pribadi pp ON pp.pegawai_id = p.id AND pp.deleted_at IS NULL
+            LEFT JOIN jenis_pegawai jp ON jp.id = p.jenis_pegawai_id
+            LEFT JOIN profesi pr ON pr.id = p.profesi_id
+            LEFT JOIN jabatan j ON j.id = p.jabatan_id AND j.deleted_at IS NULL
+            LEFT JOIN unit_kerja uk ON uk.id = j.unit_kerja_id
+            WHERE {$whereSql}
+            ORDER BY p.id DESC
+            LIMIT ? OFFSET ?
+        ", [...$bindings, $perPage, $offset]);
+
+        return new LengthAwarePaginator(
+            collect($rows)->map(fn ($row) => $this->mapPegawaiListRow($row)),
+            (int) ($totalRow->total ?? 0),
+            $perPage,
+            $page,
+            [
+                'path' => Paginator::resolveCurrentPath(),
+                'pageName' => 'page',
+            ]
+        );
     }
 
-    public function createPegawaiData(array $data): Pegawai
+    public function getPegawaiDetail(int $pegawaiId): ?object
+    {
+        $row = DB::selectOne('
+            SELECT
+                p.*,
+                u.role AS user_role,
+                u.email AS user_email,
+                pp.id AS pribadi_id,
+                pp.pendidikan_terakhir AS pribadi_pendidikan_terakhir,
+                pp.no_kk AS pribadi_no_kk,
+                pp.tanggal_lahir AS pribadi_tanggal_lahir,
+                pp.jenis_kelamin AS pribadi_jenis_kelamin,
+                pp.agama AS pribadi_agama,
+                pp.status_perkawinan AS pribadi_status_perkawinan,
+                pp.alamat AS pribadi_alamat,
+                pp.no_telp AS pribadi_no_telp,
+                pp.email AS pribadi_email,
+                pp.foto_path AS pribadi_foto_path,
+                pp.ktp_file_path AS pribadi_ktp_file_path,
+                pp.kk_file_path AS pribadi_kk_file_path,
+                pr.nama AS profesi_nama,
+                jp.nama AS jenis_pegawai_nama,
+                j.nama AS jabatan_nama,
+                uk.nama AS unit_kerja_nama,
+                gr.nama AS golongan_ruang_nama,
+                pk.nama AS pangkat_nama
+            FROM pegawai p
+            LEFT JOIN users u ON u.id = p.user_id
+            LEFT JOIN pegawai_pribadi pp ON pp.pegawai_id = p.id AND pp.deleted_at IS NULL
+            LEFT JOIN profesi pr ON pr.id = p.profesi_id
+            LEFT JOIN jenis_pegawai jp ON jp.id = p.jenis_pegawai_id
+            LEFT JOIN jabatan j ON j.id = p.jabatan_id AND j.deleted_at IS NULL
+            LEFT JOIN unit_kerja uk ON uk.id = j.unit_kerja_id
+            LEFT JOIN golongan_ruang gr ON gr.id = p.golongan_ruang_id
+            LEFT JOIN pangkat pk ON pk.id = p.pangkat_id AND pk.deleted_at IS NULL
+            WHERE p.id = ?
+                AND p.deleted_at IS NULL
+            LIMIT 1
+        ', [$pegawaiId]);
+
+        if ($row === null) {
+            return null;
+        }
+
+        $pegawai = $this->mapPegawaiDetailRow($row);
+        $pribadiId = $pegawai->pribadi?->id;
+
+        $pegawai->pasangan = $this->selectCollection('SELECT * FROM pasangan WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
+        $pegawai->anak = $this->selectCollection('SELECT * FROM anak WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId], ['tanggal_lahir']);
+        $pegawai->orangTua = $this->selectCollection('SELECT * FROM orang_tua WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
+        $pegawai->kontakDarurat = $this->selectCollection('SELECT * FROM kontak_darurat WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
+        $pegawai->tanggunganLain = $this->selectCollection('SELECT * FROM tanggungan_lain WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
+        $pegawai->str = $this->selectCollection('SELECT * FROM str WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tanggal_terbit', 'tanggal_kadaluarsa']);
+        $pegawai->sip = $this->getSipByPegawaiId($pegawaiId);
+        $pegawai->penugasanKlinis = $this->selectCollection('SELECT * FROM penugasan_klinis WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tgl_mulai', 'tgl_kadaluarsa']);
+        $pegawai->jabatanPegawai = $this->getRiwayatJabatanByPegawaiId($pegawaiId);
+        $pegawai->jadwalDiklat = $this->getJadwalDiklatByPegawaiId($pegawaiId);
+
+        return $pegawai;
+    }
+
+    public function createPegawaiData(array $data): object
     {
         return DB::transaction(function () use ($data) {
-            $user = User::create([
-                'username' => $data['nik'],
-                'password' => Hash::make($data['password']),
-                'role' => 'pegawai',
-                'is_active' => true,
-            ]);
+            $now = Carbon::now()->toDateTimeString();
+            DB::insert('
+                INSERT INTO users (username, password, role, is_active, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?)
+            ', [$data['nik'], Hash::make($data['password']), 'pegawai', true, $now, $now]);
+            $userId = (int) DB::getPdo()->lastInsertId();
 
-            $pegawai = Pegawai::create([
-                'user_id' => $user->id,
+            DB::insert('
+                INSERT INTO pegawai (user_id, nik, nama, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?)
+            ', [$userId, $data['nik'], $data['nama'], $now, $now]);
+            $pegawaiId = (int) DB::getPdo()->lastInsertId();
+
+            DB::insert('
+                INSERT INTO pegawai_pribadi (pegawai_id, created_at, updated_at)
+                VALUES (?, ?, ?)
+            ', [$pegawaiId, $now, $now]);
+
+            return (object) [
+                'id' => $pegawaiId,
+                'user_id' => $userId,
                 'nik' => $data['nik'],
                 'nama' => $data['nama'],
-            ]);
-
-            PegawaiPribadi::create([
-                'pegawai_id' => $pegawai->id,
-            ]);
-
-            return $pegawai;
+            ];
         });
     }
 
-    public function changeRole(int $pegawaiId, array $data): Pegawai
+    public function changeRole(int $pegawaiId, array $data): object
     {
-        $pegawai = Pegawai::with('user')->findOrFail($pegawaiId);
-        
-        if (isset($data['role']) && $pegawai->user) {
-            $pegawai->user->role = $data['role'];
-            $pegawai->user->save();
+        $pegawai = DB::selectOne('
+            SELECT p.*, u.role AS user_role
+            FROM pegawai p
+            LEFT JOIN users u ON u.id = p.user_id
+            WHERE p.id = ?
+                AND p.deleted_at IS NULL
+            LIMIT 1
+        ', [$pegawaiId]);
+
+        if ($pegawai === null) {
+            throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Pegawai tidak ditemukan.');
         }
 
-        if (isset($data['status_pegawai'])) {
-            $pegawai->status_pegawai = $data['status_pegawai'];
-            $pegawai->save();
-        }
+        DB::transaction(function () use ($pegawai, $data): void {
+            $now = Carbon::now()->toDateTimeString();
+
+            if (isset($data['role']) && $pegawai->user_id !== null) {
+                DB::update('
+                    UPDATE users
+                    SET role = ?, updated_at = ?
+                    WHERE id = ?
+                ', [$data['role'], $now, $pegawai->user_id]);
+                $pegawai->user_role = $data['role'];
+            }
+
+            if (isset($data['status_pegawai'])) {
+                DB::update('
+                    UPDATE pegawai
+                    SET status_pegawai = ?, updated_at = ?
+                    WHERE id = ?
+                ', [$data['status_pegawai'], $now, $pegawai->id]);
+                $pegawai->status_pegawai = $data['status_pegawai'];
+            }
+        });
+
+        $pegawai->user = (object) ['role' => $pegawai->user_role ?? null];
 
         return $pegawai;
     }
 
     public function countUsersByRole(string $role): int
     {
-        return User::query()->where('role', $role)->count();
+        $row = DB::selectOne('
+            SELECT COUNT(*) AS total
+            FROM users
+            WHERE role = ?
+        ', [$role]);
+
+        return (int) ($row->total ?? 0);
     }
 
-    private function applyPegawaiFilters(Builder $query, array $filters): void
+    private function buildPegawaiFilterSql(array $filters): array
     {
+        $where = ['p.deleted_at IS NULL'];
+        $bindings = [];
+
         $search = $this->filledString($filters['search'] ?? null);
         if ($search !== null) {
-            $query->where(function (Builder $query) use ($search): void {
-                $query->where('nama', 'like', "%{$search}%")
-                    ->orWhere('nik', 'like', "%{$search}%")
-                    ->orWhereHas('profesi', function (Builder $query) use ($search): void {
-                        $query->where('nama', 'like', "%{$search}%");
-                    })
-                    ->orWhereHas('profesiPegawai.profesi', function (Builder $query) use ($search): void {
-                        $query->where('nama', 'like', "%{$search}%");
-                    });
-            });
+            $like = "%{$search}%";
+            $where[] = '(
+                p.nama LIKE ?
+                OR p.nik LIKE ?
+                OR pr.nama LIKE ?
+                OR EXISTS (
+                    SELECT 1
+                    FROM profesi_pegawai ppg
+                    INNER JOIN profesi pr2 ON pr2.id = ppg.profesi_id
+                    WHERE ppg.pegawai_id = p.id
+                        AND ppg.deleted_at IS NULL
+                        AND pr2.nama LIKE ?
+                )
+            )';
+            array_push($bindings, $like, $like, $like, $like);
         }
 
         $statusKelengkapan = $this->filledString($filters['status_kelengkapan'] ?? null);
         if ($statusKelengkapan === 'lengkap') {
-            $this->whereProfileComplete($query);
+            $where[] = $this->profileCompleteSql();
         } elseif ($statusKelengkapan === 'belum-lengkap') {
-            $this->whereProfileIncomplete($query);
+            $where[] = 'NOT '.$this->profileCompleteSql();
         }
 
         $jenisPegawai = $this->filledString($filters['jenis_pegawai'] ?? null);
         if ($jenisPegawai !== null) {
-            $query->whereHas('jenisPegawai', function (Builder $query) use ($jenisPegawai): void {
-                $query->where('nama', 'like', "%{$jenisPegawai}%");
-            });
+            $where[] = 'jp.nama LIKE ?';
+            $bindings[] = "%{$jenisPegawai}%";
         }
 
         $pendidikan = $this->filledString($filters['pendidikan'] ?? null);
         if ($pendidikan !== null) {
-            $query->whereHas('pribadi', function (Builder $query) use ($pendidikan): void {
-                $query->where('pendidikan_terakhir', 'like', "%{$pendidikan}%");
-            });
+            $where[] = 'pp.pendidikan_terakhir LIKE ?';
+            $bindings[] = "%{$pendidikan}%";
         }
 
         $statusPegawai = $this->filledString($filters['status_pegawai'] ?? null);
         if ($statusPegawai !== null) {
-            $query->where('status_pegawai', $statusPegawai);
+            $where[] = 'p.status_pegawai = ?';
+            $bindings[] = $statusPegawai;
         }
 
         $profesi = $this->filledString($filters['profesi'] ?? null);
         if ($profesi !== null) {
-            $query->where(function (Builder $query) use ($profesi): void {
-                $query->whereHas('profesi', function (Builder $query) use ($profesi): void {
-                    $query->where('nama', 'like', "%{$profesi}%");
-                })->orWhereHas('profesiPegawai.profesi', function (Builder $query) use ($profesi): void {
-                    $query->where('nama', 'like', "%{$profesi}%");
-                });
-            });
+            $like = "%{$profesi}%";
+            $where[] = '(
+                pr.nama LIKE ?
+                OR EXISTS (
+                    SELECT 1
+                    FROM profesi_pegawai ppg
+                    INNER JOIN profesi pr2 ON pr2.id = ppg.profesi_id
+                    WHERE ppg.pegawai_id = p.id
+                        AND ppg.deleted_at IS NULL
+                        AND pr2.nama LIKE ?
+                )
+            )';
+            array_push($bindings, $like, $like);
         }
+
+        return [implode(' AND ', $where), $bindings];
     }
 
-    private function whereProfileComplete(Builder $query): void
+    private function profileCompleteSql(): string
     {
-        $query->whereNotNull('nik')
-            ->where('nik', '!=', '')
-            ->whereNotNull('jenis_pegawai_id')
-            ->whereNotNull('profesi_id')
-            ->whereNotNull('tgl_masuk');
+        return "(
+            p.nik IS NOT NULL
+            AND p.nik <> ''
+            AND p.jenis_pegawai_id IS NOT NULL
+            AND p.profesi_id IS NOT NULL
+            AND p.tgl_masuk IS NOT NULL
+            AND pp.id IS NOT NULL
+            AND pp.tanggal_lahir IS NOT NULL
+            AND pp.jenis_kelamin IS NOT NULL
+            AND pp.jenis_kelamin <> ''
+            AND pp.agama IS NOT NULL
+            AND pp.agama <> ''
+            AND pp.alamat IS NOT NULL
+            AND pp.alamat <> ''
+            AND pp.no_telp IS NOT NULL
+            AND pp.no_telp <> ''
+            AND pp.pendidikan_terakhir IS NOT NULL
+            AND pp.pendidikan_terakhir <> ''
+        )";
+    }
 
-        $query->whereHas('pribadi', function (Builder $query): void {
-            $query->whereNotNull('tanggal_lahir');
+    private function mapPegawaiListRow(object $row): object
+    {
+        $pegawai = (object) [
+            'id' => (int) $row->id,
+            'user_id' => $row->user_id !== null ? (int) $row->user_id : null,
+            'nik' => $row->nik,
+            'nip' => $row->nip ?? null,
+            'nama' => $row->nama,
+            'jenis_pegawai_id' => $row->jenis_pegawai_id !== null ? (int) $row->jenis_pegawai_id : null,
+            'profesi_id' => $row->profesi_id !== null ? (int) $row->profesi_id : null,
+            'jabatan_id' => $row->jabatan_id !== null ? (int) $row->jabatan_id : null,
+            'status_pegawai' => $row->status_pegawai ?? null,
+            'tgl_masuk' => $this->dateOrNull($row->tgl_masuk ?? null),
+        ];
 
-            foreach (['jenis_kelamin', 'agama', 'alamat', 'no_telp', 'pendidikan_terakhir'] as $field) {
-                $query->whereNotNull($field)
-                    ->where($field, '!=', '');
+        $pegawai->user = (object) [
+            'role' => $row->user_role ?? null,
+        ];
+        $pegawai->pribadi = $this->mapPribadiFromRow($row);
+        $pegawai->jenisPegawai = (object) ['nama' => $row->jenis_pegawai_nama ?? null];
+        $pegawai->profesi = (object) ['nama' => $row->profesi_nama ?? null];
+        $pegawai->jabatan = (object) [
+            'id' => isset($row->jabatan_id_detail) ? (int) $row->jabatan_id_detail : ($pegawai->jabatan_id ?? null),
+            'nama' => $row->jabatan_nama ?? null,
+            'unitKerja' => (object) [
+                'id' => isset($row->unit_kerja_id) ? (int) $row->unit_kerja_id : null,
+                'nama' => $row->unit_kerja_nama ?? null,
+            ],
+        ];
+
+        return $pegawai;
+    }
+
+    private function mapPegawaiDetailRow(object $row): object
+    {
+        $pegawai = $this->mapPegawaiListRow($row);
+
+        foreach (['tmt_cpns', 'tmt_pns', 'tmt_pangkat_akhir', 'masa_kerja'] as $field) {
+            $pegawai->{$field} = $this->dateOrNull($row->{$field} ?? null);
+        }
+
+        $pegawai->user->email = $row->user_email ?? null;
+        $pegawai->golonganRuang = (object) ['nama' => $row->golongan_ruang_nama ?? null];
+        $pegawai->pangkat = (object) ['nama' => $row->pangkat_nama ?? null];
+
+        return $pegawai;
+    }
+
+    private function mapPribadiFromRow(object $row): ?object
+    {
+        if (($row->pribadi_id ?? null) === null) {
+            return null;
+        }
+
+        return (object) [
+            'id' => (int) $row->pribadi_id,
+            'pendidikan_terakhir' => $row->pribadi_pendidikan_terakhir ?? null,
+            'no_kk' => $row->pribadi_no_kk ?? null,
+            'tanggal_lahir' => $this->dateOrNull($row->pribadi_tanggal_lahir ?? null),
+            'jenis_kelamin' => $row->pribadi_jenis_kelamin ?? null,
+            'agama' => $row->pribadi_agama ?? null,
+            'status_perkawinan' => $row->pribadi_status_perkawinan ?? null,
+            'alamat' => $row->pribadi_alamat ?? null,
+            'no_telp' => $row->pribadi_no_telp ?? null,
+            'no_hp' => null,
+            'email' => $row->pribadi_email ?? null,
+            'foto_path' => $row->pribadi_foto_path ?? null,
+            'ktp_file_path' => $row->pribadi_ktp_file_path ?? null,
+            'kk_file_path' => $row->pribadi_kk_file_path ?? null,
+            'tempat_lahir' => null,
+            'npwp' => null,
+            'bpjs_kesehatan' => null,
+            'bpjs_ketenagakerjaan' => null,
+        ];
+    }
+
+    private function getRiwayatJabatanByPegawaiId(int $pegawaiId): Collection
+    {
+        return collect(DB::select('
+            SELECT
+                jp.*,
+                j.nama AS jabatan_nama,
+                uk.nama AS unit_kerja_nama
+            FROM jabatan_pegawai jp
+            LEFT JOIN jabatan j ON j.id = jp.jabatan_id AND j.deleted_at IS NULL
+            LEFT JOIN unit_kerja uk ON uk.id = j.unit_kerja_id
+            WHERE jp.pegawai_id = ?
+                AND jp.deleted_at IS NULL
+            ORDER BY jp.id DESC
+        ', [$pegawaiId]))->map(function ($row) {
+            $row->started_at = $this->dateOrNull($row->started_at ?? null);
+            $row->ended_at = $this->dateOrNull($row->ended_at ?? null);
+            $row->jabatan = (object) [
+                'nama' => $row->jabatan_nama ?? null,
+                'unitKerja' => (object) ['nama' => $row->unit_kerja_nama ?? null],
+            ];
+
+            return $row;
+        });
+    }
+
+    private function getSipByPegawaiId(int $pegawaiId): Collection
+    {
+        return collect(DB::select('
+            SELECT
+                s.*,
+                js.nama AS jenis_sip_nama
+            FROM sip s
+            LEFT JOIN jenis_sip js ON js.id = s.jenis_sip_id
+            WHERE s.pegawai_id = ?
+                AND s.deleted_at IS NULL
+            ORDER BY s.id DESC
+        ', [$pegawaiId]))->map(function ($row) {
+            $row->tanggal_terbit = $this->dateOrNull($row->tanggal_terbit ?? null);
+            $row->tanggal_kadaluarsa = $this->dateOrNull($row->tanggal_kadaluarsa ?? null);
+            $row->jenisSip = (object) ['nama' => $row->jenis_sip_nama ?? null];
+
+            return $row;
+        });
+    }
+
+    private function getJadwalDiklatByPegawaiId(int $pegawaiId): Collection
+    {
+        return collect(DB::select('
+            SELECT
+                ljd.*,
+                d.id AS diklat_detail_id,
+                d.nama_kegiatan,
+                d.penyelenggara,
+                d.tanggal_mulai,
+                d.tanggal_selesai,
+                d.jp,
+                kd.nama AS kategori_nama,
+                jd.nama AS jenis_nama
+            FROM list_jadwal_diklat ljd
+            LEFT JOIN diklat d ON d.id = ljd.diklat_id AND d.deleted_at IS NULL
+            LEFT JOIN kategori_diklat kd ON kd.id = d.kategori_diklat_id
+            LEFT JOIN jenis_diklat jd ON jd.id = d.jenis_diklat_id
+            WHERE ljd.pegawai_id = ?
+                AND ljd.deleted_at IS NULL
+            ORDER BY ljd.id DESC
+        ', [$pegawaiId]))->map(function ($row) {
+            $row->diklat = (object) [
+                'id' => $row->diklat_detail_id !== null ? (int) $row->diklat_detail_id : null,
+                'nama_kegiatan' => $row->nama_kegiatan ?? null,
+                'penyelenggara' => $row->penyelenggara ?? null,
+                'tanggal_mulai' => $this->dateOrNull($row->tanggal_mulai ?? null),
+                'tanggal_selesai' => $this->dateOrNull($row->tanggal_selesai ?? null),
+                'jp' => $row->jp ?? null,
+                'kategoriDiklat' => (object) ['nama' => $row->kategori_nama ?? null],
+                'jenisDiklat' => (object) ['nama' => $row->jenis_nama ?? null],
+            ];
+
+            return $row;
+        });
+    }
+
+    private function selectCollection(string $sql, array $bindings = [], array $dateFields = []): Collection
+    {
+        if (in_array(null, $bindings, true)) {
+            return collect();
+        }
+
+        return collect(DB::select($sql, $bindings))->map(function ($row) use ($dateFields) {
+            foreach ($dateFields as $field) {
+                $row->{$field} = $this->dateOrNull($row->{$field} ?? null);
             }
+
+            return $row;
         });
     }
 
-    private function whereProfileIncomplete(Builder $query): void
+    private function dateOrNull(mixed $value): ?Carbon
     {
-        $query->where(function (Builder $query): void {
-            $query->orWhereNull('nik')
-                ->orWhere('nik', '')
-                ->orWhereNull('jenis_pegawai_id')
-                ->orWhereNull('profesi_id')
-                ->orWhereNull('tgl_masuk');
-
-            $query->orWhereDoesntHave('pribadi')
-                ->orWhereHas('pribadi', function (Builder $query): void {
-                    $query->orWhereNull('tanggal_lahir');
-
-                    foreach (['jenis_kelamin', 'agama', 'alamat', 'no_telp', 'pendidikan_terakhir'] as $field) {
-                        $query->orWhereNull($field)
-                            ->orWhere($field, '');
-                    }
-                });
-        });
+        return $value ? Carbon::parse($value) : null;
     }
 
     private function filledString(mixed $value): ?string

@@ -107,13 +107,20 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{base_url}}/api/dashboard",
+              "raw": "{{base_url}}/api/dashboard?type=diklat_tenkes",
               "host": [
                 "{{base_url}}"
               ],
               "path": [
                 "api",
                 "dashboard"
+              ],
+              "query": [
+                {
+                  "key": "type",
+                  "value": "diklat_tenkes",
+                  "uuid": "258c7e94-71ef-47a7-9195-f937daa0d288"
+                }
               ]
             }
           },
@@ -4723,7 +4730,7 @@
           "response": []
         },
         {
-          "name": "GET Pegawai Detail",
+          "name": "GET Pegawai Detail | BUG",
           "id": "c30c1d28-e4f9-4f63-8158-7748f9df2362",
           "request": {
             "auth": {
