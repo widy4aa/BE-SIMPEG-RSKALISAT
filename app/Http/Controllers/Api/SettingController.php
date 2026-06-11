@@ -18,9 +18,10 @@ class SettingController extends Controller
 
         if ($token !== '') {
             try {
-                $response = \Illuminate\Support\Facades\Http::withHeaders([
-                    'Authorization' => $token,
-                ])->post('https://api.fonnte.com/device');
+                $response = \Illuminate\Support\Facades\Http::withoutVerifying()
+                    ->withHeaders([
+                        'Authorization' => $token,
+                    ])->post('https://api.fonnte.com/device');
 
                 if ($response->successful()) {
                     $deviceInfo = $response->json();

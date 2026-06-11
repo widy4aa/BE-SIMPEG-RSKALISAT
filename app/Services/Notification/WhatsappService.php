@@ -29,12 +29,13 @@ class WhatsappService
         }
 
         try {
-            $response = Http::withHeaders([
-                'Authorization' => $token,
-            ])->post('https://api.fonnte.com/send', [
-                'target' => $target,
-                'message' => $message,
-            ]);
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'Authorization' => $token,
+                ])->post('https://api.fonnte.com/send', [
+                    'target' => $target,
+                    'message' => $message,
+                ]);
 
             if ($response->successful()) {
                 return [
