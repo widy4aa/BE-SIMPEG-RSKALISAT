@@ -68,7 +68,8 @@ class PegawaiService
                     $diklat?->jenis_pelaksanaan,
                     $jadwal->sertif_file_path,
                     $jadwal->no_sertif,
-                    $jadwal->status_validasi
+                    $jadwal->status_validasi,
+                    $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai)
                 ),
             ];
         });
@@ -110,6 +111,11 @@ class PegawaiService
 
         $tanggalMulai = Carbon::parse((string) $payload['tanggal_mulai'])->startOfDay();
         $tanggalSelesai = Carbon::parse((string) $payload['tanggal_selesai'])->startOfDay();
+
+        $statusPelaksanaan = $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai);
+        if ($statusPelaksanaan !== 'selesai') {
+            throw new InvalidArgumentException('Pegawai hanya dapat menambahkan riwayat diklat mandiri yang sudah selesai dilaksanakan.');
+        }
 
         $kategori = $this->pegawaiDiklatRepository->firstOrCreateKategoriByNama((string) $payload['kategori']);
         $jenisDiklat = $this->pegawaiDiklatRepository->firstOrCreateJenisByNama((string) $payload['jenis_diklat']);
@@ -281,6 +287,11 @@ class PegawaiService
 
             if ($tanggalMulai === null || $tanggalSelesai === null) {
                 throw new InvalidArgumentException('Tanggal mulai dan tanggal selesai harus tersedia.');
+            }
+
+            $statusPelaksanaan = $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai);
+            if ($statusPelaksanaan !== 'selesai') {
+                throw new InvalidArgumentException('Pegawai hanya dapat mengubah riwayat diklat yang sudah selesai dilaksanakan.');
             }
 
             if (array_key_exists('kategori', $payload) && trim((string) $payload['kategori']) !== '') {
@@ -476,6 +487,12 @@ class PegawaiService
             throw new InvalidArgumentException('Laporan tidak bisa diupload/diedit karena status validasi sudah valid.');
         }
 
+        $diklat = $jadwal->diklat;
+        $statusPelaksanaan = $this->resolveStatusByTanggal($diklat->tanggal_mulai, $diklat->tanggal_selesai);
+        if ($statusPelaksanaan !== 'selesai') {
+            throw new InvalidArgumentException('Laporan hanya bisa diupload setelah diklat selesai.');
+        }
+
         if (array_key_exists('no_sertif', $payload)) {
             $jadwal->no_sertif = (string) ($payload['no_sertif'] ?? '');
         }
@@ -498,7 +515,6 @@ class PegawaiService
             $jadwal->uploaded_at = now();
         }
 
-        $diklat = $jadwal->diklat;
         $jenisPelaksanaCurrent = (string) ($diklat->jenis_pelaksanaan ?? '');
 
         if ($jenisPelaksanaCurrent === 'internal') {
@@ -567,31 +583,35 @@ class PegawaiService
     {
         $jenisPelaksana = strtolower((string) $jenisPelaksana);
         if ($jenisPelaksana !== 'internal') {
-            return null;
+            return 'None';
         }
 
         if (empty($sertifFilePath)) {
-            return 'Upload laporan';
+            return 'Belum upload laporan';
         }
 
         if ($statusValidasi === null) {
-            return 'menunggu validasi';
+            return 'udah upload laporan namun belum di validasi';
         }
 
         $statusValidasi = strtolower($statusValidasi);
         if ($statusValidasi === 'tidak valid') {
-            return 'di tolak';
+            return 'Validasi di tolak';
         }
 
         if ($statusValidasi === 'valid') {
-            return 'diklat valid';
+            return 'sudah di validasi';
         }
 
         return null;
     }
 
-    private function shouldUploadLaporan(?string $jenisPelaksana, ?string $sertifFilePath, ?string $noSertif, ?string $statusValidasi): bool
+    private function shouldUploadLaporan(?string $jenisPelaksana, ?string $sertifFilePath, ?string $noSertif, ?string $statusValidasi, string $statusPelaksanaan): bool
     {
+        if ($statusPelaksanaan !== 'selesai') {
+            return false;
+        }
+
         $jenisPelaksana = strtolower(trim((string) $jenisPelaksana));
         $statusValidasi = strtolower(trim((string) $statusValidasi));
         $hasMissingLaporan = trim((string) $sertifFilePath) === '' || trim((string) $noSertif) === '';

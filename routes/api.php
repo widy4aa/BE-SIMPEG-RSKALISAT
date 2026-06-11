@@ -24,6 +24,8 @@ use Illuminate\Support\Facades\Route;
 
 // Public
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/forgot-password/request-otp', [\App\Http\Controllers\Api\ForgotPasswordController::class, 'requestOtp']);
+Route::post('/forgot-password/reset', [\App\Http\Controllers\Api\ForgotPasswordController::class, 'resetPassword']);
 
 // Shared - admin, pegawai, hrd, direktur
 Route::middleware([

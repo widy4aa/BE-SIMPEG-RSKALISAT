@@ -33,7 +33,7 @@ class AdminService
                         'jenis_biaya' => 'BLUD',
                         'jenis_pelaksana' => 'internal',
                         'catatan' => 'Program peningkatan kompetensi manajemen SDM tingkat lanjut.',
-                        'status_validasi' => 'diklat valid',
+                        'status_validasi' => 'sudah di validasi',
                     ],
                     [
                         'id' => 102,

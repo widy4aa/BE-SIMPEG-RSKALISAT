@@ -14,6 +14,8 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 **BAB II — Endpoint Umum (Tanpa Login)**
 1. [Health Check](#1-health-check)  
 2. [Login](#2-login)
+3. [Request OTP Lupa Password](#3-request-otp-lupa-password)
+4. [Reset Password dengan OTP](#4-reset-password-dengan-otp)
 
 **BAB III — Endpoint Semua Role**
 1. [Cek Role Login](#3-cek-role-login)
@@ -265,6 +267,100 @@ Contoh response `403 Forbidden` (akun tidak aktif):
 {
   "success": false,
   "message": "Akun tidak aktif. Silakan hubungi admin."
+}
+```
+
+### 3. Request OTP Lupa Password
+
+- Method: `POST`
+- URL: `/api/forgot-password/request-otp`
+- Auth: Tidak perlu
+
+Digunakan untuk meminta kode OTP via WhatsApp guna mereset password.
+
+Request body:
+
+```json
+{
+  "nik": "3509121234567890"
+}
+```
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "OTP berhasil dikirim ke nomor WhatsApp Anda."
+}
+```
+
+Contoh response `404 Not Found` (NIK tidak ditemukan):
+
+```json
+{
+  "success": false,
+  "message": "User dengan NIK tersebut tidak ditemukan."
+}
+```
+
+Contoh response `400 Bad Request` (No HP belum didaftarkan):
+
+```json
+{
+  "success": false,
+  "message": "Nomor telepon belum terdaftar. Silakan hubungi admin."
+}
+```
+
+Contoh response `429 Too Many Requests` (Meminta OTP kurang dari 60 detik):
+
+```json
+{
+  "success": false,
+  "message": "Harap tunggu 45 detik sebelum meminta OTP lagi."
+}
+```
+
+### 4. Reset Password dengan OTP
+
+- Method: `POST`
+- URL: `/api/forgot-password/reset`
+- Auth: Tidak perlu
+
+Digunakan untuk mereset password berdasarkan OTP yang telah diterima dari WhatsApp.
+
+Request body:
+
+```json
+{
+  "nik": "3509121234567890",
+  "otp": "123456",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}
+```
+
+Validasi:
+- `nik`: string, wajib.
+- `otp`: string, panjang harus tepat 6 karakter.
+- `password`: string, minimal 6 karakter, dikonfirmasi dengan `password_confirmation`.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Password berhasil diubah. Silakan login menggunakan password baru Anda."
+}
+```
+
+Contoh response `400 Bad Request` (OTP salah / kadaluarsa):
+
+```json
+{
+  "success": false,
+  "message": "Kode OTP tidak valid atau sudah kadaluarsa."
 }
 ```
 
@@ -579,7 +675,7 @@ Contoh response role `pegawai` (dengan pagination 7 item):
             "catatan": "Workshop peningkatan komunikasi lintas unit.",
             "sertif_file_path": "dokumen/sertif-diklat/budi-audit-internal.pdf",
             "no_sertif": "SERTIF/SDM/2026/0001",
-            "status_validasi": "diklat valid",
+            "status_validasi": "sudah di validasi",
             "uploadlaporan": false
           }
         ],
@@ -664,6 +760,7 @@ Aturan `uploadlaporan`:
 
 - Untuk diklat `external`: `true` jika `sertif_file_path` atau `no_sertif` masih kosong; `false` jika keduanya sudah terisi.
 - Untuk diklat `internal`: `true` jika `sertif_file_path` atau `no_sertif` masih kosong, atau `status_validasi` database masih null/`pending`/`tidak valid` (`di tolak`); `false` jika laporan lengkap dan `status_validasi` sudah `valid`.
+- **Aturan Tambahan Wajib**: Jika status pelaksanaan diklat (`status`) **belum selesai** (masih `mendatang` atau `berlangsung`), maka `uploadlaporan` akan **selalu `false`** (tidak boleh upload laporan sebelum diklat selesai).
 
 Catatan bentuk payload:
 
@@ -1151,7 +1248,7 @@ Contoh response sukses (`200 OK`):
         "sertif_file_path": "uploads/sertifikat/1234.pdf",
         "no_sertif": "SRT/123/2026",
         "status_kelayakan": "layak",
-        "status_validasi": null
+        "status_validasi": "menunggu validasi"
       }
     ]
   }
@@ -1274,7 +1371,7 @@ Contoh response sukses (`201`):
     "catatan": "Usulan pelatihan unit SDM",
     "jenis_pelaksana": "internal",
     "status_kelayakan": "layak",
-    "status_validasi": null
+    "status_validasi": "menunggu validasi"
   }
 }
 ```
@@ -1339,7 +1436,7 @@ Contoh response sukses (`200`):
     "catatan": "Revisi data diklat",
     "jenis_pelaksana": "internal",
     "status_kelayakan": "layak",
-    "status_validasi": null
+    "status_validasi": "menunggu validasi"
   }
 }
 ```
@@ -1375,8 +1472,9 @@ Contoh response sukses (`200`):
     "id_jadwal_diklat": 9,
     "no_sertif": "SERTIF/SDM/2026/0099",
     "sertif_file_path": "dokumen/sertif-diklat/sertif-3-1713542400.pdf",
-    "status_validasi": null,
-    "uploaded_at": "2026-06-03 10:00:00"
+    "status_kelayakan": "layak",
+    "status_validasi": "menunggu validasi",
+    "uploaded_at": "2026-05-15 14:30:00"
   }
 }
 ```
@@ -3354,7 +3452,7 @@ Contoh response sukses (`200 OK`):
         "tanggal_selesai": "2023-01-02",
         "jp": 16,
         "status_diklat": "sudah terlaksana",
-        "status_validasi": "diklat valid",
+        "status_validasi": "sudah di validasi",
         "status_kelayakan": true
       }
     ]

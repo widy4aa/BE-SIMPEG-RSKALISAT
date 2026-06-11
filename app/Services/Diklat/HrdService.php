@@ -66,7 +66,8 @@ class HrdService
                     $diklat?->jenis_pelaksanaan,
                     $jadwal->sertif_file_path,
                     $jadwal->no_sertif,
-                    $jadwal->status_validasi
+                    $jadwal->status_validasi,
+                    $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai)
                 ),
             ];
         });
@@ -528,26 +529,30 @@ class HrdService
     private function resolveStatusValidasiText(?string $jenisPelaksana, ?string $sertifFilePath, ?string $statusValidasi): ?string
     {
         if (strtolower((string) $jenisPelaksana) !== 'internal') {
-            return null;
+            return 'None';
         }
 
         if ($sertifFilePath === null || $sertifFilePath === '') {
-            return 'Upload laporan';
+            return 'Belum upload laporan';
         }
 
         if ($statusValidasi === null || $statusValidasi === '') {
-            return 'menunggu validasi';
+            return 'udah upload laporan namun belum di validasi';
         }
 
         if ($statusValidasi === 'tidak valid') {
-            return 'di tolak';
+            return 'Validasi di tolak';
         }
 
-        return 'diklat valid';
+        return 'sudah di validasi';
     }
 
-    private function shouldUploadLaporan(?string $jenisPelaksana, ?string $sertifFilePath, ?string $noSertif, ?string $statusValidasi): bool
+    private function shouldUploadLaporan(?string $jenisPelaksana, ?string $sertifFilePath, ?string $noSertif, ?string $statusValidasi, string $statusPelaksanaan): bool
     {
+        if ($statusPelaksanaan !== 'selesai') {
+            return false;
+        }
+
         $jenisPelaksana = strtolower(trim((string) $jenisPelaksana));
         $statusValidasi = strtolower(trim((string) $statusValidasi));
         $hasMissingLaporan = $this->hasMissingLaporan($sertifFilePath, $noSertif);

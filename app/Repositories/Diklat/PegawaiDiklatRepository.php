@@ -375,12 +375,12 @@ class PegawaiDiklatRepository
 
     public function getJadwalDiklatMenungguKelayakan(): Collection
     {
-        return $this->getJadwalRows('ljd.status_kelayakan IS NULL AND ljd.sertif_file_path IS NOT NULL');
+        return $this->getJadwalRows('ljd.status_kelayakan IS NULL AND ljd.sertif_file_path IS NOT NULL AND d.jenis_pelaksanaan = ?', ['external']);
     }
 
     public function getJadwalDiklatMenungguValidasi(): Collection
     {
-        return $this->getJadwalRows('ljd.sertif_file_path IS NOT NULL AND ljd.status_validasi IS NULL');
+        return $this->getJadwalRows('ljd.sertif_file_path IS NOT NULL AND ljd.status_validasi IS NULL AND d.jenis_pelaksanaan = ?', ['internal']);
     }
 
     public function getRekapLaporanDiklatInternal(Carbon $startDate, Carbon $endDate): Collection
