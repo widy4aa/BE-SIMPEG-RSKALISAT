@@ -113,7 +113,7 @@ class AdminPegawaiRepository
             SELECT
                 p.*,
                 u.role AS user_role,
-                u.email AS user_email,
+                u.username AS user_username,
                 pp.id AS pribadi_id,
                 pp.pendidikan_terakhir AS pribadi_pendidikan_terakhir,
                 pp.no_kk AS pribadi_no_kk,
@@ -163,6 +163,7 @@ class AdminPegawaiRepository
         $pegawai->sip = $this->getSipByPegawaiId($pegawaiId);
         $pegawai->penugasanKlinis = $this->selectCollection('SELECT * FROM penugasan_klinis WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tgl_mulai', 'tgl_kadaluarsa']);
         $pegawai->jabatanPegawai = $this->getRiwayatJabatanByPegawaiId($pegawaiId);
+        $pegawai->riwayatPangkat = $this->getRiwayatPangkatByPegawaiId($pegawaiId);
         $pegawai->jadwalDiklat = $this->getJadwalDiklatByPegawaiId($pegawaiId);
 
         return $pegawai;
@@ -247,6 +248,18 @@ class AdminPegawaiRepository
             FROM users
             WHERE role = ?
         ', [$role]);
+
+        return (int) ($row->total ?? 0);
+    }
+
+    public function getTotalPegawaiAktif(): int
+    {
+        $row = DB::selectOne("
+            SELECT COUNT(*) AS total
+            FROM pegawai
+            WHERE status_pegawai = 'aktif'
+                AND deleted_at IS NULL
+        ");
 
         return (int) ($row->total ?? 0);
     }
@@ -384,7 +397,7 @@ class AdminPegawaiRepository
             $pegawai->{$field} = $this->dateOrNull($row->{$field} ?? null);
         }
 
-        $pegawai->user->email = $row->user_email ?? null;
+        $pegawai->user->username = $row->user_username ?? null;
         $pegawai->golonganRuang = (object) ['nama' => $row->golongan_ruang_nama ?? null];
         $pegawai->pangkat = (object) ['nama' => $row->pangkat_nama ?? null];
 
@@ -438,6 +451,30 @@ class AdminPegawaiRepository
             $row->jabatan = (object) [
                 'nama' => $row->jabatan_nama ?? null,
                 'unitKerja' => (object) ['nama' => $row->unit_kerja_nama ?? null],
+            ];
+
+            return $row;
+        });
+    }
+
+    private function getRiwayatPangkatByPegawaiId(int $pegawaiId): Collection
+    {
+        return collect(DB::select('
+            SELECT
+                pp.*,
+                p.nama AS pangkat_nama,
+                p.pejabat_penetap
+            FROM pangkat_pegawai pp
+            LEFT JOIN pangkat p ON p.id = pp.pangkat_id AND p.deleted_at IS NULL
+            WHERE pp.pegawai_id = ?
+                AND pp.deleted_at IS NULL
+            ORDER BY pp.id DESC
+        ', [$pegawaiId]))->map(function ($row) {
+            $row->started_at = $this->dateOrNull($row->started_at ?? null);
+            $row->ended_at = $this->dateOrNull($row->ended_at ?? null);
+            $row->pangkat = (object) [
+                'nama' => $row->pangkat_nama ?? null,
+                'pejabat_penetap' => $row->pejabat_penetap ?? null,
             ];
 
             return $row;

@@ -61,7 +61,7 @@ class AdminPegawaiService
             'jumlah_dokter' => $jumlahDokter,
             'jumlah_perawat' => $jumlahPerawat,
             'jumlah_profesi' => $jumlahProfesi,
-            'jumlah_admin' => $this->repository->countUsersByRole('admin'),
+            'jumlah_pegawai_aktif' => $this->repository->getTotalPegawaiAktif(),
             'jumlah_hrd' => $this->repository->countUsersByRole('hrd'),
             'jumlah_direktur' => $this->repository->countUsersByRole('direktur'),
             'pegawai' => $paginatedPegawai,
@@ -153,6 +153,7 @@ class AdminPegawaiService
                     'tanggal_mulai' => $jp->started_at?->format('Y-m-d'),
                     'tanggal_selesai' => $jp->ended_at?->format('Y-m-d'),
                     'is_current' => (bool)$jp->is_current,
+                    'file_path' => $jp->sk_file_path,
                 ]) ?? [],
                 'str' => $pegawai->str?->map(fn($s) => [
                     'id' => $s->id,
@@ -160,6 +161,7 @@ class AdminPegawaiService
                     'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
                     'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
                     'is_current' => (bool)$s->is_current,
+                    'file_path' => $s->sk_file_path,
                 ]) ?? [],
                 'sip' => $pegawai->sip?->map(fn($s) => [
                     'id' => $s->id,
@@ -168,6 +170,7 @@ class AdminPegawaiService
                     'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
                     'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
                     'is_current' => (bool)$s->is_current,
+                    'file_path' => $s->sk_file_path,
                 ]) ?? [],
                 'penugasan_klinis' => $pegawai->penugasanKlinis?->map(fn($pk) => [
                     'id' => $pk->id,
@@ -175,6 +178,15 @@ class AdminPegawaiService
                     'tanggal_mulai' => $pk->tgl_mulai?->format('Y-m-d'),
                     'tanggal_kadaluarsa' => $pk->tgl_kadaluarsa?->format('Y-m-d'),
                     'is_current' => (bool)$pk->is_current,
+                    'file_path' => $pk->dokumen_file_path,
+                ]) ?? [],
+                'pangkat' => $pegawai->riwayatPangkat?->map(fn($p) => [
+                    'id' => $p->id,
+                    'pangkat' => $p->pangkat?->nama,
+                    'pejabat_penetap' => $p->pangkat?->pejabat_penetap,
+                    'tanggal_mulai' => $p->started_at?->format('Y-m-d'),
+                    'tanggal_selesai' => $p->ended_at?->format('Y-m-d'),
+                    'is_current' => (bool)$p->is_current,
                 ]) ?? [],
             ],
             'diklat' => $pegawai->jadwalDiklat?->map(fn($jd) => [
@@ -187,6 +199,8 @@ class AdminPegawaiService
                 'tanggal_selesai' => $jd->diklat?->tanggal_selesai?->format('Y-m-d'),
                 'jp' => $jd->diklat?->jp,
                 'status_diklat' => $jd->status_diklat,
+                'status_kelayakan' => $jd->status_kelayakan,
+                'status_validasi' => $jd->status_validasi,
             ]) ?? [],
         ];
     }

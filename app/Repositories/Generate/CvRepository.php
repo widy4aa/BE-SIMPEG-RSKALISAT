@@ -13,7 +13,7 @@ class CvRepository
         $row = DB::selectOne('
             SELECT
                 p.*,
-                u.email AS user_email,
+                u.username AS user_username,
                 pp.id AS pribadi_id,
                 pp.alamat AS pribadi_alamat,
                 pp.no_telp AS pribadi_no_telp,
@@ -83,7 +83,7 @@ class CvRepository
             'nama' => $row->nama,
             'tgl_masuk' => $this->dateOrNull($row->tgl_masuk ?? null),
             'tmt_pns' => $this->dateOrNull($row->tmt_pns ?? null),
-            'user' => (object) ['email' => $row->user_email ?? null],
+            'user' => (object) ['username' => $row->user_username ?? null],
             'jenisPegawai' => (object) ['nama' => $row->jenis_pegawai_nama ?? null],
             'profesi' => (object) ['nama' => $row->profesi_nama ?? null],
             'jabatan' => (object) [

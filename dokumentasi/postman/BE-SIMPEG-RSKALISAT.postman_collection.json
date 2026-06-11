@@ -2825,7 +2825,144 @@
                   ]
                 }
               },
-              "response": []
+              "response": [
+                {
+                  "id": "cb642367-3b0e-49b8-94b1-0e231e9d6b5a",
+                  "name": "POST Diklat",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "nama_kegiatan",
+                          "type": "text",
+                          "value": "Workshop Pelayanan Prima"
+                        },
+                        {
+                          "key": "kategori",
+                          "type": "text",
+                          "value": "Teknis"
+                        },
+                        {
+                          "key": "jenis_diklat",
+                          "type": "text",
+                          "value": "ASN"
+                        },
+                        {
+                          "key": "penyelenggara",
+                          "type": "text",
+                          "value": "RS Kalisat"
+                        },
+                        {
+                          "key": "lokasi",
+                          "type": "text",
+                          "value": "Aula RS"
+                        },
+                        {
+                          "key": "tanggal_mulai",
+                          "type": "text",
+                          "value": "2026-08-10"
+                        },
+                        {
+                          "key": "tanggal_selesai",
+                          "type": "text",
+                          "value": "2026-08-12"
+                        },
+                        {
+                          "key": "waktu",
+                          "type": "text",
+                          "value": "08:00:00"
+                        },
+                        {
+                          "key": "no_sertif",
+                          "type": "text",
+                          "value": "SERTIF/SDM/2026/0099"
+                        },
+                        {
+                          "key": "upload_sertif",
+                          "type": "file",
+                          "src": [
+                            ""
+                          ]
+                        },
+                        {
+                          "key": "jp",
+                          "type": "text",
+                          "value": "24"
+                        },
+                        {
+                          "key": "jenis_biaya",
+                          "type": "text",
+                          "value": "BLUD"
+                        },
+                        {
+                          "key": "total_biaya",
+                          "type": "text",
+                          "value": "1500000"
+                        },
+                        {
+                          "key": "catatan",
+                          "type": "text",
+                          "value": "Usulan pelatihan unit SDM"
+                        },
+                        {
+                          "key": "jenis_pelaksana",
+                          "type": "text",
+                          "value": "internal"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{base_url}}/api/diklat",
+                      "host": [
+                        "{{base_url}}"
+                      ],
+                      "path": [
+                        "api",
+                        "diklat"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Host",
+                      "value": "127.0.0.1:8000"
+                    },
+                    {
+                      "key": "Connection",
+                      "value": "close"
+                    },
+                    {
+                      "key": "X-Powered-By",
+                      "value": "PHP/8.3.20"
+                    },
+                    {
+                      "key": "Cache-Control",
+                      "value": "no-cache, private"
+                    },
+                    {
+                      "key": "Date",
+                      "value": "Thu, 11 Jun 2026 14:12:26 GMT"
+                    },
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    },
+                    {
+                      "key": "Access-Control-Allow-Origin",
+                      "value": "*"
+                    }
+                  ],
+                  "cookie": [],
+                  "responseTime": "2026-06-11T14:12:38.321Z",
+                  "body": "{\n    \"success\": false,\n    \"message\": \"Access denied.\"\n}"
+                }
+              ]
             },
             {
               "name": "PATCH Diklat",

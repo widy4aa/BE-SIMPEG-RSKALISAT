@@ -33,6 +33,14 @@ class AuthService
             ];
         }
 
+        if ($user->pegawai && $user->pegawai->status_pegawai !== 'aktif') {
+            return [
+                'success' => false,
+                'message' => 'Akun tidak aktif karena status pegawai tidak aktif.',
+                'status' => 403,
+            ];
+        }
+
         $jwt = $this->jwtService->generate([
             'sub' => $user->id,
             'nik' => $user->username,

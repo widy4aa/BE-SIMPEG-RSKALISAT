@@ -15,7 +15,11 @@ class NotificationActionSyncService
 
     public function syncDashboardActionsByUserId(int $userId): void
     {
-        $pegawai = $this->pegawaiDashboardRepository->findPegawaiDashboardByUserId($userId);
+        $pegawai = \App\Models\Pegawai::where('user_id', $userId)
+            ->with(['str' => function ($q) {
+                $q->orderBy('id', 'desc');
+            }, 'pribadi.pasangan', 'pribadi.anak', 'pribadi.orangTua', 'pribadi.kontakDarurat'])
+            ->first();
 
         if ($pegawai === null) {
             return;
