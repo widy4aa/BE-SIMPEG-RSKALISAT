@@ -59,7 +59,7 @@ class PaginationSearchFilterTest extends TestCase
             ->getJson('/api/pegawai?page=1&per_page=1&search=Dokter&status_kelengkapan=lengkap&jenis_pegawai=PNS&pendidikan=S1&status_pegawai=aktif&profesi=Dokter');
 
         $response->assertOk()
-            ->assertJsonPath('data.jumlah_admin', 1)
+            ->assertJsonPath('data.jumlah_pegawai_aktif', 4)
             ->assertJsonPath('data.jumlah_hrd', 1)
             ->assertJsonPath('data.jumlah_direktur', 1)
             ->assertJsonPath('data.pegawai.per_page', 1)

@@ -3181,7 +3181,7 @@ Catatan:
 
 - Filter hanya memengaruhi data di paginator `pegawai`.
 - `total_pegawai`, `jumlah_dokter`, `jumlah_perawat`, dan `jumlah_profesi` adalah ringkasan global sesuai implementasi saat ini.
-- `jumlah_admin`, `jumlah_hrd`, dan `jumlah_direktur` adalah jumlah global user berdasarkan role dan tidak ikut terfilter oleh parameter pencarian.
+- `jumlah_pegawai_aktif`, `jumlah_hrd`, dan `jumlah_direktur` adalah jumlah global user berdasarkan role dan tidak ikut terfilter oleh parameter pencarian.
 
 Contoh response `200 OK`:
 
@@ -3194,7 +3194,7 @@ Contoh response `200 OK`:
     "jumlah_dokter": 10,
     "jumlah_perawat": 30,
     "jumlah_profesi": 15,
-    "jumlah_admin": 2,
+    "jumlah_pegawai_aktif": 2,
     "jumlah_hrd": 3,
     "jumlah_direktur": 1,
     "pegawai": {
@@ -3306,10 +3306,42 @@ Contoh response sukses (`200 OK`):
       "tanggungan_lain": []
     },
     "riwayat_karir": {
-      "jabatan": [],
-      "str": [],
-      "sip": [],
-      "penugasan_klinis": []
+      "jabatan": [
+        {
+          "id": 1,
+          "nama": "Dokter Umum",
+          "file_path": "dokumen/sk/sk-jabatan-123.pdf"
+        }
+      ],
+      "pangkat": [
+        {
+          "id": 1,
+          "nama": "Penata",
+          "golongan": "III/c",
+          "sk_file_path": "dokumen/sk-pangkat/sk-pangkat-123.pdf"
+        }
+      ],
+      "str": [
+        {
+          "id": 1,
+          "no_str": "123456789",
+          "file_path": "dokumen/str/str-123.pdf"
+        }
+      ],
+      "sip": [
+        {
+          "id": 1,
+          "no_sip": "987654321",
+          "file_path": "dokumen/sip/sip-123.pdf"
+        }
+      ],
+      "penugasan_klinis": [
+        {
+          "id": 1,
+          "no_surat": "PK-001",
+          "file_path": "dokumen/penugasan-klinis/pk-123.pdf"
+        }
+      ]
     },
     "diklat": [
       {
@@ -3321,7 +3353,9 @@ Contoh response sukses (`200 OK`):
         "tanggal_mulai": "2023-01-01",
         "tanggal_selesai": "2023-01-02",
         "jp": 16,
-        "status_diklat": "sudah terlaksana"
+        "status_diklat": "sudah terlaksana",
+        "status_validasi": "diklat valid",
+        "status_kelayakan": true
       }
     ]
   }
@@ -3579,6 +3613,66 @@ Contoh response `200 OK`:
       "kota": "Kalisat",
       "tanggal": "2026-04-28"
     }
+  }
+}
+```
+
+### 21. Settings (Admin)
+
+Endpoint ini digunakan untuk mengelola konfigurasi sistem. Saat ini baru mendukung pengelolaan token WhatsApp.
+
+#### GET Pengaturan WhatsApp
+
+- Method: `GET`
+- URL: `/api/settings/whatsapp`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Mengambil token WhatsApp saat ini dan informasi perangkat Fonnte yang terhubung.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil mengambil pengaturan WhatsApp",
+  "data": {
+    "whatsapp_token": "mnsve3hD8m9qLLq6gW8n",
+    "device": {
+      "device": "628970702352",
+      "device_status": "connect",
+      "name": "Admin WhatsApp",
+      "quota": "971"
+    }
+  }
+}
+```
+
+#### PUT Pengaturan WhatsApp
+
+- Method: `PUT`
+- URL: `/api/settings/whatsapp`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Menyimpan atau memperbarui token WhatsApp.
+
+Request body:
+
+```json
+{
+  "whatsapp_token": "tokenbaru123"
+}
+```
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Pengaturan WhatsApp berhasil diperbarui",
+  "data": {
+    "whatsapp_token": "tokenbaru123"
   }
 }
 ```

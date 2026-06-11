@@ -156,6 +156,10 @@ Route::middleware([
     Route::post('/pegawai', [PegawaiController::class, 'store']);
     Route::patch('/pegawai/{id}/change-role', [PegawaiController::class, 'changeRole']);
 
+    // Settings
+    Route::get('/settings/whatsapp', [\App\Http\Controllers\Api\SettingController::class, 'getWhatsappSetting']);
+    Route::put('/settings/whatsapp', [\App\Http\Controllers\Api\SettingController::class, 'updateWhatsappSetting']);
+
     // Change request
     Route::prefix('admin')->group(function () {
         Route::get('/change-requests', [ChangeRequestAdminController::class, 'index']);

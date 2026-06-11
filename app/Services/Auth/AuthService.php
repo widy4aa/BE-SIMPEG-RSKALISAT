@@ -33,7 +33,7 @@ class AuthService
             ];
         }
 
-        if ($user->pegawai && $user->pegawai->status_pegawai !== 'aktif') {
+        if ($user->pegawai && $user->pegawai->status_pegawai === 'tidak aktif') {
             return [
                 'success' => false,
                 'message' => 'Akun tidak aktif karena status pegawai tidak aktif.',
