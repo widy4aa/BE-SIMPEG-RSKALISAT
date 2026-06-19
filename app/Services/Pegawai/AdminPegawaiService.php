@@ -149,7 +149,7 @@ class AdminPegawaiService
                     'tanggal_mulai' => $jp->started_at?->format('Y-m-d'),
                     'tanggal_selesai' => $jp->ended_at?->format('Y-m-d'),
                     'is_current' => (bool)$jp->is_current,
-                    'file_path' => $jp->sk_file_path,
+                    'file_path' => $jp->sk_file_path ?? null,
                 ]) ?? [],
                 'str' => $pegawai->str?->map(fn($s) => [
                     'id' => $s->id,

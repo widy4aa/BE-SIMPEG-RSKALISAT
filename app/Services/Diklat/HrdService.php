@@ -2,7 +2,9 @@
 
 namespace App\Services\Diklat;
 
+use App\Models\Pegawai;
 use App\Repositories\Diklat\PegawaiDiklatRepository;
+use App\Services\Notification\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -10,8 +12,10 @@ use InvalidArgumentException;
 
 class HrdService
 {
-    public function __construct(private readonly PegawaiDiklatRepository $pegawaiDiklatRepository)
-    {
+    public function __construct(
+        private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
+        private readonly WhatsappService $whatsapp,
+    ) {
     }
 
     public function build(int $userId, array $filters = []): array
@@ -447,6 +451,12 @@ class HrdService
         $jadwal->status_kelayakan = $isLayak ? 'layak' : 'tidak layak';
         $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
 
+        $namaDiklat = (string) ($jadwal->diklat?->nama_kegiatan ?? 'Diklat');
+        $pesanStatus = $isLayak
+            ? "✅ Anda dinyatakan *LAYAK* mengikuti diklat *{$namaDiklat}*."
+            : "❌ Anda dinyatakan *TIDAK LAYAK* mengikuti diklat *{$namaDiklat}*.";
+        $this->sendNotifDiklatWa((int) ($jadwal->pegawai_id ?? 0), $namaDiklat, $pesanStatus);
+
         return [
             'id_jadwal_diklat' => (int) $jadwal->id,
             'diklat_id' => (int) ($jadwal->diklat_id ?? 0),
@@ -472,6 +482,12 @@ class HrdService
 
         $jadwal->status_validasi = $isValid ? 'valid' : 'tidak valid';
         $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
+
+        $namaDiklat = (string) ($jadwal->diklat?->nama_kegiatan ?? 'Diklat');
+        $pesanStatus = $isValid
+            ? "✅ Laporan diklat *{$namaDiklat}* Anda telah *DIVALIDASI* oleh HRD."
+            : "❌ Laporan diklat *{$namaDiklat}* Anda *DITOLAK*. Harap koordinasi dengan HRD untuk revisi.";
+        $this->sendNotifDiklatWa((int) ($jadwal->pegawai_id ?? 0), $namaDiklat, $pesanStatus);
 
         return [
             'id_jadwal_diklat' => (int) $jadwal->id,
@@ -571,6 +587,27 @@ class HrdService
     private function hasMissingLaporan(?string $sertifFilePath, ?string $noSertif): bool
     {
         return trim((string) $sertifFilePath) === '' || trim((string) $noSertif) === '';
+    }
+
+    private function sendNotifDiklatWa(int $pegawaiId, string $namaDiklat, string $statusPesan): void
+    {
+        if ($pegawaiId <= 0) return;
+
+        $pegawai = Pegawai::with('pribadi')->find($pegawaiId);
+        $noTelp  = $pegawai?->pribadi?->no_telp ?? '';
+        if ($noTelp === '') return;
+
+        $no = preg_replace('/\D/', '', $noTelp);
+        if (str_starts_with($no, '0')) {
+            $no = '62'.substr($no, 1);
+        } elseif (! str_starts_with($no, '62')) {
+            $no = '62'.$no;
+        }
+
+        $pesan = "Halo {$pegawai->nama},\n\n{$statusPesan}\n\nSilakan login ke aplikasi SIMPEG untuk informasi lebih lanjut.";
+
+        $this->whatsapp->sendMessage($no, $pesan);
+        // Gagal kirim WA tidak mempengaruhi status diklat yang sudah tersimpan
     }
 
     public function generateLaporanDiklat(int $bulanAwal, int $tahunAwal, int $bulanAkhir, int $tahunAkhir): array

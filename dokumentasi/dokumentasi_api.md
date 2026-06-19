@@ -18,7 +18,9 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 4. [Reset Password dengan OTP](#4-reset-password-dengan-otp)
 
 **BAB III — Endpoint Semua Role**
-1. [Cek Role Login](#3-cek-role-login)
+1. [Logout](#1-logout)
+2. [Ganti Password (Saat Login)](#2-ganti-password-saat-login)
+3. [Cek Role Login](#3-cek-role-login)
 2. [Dashboard](#4-dashboard)
   - [Response Dashboard Untuk Role Pegawai](#response-dashboard-untuk-role-pegawai)
   - [Response Dashboard Untuk Role Admin](#response-dashboard-untuk-role-admin)
@@ -100,6 +102,11 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
      - [Tambah Data Kontak Darurat](#b-tambah-data-kontak-darurat)
      - [Ubah Data Kontak Darurat](#c-ubah-data-kontak-darurat)
      - [Hapus Data Kontak Darurat](#d-hapus-data-kontak-darurat)
+    - [Modul Tanggungan Lain (Self-Service)](#6-modul-tanggungan-lain)
+     - [Get Data Tanggungan Lain](#a-get-data-tanggungan-lain)
+     - [Tambah Data Tanggungan Lain](#b-tambah-data-tanggungan-lain)
+     - [Ubah Data Tanggungan Lain](#c-ubah-data-tanggungan-lain)
+     - [Hapus Data Tanggungan Lain](#d-hapus-data-tanggungan-lain)
 13. [Master Data (Form Dropdowns)](#17-master-data-form-dropdowns)
    - [List Master Data (Semua Role Login)](#171-list-master-data-semua-role-login)
    - [CRUD Master Data (Khusus HRD)](#172-crud-master-data-khusus-hrd)
@@ -107,9 +114,11 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
   - [Get Pegawai Detail (Admin/HRD/Direktur)](#get-pegawai-detail-adminhrddirektur)
    - [Tambah Data Pegawai Baru (Hanya Admin)](#tambah-data-pegawai-baru-hanya-admin)
    - [Ubah Role / Status Pegawai (Hanya Admin)](#ubah-role-status-pegawai-hanya-admin)
+   - [Ubah NIK Sendiri (Hanya Admin)](#ubah-nik-sendiri-hanya-admin)
 15. [STR/SIP (Admin/HRD/Direktur)](#19-strsip-adminhrddirektur)
 16. [Generate CV](#20-generate-cv)
 17. [HRD Manajemen Data Pegawai](#21-hrd-manajemen-data-pegawai)
+   - [21.4 Riwayat Karir Pegawai (HRD)](#214-riwayat-karir-pegawai-hrd) *(Jabatan, STR, SIP, Penugasan Klinis, Pangkat, Pendidikan)*
    - [21.5 Reminder WhatsApp STR/SIP & Penugasan Klinis](#215-reminder-whatsapp-strsip--penugasan-klinis-hrd)
 18. [Kirim Pesan WhatsApp ke Pegawai](#22-kirim-pesan-whatsapp-ke-pegawai)
 
@@ -173,7 +182,7 @@ Catatan umum syarat akses:
 - Endpoint `admin`, `hrd`, `direktur`: `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `POST /api/pesan/pegawai/{id}`
 - Endpoint `pegawai`, `hrd`, `direktur`: `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
 - Endpoint `hrd`, `direktur`: `GET /api/diklat/all`
-- Endpoint khusus `admin`: `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`, semua `/api/admin/change-requests/*`
+- Endpoint khusus `admin`: `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`, `PATCH /api/auth/change-nik`, semua `/api/admin/change-requests/*`
 - Endpoint khusus `hrd`: `POST/PATCH/DELETE /api/form/*`, semua `/api/hrd/diklat/*`, `GET /api/generate/laporan-diklat`
 - Endpoint khusus `hrd` (manajemen pegawai): `PATCH|POST /api/hrd/pegawai/{id}/inti`, `PATCH|POST /api/hrd/pegawai/{id}/pribadi`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/keluarga/*`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/riwayat-karir/*`, `POST /api/hrd/pegawai/{id}/reminder/str-sip`, `POST /api/hrd/pegawai/{id}/reminder/penugasan-klinis`
 
@@ -371,6 +380,78 @@ Contoh response `400 Bad Request` (OTP salah / kadaluarsa):
 ## Endpoint Semua Role (Login Required)
 
 Endpoint berikut bisa dipakai oleh role `admin`, `pegawai`, `hrd`, dan `direktur`. Wajib menyertakan token JWT.
+
+### 1. Logout
+
+- Method: `POST`
+- URL: `/api/logout`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+JWT bersifat stateless — tidak ada server-side blacklist. Client wajib menghapus token setelah endpoint ini dipanggil.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Logout berhasil. Silakan hapus token di sisi client."
+}
+```
+
+---
+
+### 2. Ganti Password (Saat Login)
+
+- Method: `POST`
+- URL: `/api/auth/change-password`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+Request body (`application/json`):
+
+```json
+{
+  "password_lama": "passwordLama123",
+  "password_baru": "passwordBaru456",
+  "password_baru_confirmation": "passwordBaru456"
+}
+```
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `password_lama` | String | Ya | Password yang sedang aktif |
+| `password_baru` | String | Ya | Password baru, min 8 karakter |
+| `password_baru_confirmation` | String | Ya | Konfirmasi password baru, harus sama |
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Password berhasil diubah."
+}
+```
+
+Contoh response `422 Unprocessable Entity` (password lama salah):
+
+```json
+{
+  "success": false,
+  "message": "Password lama tidak sesuai."
+}
+```
+
+Contoh response `404 Not Found` (user tidak ditemukan):
+
+```json
+{
+  "success": false,
+  "message": "User tidak ditemukan."
+}
+```
+
+---
 
 ### 3. Cek Role Login
 
@@ -3238,6 +3319,100 @@ Dokumentasi CRUD Data Keluarga yang terbagi menjadi entitas: **Pasangan**, **Ana
 
 ---
 
+### 6. Modul Tanggungan Lain
+
+Pegawai dapat mengelola data tanggungan lain secara mandiri (self-service). Semua operasi mengacu pada data milik pegawai yang sedang login berdasarkan JWT.
+
+#### A. Get Data Tanggungan Lain
+- **Nama Fitur:** Mendapatkan Daftar Tanggungan Lain
+- **Route:** `GET /api/keluarga/tanggungan-lain`
+- **Headers:** `Authorization: Bearer {token}`
+- **Role:** `admin`, `pegawai`, `hrd`, `direktur`
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data tanggungan lain berhasil diambil.",
+    "data": {
+      "label": "Data Tanggungan Lain",
+      "total": 1,
+      "items": [
+        {
+          "id": 1,
+          "nama": "Budi Santoso",
+          "hubungan_keluarga": "Adik",
+          "status_tanggungan": true
+        }
+      ]
+    }
+  }
+  ```
+
+#### B. Tambah Data Tanggungan Lain
+- **Route:** `POST /api/keluarga/tanggungan-lain`
+- **Body Type:** `application/json`
+- **Tabel Parameter:**
+
+| Field | Tipe | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nama` | String | Ya | Nama tanggungan, max 255 karakter |
+| `hubungan_keluarga` | String | Ya | Hubungan keluarga, max 100 karakter |
+| `status_tanggungan` | Boolean | Tidak | Status tanggungan aktif/tidak |
+
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "nama": "Budi Santoso",
+    "hubungan_keluarga": "Adik",
+    "status_tanggungan": true
+  }
+  ```
+- **Response:** `201 Created`
+  ```json
+  {
+    "success": true,
+    "message": "Data tanggungan lain berhasil ditambahkan.",
+    "data": {
+      "id": 1,
+      "nama": "Budi Santoso"
+    }
+  }
+  ```
+
+#### C. Ubah Data Tanggungan Lain
+- **Route:** `PATCH /api/keluarga/tanggungan-lain/{id}`
+- **Body Type:** `application/json`
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "status_tanggungan": false
+  }
+  ```
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data tanggungan lain berhasil diperbarui.",
+    "data": {
+      "id": 1,
+      "nama": "Budi Santoso"
+    }
+  }
+  ```
+
+#### D. Hapus Data Tanggungan Lain
+- **Route:** `DELETE /api/keluarga/tanggungan-lain/{id}`
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "Data tanggungan lain berhasil dihapus.",
+    "data": { "id": 1 }
+  }
+  ```
+
+---
+
 ### 17. Master Data (Form Dropdowns)
 
 Endpoint master data menyediakan opsi dropdown untuk form dan CRUD master data (khusus HRD).
@@ -3668,6 +3843,57 @@ Minimal salah satu field `role` atau `status_pegawai` harus dikirim.
     "message": "Tidak dapat mengubah role/status diri sendiri."
   }
   ```
+
+#### Ubah NIK Sendiri (Hanya Admin)
+
+- **Route:** `PATCH /api/auth/change-nik`
+- **Body Type:** `application/json`
+- **Auth:** Wajib Bearer token
+- **Role yang diizinkan:** `admin`
+
+Digunakan oleh Admin untuk mengubah NIK-nya sendiri. NIK juga merupakan `username` untuk login, sehingga perubahan ini akan memperbarui data di tabel `pegawai` dan `users` sekaligus.
+
+- **Request Payload:**
+
+| Field | Type | Wajib | Keterangan |
+|-------|------|-------|------------|
+| `nik` | String | Ya | NIK baru, max 20 karakter, harus unik |
+
+- **Contoh Request Payload (JSON):**
+  ```json
+  {
+    "nik": "3509199999900001"
+  }
+  ```
+
+- **Response:** `200 OK`
+  ```json
+  {
+    "success": true,
+    "message": "NIK berhasil diubah.",
+    "data": {
+      "nik": "3509199999900001"
+    }
+  }
+  ```
+
+- **Response Gagal (NIK sudah digunakan):** `422 Unprocessable Entity`
+  ```json
+  {
+    "success": false,
+    "message": "NIK sudah digunakan."
+  }
+  ```
+
+- **Response Gagal (user tidak ditemukan):** `404 Not Found`
+  ```json
+  {
+    "success": false,
+    "message": "User tidak ditemukan."
+  }
+  ```
+
+---
 
 ### 19. STR/SIP (Admin/HRD/Direktur)
 
@@ -4251,6 +4477,68 @@ Body `POST` tambah pangkat (`multipart/form-data`):
 
 ---
 
+##### Pendidikan
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/riwayat-karir/pendidikan` | List riwayat pendidikan |
+| `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/pendidikan` | Tambah riwayat pendidikan |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}` | Update riwayat pendidikan |
+| `DELETE` | `/api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}` | Hapus riwayat pendidikan |
+
+> **Catatan:** Model `Pendidikan` menggunakan `pegawai_pribadi_id` (FK ke `pegawai_pribadi`). Service secara otomatis meresolve `pegawai_id → pribadi_id`.
+
+Body `POST` tambah pendidikan (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `jenjang` | string, required, max:50 | Jenjang pendidikan (SD, SMP, SMA, D3, S1, S2, S3) |
+| `institusi` | string, required, max:255 | Nama institusi/universitas |
+| `jurusan` | string, required, max:255 | Jurusan/program studi |
+| `tahun_lulus` | integer, required | Tahun kelulusan (1900–2100) |
+| `nomor_ijazah` | string, nullable, max:100 | Nomor ijazah |
+| `ijazah` | file, nullable | File ijazah (pdf/jpg/jpeg/png/webp, max 5 MB) |
+
+Response `200 OK` (list):
+```json
+{
+  "success": true,
+  "message": "Data riwayat pendidikan berhasil diambil.",
+  "data": {
+    "label": "Riwayat pendidikan",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "jenjang": "S1",
+        "institusi": "Universitas Jember",
+        "jurusan": "Kedokteran",
+        "tahun_lulus": 2015,
+        "nomor_ijazah": "123/UN25/2015",
+        "ijazah_url": null
+      }
+    ]
+  }
+}
+```
+
+Response `201 Created` (tambah/update):
+```json
+{
+  "success": true,
+  "message": "Riwayat pendidikan berhasil ditambahkan.",
+  "data": {
+    "id": 1,
+    "jenjang": "S1",
+    "institusi": "Universitas Jember",
+    "jurusan": "Kedokteran",
+    "tahun_lulus": 2015
+  }
+}
+```
+
+---
+
 #### 21.5 Reminder WhatsApp STR/SIP & Penugasan Klinis (HRD)
 
 Endpoint untuk mengirim pesan reminder WhatsApp kepada pegawai terkait dokumen izin yang akan atau telah kedaluwarsa. Pesan dikirim secara manual oleh HRD.
@@ -4370,6 +4658,7 @@ Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint 
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
 - **Kirim Pesan WA:** `POST /api/pesan/pegawai/{id}`
 - **Pegawai (Admin only):** `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`
+- **NIK (Admin only):** `PATCH /api/auth/change-nik`
 - **Change Request (Admin only):** `GET /api/admin/change-requests`, `GET /api/admin/change-requests/{id}`, `PATCH /api/admin/change-requests/{id}/accept`, `PATCH /api/admin/change-requests/{id}/reject`
 
 #### Admin Approval Change Request

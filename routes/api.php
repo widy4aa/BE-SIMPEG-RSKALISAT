@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\Keluarga\PasanganController;
 use App\Http\Controllers\Api\Keluarga\AnakController;
 use App\Http\Controllers\Api\Keluarga\OrangTuaController;
 use App\Http\Controllers\Api\Keluarga\KontakDaruratController;
+use App\Http\Controllers\Api\Keluarga\TanggunganLainController;
 use App\Http\Controllers\Api\MasterDataController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PegawaiController;
@@ -84,6 +85,16 @@ Route::middleware([
     Route::post('/keluarga/kontak-darurat', [KontakDaruratController::class, 'store']);
     Route::patch('/keluarga/kontak-darurat/{id}', [KontakDaruratController::class, 'update']);
     Route::delete('/keluarga/kontak-darurat/{id}', [KontakDaruratController::class, 'destroy']);
+
+    // Keluarga - tanggungan lain (self-service)
+    Route::get('/keluarga/tanggungan-lain', [TanggunganLainController::class, 'index']);
+    Route::post('/keluarga/tanggungan-lain', [TanggunganLainController::class, 'store']);
+    Route::patch('/keluarga/tanggungan-lain/{id}', [TanggunganLainController::class, 'update']);
+    Route::delete('/keluarga/tanggungan-lain/{id}', [TanggunganLainController::class, 'destroy']);
+
+    // Auth
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/change-password', [AuthController::class, 'changePassword']);
 
     // Riwayat karir - pendidikan
     Route::get('/riwayat-karir/pendidikan', [RiwayatKarirController::class, 'pendidikan']);
@@ -164,6 +175,7 @@ Route::middleware([
     // Pegawai
     Route::post('/pegawai', [PegawaiController::class, 'store']);
     Route::patch('/pegawai/{id}/change-role', [PegawaiController::class, 'changeRole']);
+    Route::patch('/auth/change-nik', [AuthController::class, 'changeNik']);
 
     // Settings
     Route::get('/settings/whatsapp', [\App\Http\Controllers\Api\SettingController::class, 'getWhatsappSetting']);
@@ -264,6 +276,13 @@ Route::middleware([
         Route::patch('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePangkat']);
         Route::post('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePangkat']);
         Route::delete('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'destroyPangkat']);
+
+        // Riwayat Karir - pendidikan
+        Route::get('/riwayat-karir/pendidikan', [HrdRiwayatKarirController::class, 'pendidikan']);
+        Route::post('/riwayat-karir/pendidikan', [HrdRiwayatKarirController::class, 'storePendidikan']);
+        Route::patch('/riwayat-karir/pendidikan/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePendidikan']);
+        Route::post('/riwayat-karir/pendidikan/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePendidikan']);
+        Route::delete('/riwayat-karir/pendidikan/{riwayatId}', [HrdRiwayatKarirController::class, 'destroyPendidikan']);
 
         // Reminder WhatsApp
         Route::post('/reminder/str-sip', [HrdRiwayatKarirController::class, 'sendReminderStrSip']);

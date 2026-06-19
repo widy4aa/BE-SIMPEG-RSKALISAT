@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Api\Hrd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RiwayatKarir\StoreJabatanRequest;
 use App\Http\Requests\RiwayatKarir\StorePangkatRequest;
+use App\Http\Requests\RiwayatKarir\StorePendidikanRequest;
 use App\Http\Requests\RiwayatKarir\StorePenugasanKlinisRequest;
 use App\Http\Requests\RiwayatKarir\StoreSipRequest;
 use App\Http\Requests\RiwayatKarir\StoreStrRequest;
 use App\Http\Requests\RiwayatKarir\UpdateJabatanRequest;
 use App\Http\Requests\RiwayatKarir\UpdatePangkatRequest;
+use App\Http\Requests\RiwayatKarir\UpdatePendidikanRequest;
 use App\Http\Requests\RiwayatKarir\UpdatePenugasanKlinisRequest;
 use App\Http\Requests\RiwayatKarir\UpdateSipRequest;
 use App\Http\Requests\RiwayatKarir\UpdateStrRequest;
@@ -29,6 +31,55 @@ class HrdRiwayatKarirController extends Controller
         private readonly HrdRiwayatKarirService $service,
         private readonly WhatsappService $whatsapp,
     ) {}
+
+    // ── Pendidikan ───────────────────────────────────────────────────────────
+
+    public function pendidikan(Request $request, int $id): JsonResponse
+    {
+        try {
+            return response()->json(['success' => true, 'message' => 'Data riwayat pendidikan berhasil diambil.', 'data' => $this->service->getPendidikan($id)]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
+        }
+    }
+
+    public function storePendidikan(StorePendidikanRequest $request, int $id): JsonResponse
+    {
+        try {
+            $result = $this->service->createPendidikan($id, $request->validated(), $request->file('ijazah'));
+            return response()->json(['success' => true, 'message' => 'Riwayat pendidikan berhasil ditambahkan.', 'data' => $result], 201);
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
+        }
+    }
+
+    public function updatePendidikan(UpdatePendidikanRequest $request, int $id, int $riwayatId): JsonResponse
+    {
+        try {
+            $result = $this->service->updatePendidikan($riwayatId, $id, $request->validated(), $request->file('ijazah'));
+            return response()->json(['success' => true, 'message' => 'Riwayat pendidikan berhasil diperbarui.', 'data' => $result]);
+        } catch (InvalidArgumentException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 422);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
+        }
+    }
+
+    public function destroyPendidikan(Request $request, int $id, int $riwayatId): JsonResponse
+    {
+        try {
+            $result = $this->service->deletePendidikan($riwayatId, $id);
+            return response()->json(['success' => true, 'message' => 'Riwayat pendidikan berhasil dihapus.', 'data' => $result]);
+        } catch (ModelNotFoundException $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 404);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Terjadi kesalahan: '.$e->getMessage()], 500);
+        }
+    }
 
     // ── Jabatan ───────────────────────────────────────────────────────────────
 
