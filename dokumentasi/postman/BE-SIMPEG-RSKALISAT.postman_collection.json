@@ -8715,6 +8715,63 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "HRD - Kirim Pesan WhatsApp ke Pegawai",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token_hrd}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pesan\": \"Halo, ini adalah pesan test dari HRD.\"\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{base_url}}/api/pesan/pegawai/{{pegawai_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "pesan", "pegawai", "{{pegawai_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "HRD - Kirim Reminder WA STR/SIP",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token_hrd}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tipe_dokumen\": \"str\",\n  \"dokumen_id\": 1\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{{pegawai_id}}/reminder/str-sip",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hrd", "pegawai", "{{pegawai_id}}", "reminder", "str-sip"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "HRD - Kirim Reminder WA Penugasan Klinis",
+          "request": {
+            "auth": {"type": "bearer", "bearer": [{"key": "token", "value": "{{token_hrd}}", "type": "string"}]},
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"dokumen_id\": 1\n}",
+              "options": {"raw": {"language": "json"}}
+            },
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{{pegawai_id}}/reminder/penugasan-klinis",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hrd", "pegawai", "{{pegawai_id}}", "reminder", "penugasan-klinis"]
+            }
+          },
+          "response": []
         }
       ]
     }

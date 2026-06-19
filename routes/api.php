@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\PegawaiController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RiwayatKarirController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\MessageController;
 use App\Http\Controllers\Api\StrSipController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
@@ -150,6 +151,9 @@ Route::middleware([
 
     // STR/SIP
     Route::get('/str-sip', [StrSipController::class, 'index']);
+
+    // Kirim pesan WhatsApp ke pegawai
+    Route::post('/pesan/pegawai/{id}', [MessageController::class, 'sendToPegawai']);
 });
 
 // Admin only
@@ -260,6 +264,10 @@ Route::middleware([
         Route::patch('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePangkat']);
         Route::post('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePangkat']);
         Route::delete('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'destroyPangkat']);
+
+        // Reminder WhatsApp
+        Route::post('/reminder/str-sip', [HrdRiwayatKarirController::class, 'sendReminderStrSip']);
+        Route::post('/reminder/penugasan-klinis', [HrdRiwayatKarirController::class, 'sendReminderPenugasanKlinis']);
     });
 
     // Diklat - master HRD

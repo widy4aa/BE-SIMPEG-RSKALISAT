@@ -110,6 +110,8 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 15. [STR/SIP (Admin/HRD/Direktur)](#19-strsip-adminhrddirektur)
 16. [Generate CV](#20-generate-cv)
 17. [HRD Manajemen Data Pegawai](#21-hrd-manajemen-data-pegawai)
+   - [21.5 Reminder WhatsApp STR/SIP & Penugasan Klinis](#215-reminder-whatsapp-strsip--penugasan-klinis-hrd)
+18. [Kirim Pesan WhatsApp ke Pegawai](#22-kirim-pesan-whatsapp-ke-pegawai)
 
 **BAB IV — Ringkasan Endpoint Per Role**
 1. [Admin](#admin) *(termasuk Admin Approval Change Request)*
@@ -161,19 +163,19 @@ Authorization: Bearer <jwt_token>
 
 ## Status Sinkronisasi Endpoint
 
-Dokumen ini sudah dicocokkan ulang dengan hasil `php artisan route:list --path=api` pada code saat ini. Total route API aktif: **174 route** (119 route lama + 55 route HRD manajemen pegawai).
+Dokumen ini sudah dicocokkan ulang dengan hasil `php artisan route:list --path=api` pada code saat ini. Total route API aktif: **177 route** (119 route lama + 55 HRD manajemen pegawai + 3 pesan & reminder WA).
 
 Catatan umum syarat akses:
 
 - Endpoint public tanpa token: `GET /api/health`, `POST /api/login`
 - Endpoint dengan token saja: `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`, semua `GET /api/form/*`
 - Endpoint semua role (`admin`, `pegawai`, `hrd`, `direktur`): `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/generate/cv`, `GET/PATCH /api/profile`, upload file profile/KTP/KK, semua CRUD keluarga, semua CRUD riwayat karir
-- Endpoint `admin`, `hrd`, `direktur`: `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`
+- Endpoint `admin`, `hrd`, `direktur`: `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `POST /api/pesan/pegawai/{id}`
 - Endpoint `pegawai`, `hrd`, `direktur`: `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
 - Endpoint `hrd`, `direktur`: `GET /api/diklat/all`
 - Endpoint khusus `admin`: `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`, semua `/api/admin/change-requests/*`
 - Endpoint khusus `hrd`: `POST/PATCH/DELETE /api/form/*`, semua `/api/hrd/diklat/*`, `GET /api/generate/laporan-diklat`
-- Endpoint khusus `hrd` (manajemen pegawai): `PATCH|POST /api/hrd/pegawai/{id}/inti`, `PATCH|POST /api/hrd/pegawai/{id}/pribadi`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/keluarga/*`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/riwayat-karir/*`
+- Endpoint khusus `hrd` (manajemen pegawai): `PATCH|POST /api/hrd/pegawai/{id}/inti`, `PATCH|POST /api/hrd/pegawai/{id}/pribadi`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/keluarga/*`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/riwayat-karir/*`, `POST /api/hrd/pegawai/{id}/reminder/str-sip`, `POST /api/hrd/pegawai/{id}/reminder/penugasan-klinis`
 
 Untuk request dengan file, gunakan `multipart/form-data`. Untuk request tanpa file, gunakan `application/json`.
 
@@ -4249,6 +4251,106 @@ Body `POST` tambah pangkat (`multipart/form-data`):
 
 ---
 
+#### 21.5 Reminder WhatsApp STR/SIP & Penugasan Klinis (HRD)
+
+Endpoint untuk mengirim pesan reminder WhatsApp kepada pegawai terkait dokumen izin yang akan atau telah kedaluwarsa. Pesan dikirim secara manual oleh HRD.
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `POST` | `/api/hrd/pegawai/{id}/reminder/str-sip` | Kirim reminder dokumen STR atau SIP |
+| `POST` | `/api/hrd/pegawai/{id}/reminder/penugasan-klinis` | Kirim reminder penugasan klinis |
+
+Body `POST` reminder STR/SIP (`application/json`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `tipe_dokumen` | string, required | `"str"` atau `"sip"` |
+| `dokumen_id` | integer, required | ID dokumen STR atau SIP |
+
+Body `POST` reminder penugasan klinis (`application/json`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `dokumen_id` | integer, required | ID dokumen penugasan klinis |
+
+Response `200 OK` (berhasil):
+```json
+{
+  "success": true,
+  "message": "Pesan pengingat STR (0001/STR/2024) berhasil dikirim."
+}
+```
+
+Response `422` (nomor HP tidak tersedia):
+```json
+{
+  "success": false,
+  "message": "Pegawai belum memasukkan nomor HP/Telepon."
+}
+```
+
+Response `404` (dokumen tidak ditemukan):
+```json
+{
+  "success": false,
+  "message": "Data dokumen tidak ditemukan."
+}
+```
+
+Urgensi pesan ditentukan otomatis berdasarkan sisa hari kadaluarsa:
+- **Kadaluarsa (< 0 hari):** Pesan sangat mendesak 🚨
+- **≤ 30 hari:** Pesan peringatan penting ⚠️
+- **> 30 hari:** Pesan informasi ℹ️
+
+---
+
+### 22. Kirim Pesan WhatsApp ke Pegawai
+
+- **Role akses:** `admin`, `hrd`, `direktur`
+- **Method:** `POST`
+- **URL:** `/api/pesan/pegawai/{id}`
+- **Auth:** Wajib Bearer token
+
+Body (`application/json`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `pesan` | string, required, max:2000 | Isi pesan yang akan dikirim |
+
+Response `200 OK` (berhasil):
+```json
+{
+  "success": true,
+  "message": "Pesan berhasil dikirim ke nomor 0812xxxx"
+}
+```
+
+Response `422` (nomor HP tidak tersedia):
+```json
+{
+  "success": false,
+  "message": "Pegawai belum memasukkan nomor HP/Telepon."
+}
+```
+
+Response `422` (gagal kirim — kuota habis):
+```json
+{
+  "success": false,
+  "message": "Gagal mengirim pesan: Kuota WhatsApp (Fonnte) habis."
+}
+```
+
+Response `422` (gagal kirim — token tidak valid):
+```json
+{
+  "success": false,
+  "message": "Gagal mengirim pesan: Token WhatsApp tidak valid atau belum disetting."
+}
+```
+
+---
+
 ## Ringkasan Endpoint Per Role
 
 Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint butuh header `Authorization: Bearer <jwt_token>`.
@@ -4266,6 +4368,7 @@ Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint 
 - **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
 - **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
+- **Kirim Pesan WA:** `POST /api/pesan/pegawai/{id}`
 - **Pegawai (Admin only):** `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`
 - **Change Request (Admin only):** `GET /api/admin/change-requests`, `GET /api/admin/change-requests/{id}`, `PATCH /api/admin/change-requests/{id}/accept`, `PATCH /api/admin/change-requests/{id}/reject`
 
@@ -4450,6 +4553,8 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 - **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
 - **HRD Manajemen Data Pegawai:** `PATCH /api/hrd/pegawai/{id}/inti`, `PATCH|POST /api/hrd/pegawai/{id}/pribadi`, CRUD Keluarga (pasangan, anak, orang tua, kontak darurat, tanggungan lain), CRUD Riwayat Karir (jabatan, STR, SIP, penugasan klinis, pangkat) via `/api/hrd/pegawai/{id}/keluarga/*` dan `/api/hrd/pegawai/{id}/riwayat-karir/*`
+- **Reminder WA:** `POST /api/hrd/pegawai/{id}/reminder/str-sip`, `POST /api/hrd/pegawai/{id}/reminder/penugasan-klinis`
+- **Kirim Pesan WA:** `POST /api/pesan/pegawai/{id}`
 
 ### Direktur
 
@@ -4465,6 +4570,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 - **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
 - **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
+- **Kirim Pesan WA:** `POST /api/pesan/pegawai/{id}`
 
 
 ## Akun Seeder Untuk Uji Login
@@ -4815,7 +4921,7 @@ Langkah pakai di Postman:
 
 ## Daftar Request di Collection
 
-Collection Postman berisi 174 request utama yang sudah disesuaikan dengan 174 route aktif dari `php artisan route:list --path=api`, ditambah 41 request skenario testing end-to-end.
+Collection Postman berisi 177 request utama yang sudah disesuaikan dengan 177 route aktif dari `php artisan route:list --path=api`, ditambah 41 request skenario testing end-to-end.
 
 Folder yang tersedia:
 
@@ -4851,3 +4957,5 @@ Folder yang tersedia:
   - Update data pribadi pegawai (`PATCH|POST /api/hrd/pegawai/{id}/pribadi`).
   - CRUD keluarga: pasangan, anak, orang tua, kontak darurat, tanggungan lain.
   - CRUD riwayat karir: jabatan, STR, SIP, penugasan klinis, pangkat.
+  - Reminder WA: kirim reminder STR/SIP dan penugasan klinis.
+  - Kirim pesan WA bebas ke pegawai (`POST /api/pesan/pegawai/{id}`).
