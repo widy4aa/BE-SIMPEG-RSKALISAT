@@ -20,7 +20,7 @@ class DiklatService
             'admin' => $this->adminService->build($userId),
             'pegawai' => $this->pegawaiService->build($userId, $filters),
             'hrd' => $this->hrdService->build($userId, $filters),
-            'direktur' => $this->direkturService->build($userId),
+            'direktur' => $this->direkturService->build($userId, $filters),
             default => null,
         };
     }

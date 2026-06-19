@@ -330,6 +330,24 @@ class AdminPegawaiRepository
             array_push($bindings, $like, $like);
         }
 
+        $tahunMasuk = $this->filledString($filters['tahun_masuk'] ?? null);
+        if ($tahunMasuk !== null && ctype_digit($tahunMasuk)) {
+            $where[] = 'YEAR(p.tgl_masuk) = ?';
+            $bindings[] = (int) $tahunMasuk;
+        }
+
+        $tglMasukDari = $this->filledString($filters['tgl_masuk_dari'] ?? null);
+        if ($tglMasukDari !== null) {
+            $where[] = 'DATE(p.tgl_masuk) >= ?';
+            $bindings[] = $tglMasukDari;
+        }
+
+        $tglMasukSampai = $this->filledString($filters['tgl_masuk_sampai'] ?? null);
+        if ($tglMasukSampai !== null) {
+            $where[] = 'DATE(p.tgl_masuk) <= ?';
+            $bindings[] = $tglMasukSampai;
+        }
+
         return [implode(' AND ', $where), $bindings];
     }
 
@@ -425,10 +443,6 @@ class AdminPegawaiRepository
             'foto_path' => $row->pribadi_foto_path ?? null,
             'ktp_file_path' => $row->pribadi_ktp_file_path ?? null,
             'kk_file_path' => $row->pribadi_kk_file_path ?? null,
-            'tempat_lahir' => null,
-            'npwp' => null,
-            'bpjs_kesehatan' => null,
-            'bpjs_ketenagakerjaan' => null,
         ];
     }
 

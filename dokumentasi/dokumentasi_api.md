@@ -109,6 +109,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
    - [Ubah Role / Status Pegawai (Hanya Admin)](#ubah-role-status-pegawai-hanya-admin)
 15. [STR/SIP (Admin/HRD/Direktur)](#19-strsip-adminhrddirektur)
 16. [Generate CV](#20-generate-cv)
+17. [HRD Manajemen Data Pegawai](#21-hrd-manajemen-data-pegawai)
 
 **BAB IV — Ringkasan Endpoint Per Role**
 1. [Admin](#admin) *(termasuk Admin Approval Change Request)*
@@ -160,7 +161,7 @@ Authorization: Bearer <jwt_token>
 
 ## Status Sinkronisasi Endpoint
 
-Dokumen ini sudah dicocokkan ulang dengan hasil `php artisan route:list --path=api` pada code saat ini. Total route API aktif: **119 route**.
+Dokumen ini sudah dicocokkan ulang dengan hasil `php artisan route:list --path=api` pada code saat ini. Total route API aktif: **174 route** (119 route lama + 55 route HRD manajemen pegawai).
 
 Catatan umum syarat akses:
 
@@ -172,6 +173,7 @@ Catatan umum syarat akses:
 - Endpoint `hrd`, `direktur`: `GET /api/diklat/all`
 - Endpoint khusus `admin`: `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`, semua `/api/admin/change-requests/*`
 - Endpoint khusus `hrd`: `POST/PATCH/DELETE /api/form/*`, semua `/api/hrd/diklat/*`, `GET /api/generate/laporan-diklat`
+- Endpoint khusus `hrd` (manajemen pegawai): `PATCH|POST /api/hrd/pegawai/{id}/inti`, `PATCH|POST /api/hrd/pegawai/{id}/pribadi`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/keluarga/*`, semua `GET|POST|PATCH|DELETE /api/hrd/pegawai/{id}/riwayat-karir/*`
 
 Untuk request dengan file, gunakan `multipart/form-data`. Untuk request tanpa file, gunakan `application/json`.
 
@@ -424,7 +426,7 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 - URL: `/api/dashboard`
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
-- Parameter URL (Opsional, khusus role HRD): `?type=pegawai`, `?type=diklat_asn`, atau `?type=diklat_tenkes`
+- Parameter URL (Opsional, khusus role HRD dan Direktur): `?type=pegawai`, `?type=diklat_asn`, atau `?type=diklat_tenkes`
 
 Contoh header:
 
@@ -533,6 +535,75 @@ Contoh response `200 OK`:
 }
 ```
 
+#### Response Dashboard Untuk Role Direktur
+
+Struktur response direktur identik dengan HRD. Parameter `?type` juga didukung.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Selamat datang direktur",
+  "data": {
+    "role": "direktur",
+    "dashboard": {
+      "label": "Dashboard direktur",
+      "pegawai": {
+        "total_pegawai": 15,
+        "total_pegawai_kurang_lengkap": 1,
+        "total_pegawai_lengkap": 14,
+        "jenis_pegawai": {
+          "PNS": 7,
+          "BLUD": 3
+        },
+        "profesi": {
+          "Dokter": 4,
+          "Perawat": 1
+        },
+        "tingkat_pendidikan": {
+          "S1/D4": 5,
+          "S2": 5
+        },
+        "tahun_masuk_5_tahun_terakhir": {
+          "2022": 0,
+          "2023": 1,
+          "2024": 0,
+          "2025": 0,
+          "2026": 0
+        }
+      },
+      "diklat_asn": {
+        "total_diklat": 12,
+        "selesai": 8,
+        "berlangsung": 4,
+        "pegawai_sudah_ikut": 10,
+        "pegawai_belum_ikut": 5,
+        "diklat_per_kategori": {
+          "Struktural": 2,
+          "Fungsional": 3,
+          "Teknis": 5,
+          "Akred": 2
+        }
+      },
+      "diklat_tenkes": {
+        "total_diklat": 20,
+        "selesai": 15,
+        "berlangsung": 5,
+        "pegawai_sudah_ikut": 12,
+        "pegawai_belum_ikut": 3,
+        "diklat_per_kategori": {
+          "Struktural": 0,
+          "Fungsional": 8,
+          "Teknis": 10,
+          "Akred": 2
+        }
+      }
+    }
+  }
+}
+```
+
 #### Response Dashboard Untuk Role HRD
 
 Contoh response `200 OK`:
@@ -635,8 +706,8 @@ Keterangan implementasi saat ini:
 
 - Role `pegawai`: data diambil dari database melalui repository.
 - Role `admin`: payload ringkasan tersendiri.
-- Role `direktur`: mengembalikan struktur dan payload yang persis sama dengan role `hrd`.
 - Role `hrd`: data diambil dari database berdasarkan peserta (hanya diklat yang diikuti HRD login).
+- Role `direktur`: data diambil dari database melalui `DirekturDashboardRepository`. Menampilkan ringkasan agregat (`total_diklat`, `selesai`, `berlangsung`, `mendatang`) dan daftar semua master diklat yang dapat difilter.
 
 Contoh response role `pegawai` (dengan pagination 7 item):
 
@@ -767,7 +838,54 @@ Catatan bentuk payload:
 - `admin`: `ringkasan` + `list_diklat`
 - `pegawai`: `ringkasan` + `riwayat_diklat`
 - `hrd`: `ringkasan` + `riwayat_diklat` (berisi riwayat diklat peserta HRD login)
-- `direktur`: `ringkasan` + `keputusan_terbaru`
+- `direktur`: `ringkasan` (total_diklat, selesai, berlangsung, mendatang) + `list_diklat` (paginated, dapat difilter)
+
+Contoh response role `direktur`:
+
+```json
+{
+  "success": true,
+  "message": "Ringkasan diklat direktur berhasil diambil.",
+  "data": {
+    "role": "direktur",
+    "diklat": {
+      "label": "Diklat direktur",
+      "ringkasan": {
+        "total_diklat": 32,
+        "selesai": 23,
+        "berlangsung": 4,
+        "mendatang": 5
+      },
+      "list_diklat": {
+        "current_page": 1,
+        "data": [
+          {
+            "id_diklat": 12,
+            "nama": "Workshop Pelayanan Prima",
+            "kategori": "Teknis",
+            "jenis": "ASN",
+            "pelaksana": "RS Kalisat",
+            "tanggal_mulai": "2026-05-10",
+            "tanggal_selesai": "2026-05-12",
+            "status": "selesai",
+            "tempat": "Aula RS",
+            "waktu": "08:00:00",
+            "created_by": "Admin SIMPEG",
+            "jp": 24,
+            "total_biaya": "2500000.00",
+            "jenis_biaya": "BLUD",
+            "jenis_pelaksana": "internal",
+            "catatan": "Usulan pelatihan unit SDM",
+            "jumlah_peserta": 5
+          }
+        ],
+        "per_page": 7,
+        "total": 32
+      }
+    }
+  }
+}
+```
 
 Catatan field `catatan`:
 
@@ -776,8 +894,8 @@ Catatan field `catatan`:
 
 Catatan field `status`:
 
-- Status hitung by tanggal (`mendatang`, `berlangsung`, `selesai`) saat ini diterapkan pada item role `pegawai` dan `hrd`.
-- Item role `admin` dan `direktur` saat ini belum menggunakan field `status`.
+- Status hitung by tanggal (`mendatang`, `berlangsung`, `selesai`) diterapkan pada item role `pegawai`, `hrd`, dan `direktur`.
+- Item role `admin` saat ini belum menggunakan field `status`.
 
 #### GET Diklat (All - HRD & Direktur)
 
@@ -3268,11 +3386,16 @@ Query parameter opsional:
 | `pendidikan` | String | - | Filter pendidikan terakhir, contoh `S1`, `D3`, atau `SMA/SMK Sederajat`. |
 | `status_pegawai` | String | - | Filter status keaktifan pegawai, contoh `aktif` atau `tidak aktif`. |
 | `profesi` | String | - | Filter nama profesi pegawai. |
+| `tahun_masuk` | Integer | - | Filter berdasarkan tahun masuk pegawai, contoh `2023`. Hanya nilai angka valid yang diproses. |
+| `tgl_masuk_dari` | String | - | Filter pegawai yang tanggal masuknya mulai dari tanggal ini, format `Y-m-d`. |
+| `tgl_masuk_sampai` | String | - | Filter pegawai yang tanggal masuknya sampai dengan tanggal ini, format `Y-m-d`. |
 
 Contoh URL dengan filter:
 
 ```http
 GET /api/pegawai?page=1&per_page=10&search=budi&status_kelengkapan=lengkap&jenis_pegawai=PNS&pendidikan=S1&status_pegawai=aktif&profesi=Dokter
+GET /api/pegawai?tahun_masuk=2023
+GET /api/pegawai?tgl_masuk_dari=2022-01-01&tgl_masuk_sampai=2024-12-31
 ```
 
 Catatan:
@@ -3385,16 +3508,12 @@ Contoh response sukses (`200 OK`):
     },
     "pribadi": {
       "jenis_kelamin": "Laki-laki",
-      "tempat_lahir": "Surabaya",
       "tanggal_lahir": "1990-01-01",
       "agama": "Islam",
       "status_perkawinan": "Menikah",
       "alamat": "Jl. Mawar No. 1",
       "no_hp": "0812...",
-      "no_telp": null,
-      "npwp": "...",
-      "bpjs_kesehatan": "...",
-      "bpjs_ketenagakerjaan": "..."
+      "no_telp": null
     },
     "keluarga": {
       "pasangan": [],
@@ -3775,6 +3894,361 @@ Contoh response `200 OK`:
 }
 ```
 
+### 21. HRD Manajemen Data Pegawai
+
+Semua endpoint pada bagian ini hanya dapat diakses oleh role `hrd`. Parameter `{id}` pada URL mengacu pada `pegawai_id` yang ingin dikelola, bukan `id` user yang sedang login.
+
+Base URL semua endpoint di bagian ini: `/api/hrd/pegawai/{id}`
+
+---
+
+#### 21.1 Update Data Inti Pegawai
+
+- Method: `PATCH`
+- URL: `/api/hrd/pegawai/{id}/inti`
+- Auth: Wajib Bearer token
+- Role: `hrd`
+- Content-Type: `application/json`
+
+Semua field bersifat opsional (`sometimes`). Hanya field yang dikirim yang akan diupdate.
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nik` | string, max:20 | Nomor Induk Kependudukan |
+| `nip` | string\|null, max:20 | Nomor Induk Pegawai |
+| `nama` | string, max:255 | Nama lengkap |
+| `jenis_pegawai_id` | integer\|null | FK ke tabel jenis_pegawai |
+| `profesi_id` | integer\|null | FK ke tabel profesi |
+| `golongan_ruang_id` | integer\|null | FK ke tabel golongan_ruang |
+| `status_pegawai` | string | `aktif`, `nonaktif`, atau `cuti` |
+| `tgl_masuk` | date\|null | Tanggal masuk kerja (Y-m-d) |
+| `tmt_cpns` | date\|null | TMT CPNS (Y-m-d) |
+| `tmt_pns` | date\|null | TMT PNS (Y-m-d) |
+
+Response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Data inti pegawai berhasil diperbarui.",
+  "data": {
+    "id": 1,
+    "nik": "3174010101010001",
+    "nip": "199001012020011001",
+    "nama": "Budi Santoso",
+    "status_pegawai": "aktif",
+    "tgl_masuk": "2020-01-01"
+  }
+}
+```
+
+Response `422 Unprocessable Entity`:
+```json
+{"success": false, "message": "Data pegawai tidak ditemukan."}
+```
+
+---
+
+#### 21.2 Update Data Pribadi Pegawai
+
+- Method: `PATCH` atau `POST`
+- URL: `/api/hrd/pegawai/{id}/pribadi`
+- Auth: Wajib Bearer token
+- Role: `hrd`
+- Content-Type: `multipart/form-data` (jika upload file) atau `application/json`
+
+Semua field bersifat opsional.
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `jenis_kelamin` | string | `L` atau `P` |
+| `tanggal_lahir` | date\|null | Format Y-m-d |
+| `agama` | string\|null | Agama |
+| `status_perkawinan` | string\|null | Status perkawinan |
+| `alamat` | string\|null | Alamat lengkap |
+| `no_telp` | string\|null | Nomor telepon (max:20) |
+| `pendidikan_terakhir` | string\|null | Pendidikan terakhir (max:100) |
+| `no_kk` | string\|null | Nomor KK (max:20) |
+| `foto_profil` | file\|null | Foto profil (jpg/jpeg/png, max 2 MB) |
+| `ktp_file` | file\|null | File KTP (pdf/jpg/jpeg/png, max 5 MB) |
+| `kk_file` | file\|null | File KK (pdf/jpg/jpeg/png, max 5 MB) |
+
+Catatan: `POST` digunakan sebagai alias untuk `PATCH` karena browser/form HTML tidak mendukung `PATCH` dengan `multipart/form-data`.
+
+Response `200 OK`:
+```json
+{
+  "success": true,
+  "message": "Data pribadi pegawai berhasil diperbarui.",
+  "data": {
+    "id": 1,
+    "jenis_kelamin": "L",
+    "tanggal_lahir": "1990-01-01",
+    "agama": "Islam",
+    "status_perkawinan": "Menikah",
+    "alamat": "Jl. Mawar No. 1",
+    "no_telp": "081234567890"
+  }
+}
+```
+
+---
+
+#### 21.3 Data Keluarga Pegawai (HRD)
+
+Semua endpoint keluarga berada di bawah prefix `/api/hrd/pegawai/{id}/keluarga/`. Parameter `{keluargaId}` adalah `id` record keluarga yang ingin diubah atau dihapus.
+
+Response sukses umum:
+- `200 OK` untuk GET, update, dan delete
+- `201 Created` untuk store
+
+Response error umum:
+- `422` jika pegawai tidak ditemukan atau validasi gagal
+- `404` jika record keluarga tidak ditemukan (update/delete)
+
+---
+
+##### Pasangan
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/keluarga/pasangan` | List semua pasangan |
+| `POST` | `/api/hrd/pegawai/{id}/keluarga/pasangan` | Tambah pasangan baru |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}` | Update data pasangan |
+| `DELETE` | `/api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}` | Hapus pasangan |
+
+Body `POST` tambah pasangan (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama` | string, required | Nama pasangan |
+| `status_perkawinan` | string, required | Status perkawinan |
+| `tgl_perkawinan` | date, nullable | Tanggal perkawinan |
+| `pekerjaan` | string, nullable | Pekerjaan pasangan |
+| `buku_nikah_file` | file, nullable | Buku nikah (pdf/jpg/png, max 5 MB) |
+
+---
+
+##### Anak
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/keluarga/anak` | List semua anak |
+| `POST` | `/api/hrd/pegawai/{id}/keluarga/anak` | Tambah anak |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}` | Update data anak |
+| `DELETE` | `/api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}` | Hapus anak |
+
+Body `POST` tambah anak (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama` | string, required | Nama anak |
+| `tanggal_lahir` | date, nullable | Tanggal lahir |
+| `jenis_kelamin` | string, nullable | `L` atau `P` |
+| `akta_kelahiran_file` | file, nullable | Akta kelahiran (pdf/jpg/png, max 5 MB) |
+
+---
+
+##### Orang Tua
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/keluarga/orang-tua` | List orang tua |
+| `POST` | `/api/hrd/pegawai/{id}/keluarga/orang-tua` | Tambah orang tua |
+| `PATCH` | `/api/hrd/pegawai/{id}/keluarga/orang-tua/{keluargaId}` | Update orang tua |
+| `DELETE` | `/api/hrd/pegawai/{id}/keluarga/orang-tua/{keluargaId}` | Hapus orang tua |
+
+Body `POST` tambah orang tua (`application/json`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama` | string, required | Nama orang tua |
+| `hubungan` | string, required | `ayah` atau `ibu` |
+| `tanggal_lahir` | date, nullable | Tanggal lahir |
+| `pekerjaan` | string, nullable | Pekerjaan |
+
+---
+
+##### Kontak Darurat
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/keluarga/kontak-darurat` | List kontak darurat |
+| `POST` | `/api/hrd/pegawai/{id}/keluarga/kontak-darurat` | Tambah kontak darurat |
+| `PATCH` | `/api/hrd/pegawai/{id}/keluarga/kontak-darurat/{keluargaId}` | Update kontak darurat |
+| `DELETE` | `/api/hrd/pegawai/{id}/keluarga/kontak-darurat/{keluargaId}` | Hapus kontak darurat |
+
+Body `POST` tambah kontak darurat (`application/json`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama` | string, required | Nama kontak |
+| `hubungan` | string, required | Hubungan dengan pegawai |
+| `no_telp` | string, required | Nomor telepon |
+
+---
+
+##### Tanggungan Lain
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/keluarga/tanggungan-lain` | List tanggungan lain |
+| `POST` | `/api/hrd/pegawai/{id}/keluarga/tanggungan-lain` | Tambah tanggungan lain |
+| `PATCH` | `/api/hrd/pegawai/{id}/keluarga/tanggungan-lain/{keluargaId}` | Update tanggungan lain |
+| `DELETE` | `/api/hrd/pegawai/{id}/keluarga/tanggungan-lain/{keluargaId}` | Hapus tanggungan lain |
+
+Body `POST` tambah tanggungan lain (`application/json`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama` | string, required, max:255 | Nama tanggungan |
+| `hubungan_keluarga` | string, required, max:100 | Hubungan keluarga |
+| `status_tanggungan` | boolean, nullable | Status tanggungan |
+
+---
+
+#### 21.4 Riwayat Karir Pegawai (HRD)
+
+Semua endpoint riwayat karir berada di bawah prefix `/api/hrd/pegawai/{id}/riwayat-karir/`. Parameter `{riwayatId}` adalah `id` record riwayat yang ingin diubah atau dihapus.
+
+---
+
+##### Jabatan
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/riwayat-karir/jabatan` | List riwayat jabatan |
+| `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/jabatan` | Tambah riwayat jabatan |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}` | Update riwayat jabatan |
+| `DELETE` | `/api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}` | Hapus riwayat jabatan |
+
+Body `POST` tambah jabatan (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama_jabatan` | string, required | Nama jabatan |
+| `unit_kerja_id` | integer, nullable | FK ke unit_kerja |
+| `tmt_mulai` | date, nullable | TMT mulai jabatan |
+| `tmt_selesai` | date, nullable | TMT selesai jabatan |
+| `is_current` | boolean, required | Jabatan aktif saat ini |
+| `note` | string, nullable | Catatan |
+| `sk_jabatan` | file, nullable | SK jabatan (pdf/jpg/png, max 5 MB) |
+
+Response `200 OK` (list):
+```json
+{
+  "success": true,
+  "message": "Data riwayat jabatan berhasil diambil.",
+  "data": {
+    "label": "Riwayat jabatan",
+    "total": 1,
+    "items": [
+      {
+        "id": 1,
+        "unit_kerja_id": 2,
+        "unit_kerja_nama": "Instalasi Rawat Inap",
+        "nama_jabatan": "Perawat Terampil",
+        "is_current": true,
+        "tmt_mulai": "2020-01-01",
+        "tmt_selesai": null,
+        "link_sk": "/dokumen/jabatan/sk-jabatan-1-1715778987.pdf",
+        "note": ""
+      }
+    ]
+  }
+}
+```
+
+---
+
+##### STR
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/riwayat-karir/str` | List riwayat STR |
+| `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/str` | Tambah riwayat STR |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}` | Update riwayat STR |
+| `DELETE` | `/api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}` | Hapus riwayat STR |
+
+Body `POST` tambah STR (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nomor_str` | string, required | Nomor STR |
+| `tanggal_terbit` | date, required | Tanggal terbit STR |
+| `tanggal_kadaluarsa` | date, nullable | Tanggal kadaluarsa |
+| `is_current` | boolean, required | STR aktif |
+| `sk_str` | file, nullable | File STR (pdf/jpg/png, max 5 MB) |
+
+---
+
+##### SIP
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/riwayat-karir/sip` | List riwayat SIP |
+| `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/sip` | Tambah riwayat SIP |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}` | Update riwayat SIP |
+| `DELETE` | `/api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}` | Hapus riwayat SIP |
+
+Body `POST` tambah SIP (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `jenis_sip_id` | integer, nullable | FK ke jenis_sip |
+| `nomor_sip` | string, required | Nomor SIP |
+| `tanggal_terbit` | date, required | Tanggal terbit SIP |
+| `tanggal_kadaluarsa` | date, nullable | Tanggal kadaluarsa |
+| `is_current` | boolean, required | SIP aktif |
+| `sk_sip` | file, nullable | File SIP (pdf/jpg/png, max 5 MB) |
+
+---
+
+##### Penugasan Klinis
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis` | List penugasan klinis |
+| `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis` | Tambah penugasan klinis |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}` | Update penugasan klinis |
+| `DELETE` | `/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}` | Hapus penugasan klinis |
+
+Body `POST` tambah penugasan klinis (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nomor_surat` | string, required | Nomor surat penugasan |
+| `tgl_mulai` | date, required | Tanggal mulai |
+| `tgl_kadaluarsa` | date, nullable | Tanggal kadaluarsa |
+| `is_current` | boolean, required | Penugasan aktif |
+| `dokumen_file` | file, nullable | Dokumen penugasan (pdf/jpg/png, max 5 MB) |
+
+---
+
+##### Pangkat
+
+| Method | URL | Fungsi |
+|--------|-----|--------|
+| `GET` | `/api/hrd/pegawai/{id}/riwayat-karir/pangkat` | List riwayat pangkat |
+| `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/pangkat` | Tambah riwayat pangkat |
+| `PATCH` / `POST` | `/api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}` | Update riwayat pangkat |
+| `DELETE` | `/api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}` | Hapus riwayat pangkat |
+
+Body `POST` tambah pangkat (`multipart/form-data`):
+
+| Field | Type | Deskripsi |
+|-------|------|-----------|
+| `nama_pangkat` | string, required | Nama pangkat |
+| `pejabat_penetap` | string, nullable | Pejabat yang menetapkan |
+| `tmt_sk` | date, nullable | TMT SK pangkat |
+| `is_current` | boolean, required | Pangkat aktif |
+| `started_at` | date, nullable | Tanggal mulai berlaku |
+| `ended_at` | date, nullable | Tanggal selesai berlaku |
+| `note` | string, nullable | Catatan |
+| `sk_pangkat` | file, nullable | SK pangkat (pdf/jpg/png, max 5 MB) |
+
+---
+
 ## Ringkasan Endpoint Per Role
 
 Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint butuh header `Authorization: Bearer <jwt_token>`.
@@ -3975,6 +4449,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 - **Riwayat STR:** `GET|POST /api/riwayat-karir/str`, `PATCH|POST|DELETE /api/riwayat-karir/str/{id}`
 - **Riwayat Penugasan Klinis:** `GET|POST /api/riwayat-karir/penugasan-klinis`, `PATCH|POST|DELETE /api/riwayat-karir/penugasan-klinis/{id}`
 - **Keluarga:** CRUD Pasangan, Anak, Orang Tua, Kontak Darurat
+- **HRD Manajemen Data Pegawai:** `PATCH /api/hrd/pegawai/{id}/inti`, `PATCH|POST /api/hrd/pegawai/{id}/pribadi`, CRUD Keluarga (pasangan, anak, orang tua, kontak darurat, tanggungan lain), CRUD Riwayat Karir (jabatan, STR, SIP, penugasan klinis, pangkat) via `/api/hrd/pegawai/{id}/keluarga/*` dan `/api/hrd/pegawai/{id}/riwayat-karir/*`
 
 ### Direktur
 
@@ -4340,7 +4815,7 @@ Langkah pakai di Postman:
 
 ## Daftar Request di Collection
 
-Collection Postman berisi 119 request utama yang sudah disesuaikan dengan 119 route aktif dari `php artisan route:list --path=api`, ditambah 41 request skenario testing end-to-end.
+Collection Postman berisi 174 request utama yang sudah disesuaikan dengan 174 route aktif dari `php artisan route:list --path=api`, ditambah 41 request skenario testing end-to-end.
 
 Folder yang tersedia:
 
@@ -4371,3 +4846,8 @@ Folder yang tersedia:
   - Keluarga anak.
   - Pegawai admin management.
   - Notifikasi.
+11. `11. HRD Manajemen Pegawai`
+  - Update data inti pegawai (`PATCH /api/hrd/pegawai/{id}/inti`).
+  - Update data pribadi pegawai (`PATCH|POST /api/hrd/pegawai/{id}/pribadi`).
+  - CRUD keluarga: pasangan, anak, orang tua, kontak darurat, tanggungan lain.
+  - CRUD riwayat karir: jabatan, STR, SIP, penugasan klinis, pangkat.

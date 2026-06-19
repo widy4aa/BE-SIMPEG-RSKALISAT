@@ -109,6 +109,31 @@ class PegawaiDiklatRepository
         return $this->paginate(collect($rows)->map(fn ($row) => $this->mapDiklatRow($row)), (int) ($totalRow->total ?? 0), $perPage, $page);
     }
 
+    public function getMasterDiklatStats(array $filters = []): array
+    {
+        [$whereSql, $bindings] = $this->buildDiklatFilterSql($filters, 'd');
+        $today = Carbon::today()->toDateString();
+
+        $row = DB::selectOne("
+            SELECT
+                COUNT(*) AS total,
+                SUM(CASE WHEN DATE(d.tanggal_selesai) < ? THEN 1 ELSE 0 END) AS selesai,
+                SUM(CASE WHEN DATE(d.tanggal_mulai) <= ? AND DATE(d.tanggal_selesai) >= ? THEN 1 ELSE 0 END) AS berlangsung,
+                SUM(CASE WHEN DATE(d.tanggal_mulai) > ? THEN 1 ELSE 0 END) AS mendatang
+            FROM diklat d
+            LEFT JOIN kategori_diklat kd ON kd.id = d.kategori_diklat_id
+            LEFT JOIN jenis_diklat jd ON jd.id = d.jenis_diklat_id
+            WHERE {$whereSql}
+        ", [$today, $today, $today, $today, ...$bindings]);
+
+        return [
+            'total' => (int) ($row->total ?? 0),
+            'selesai' => (int) ($row->selesai ?? 0),
+            'berlangsung' => (int) ($row->berlangsung ?? 0),
+            'mendatang' => (int) ($row->mendatang ?? 0),
+        ];
+    }
+
     public function firstOrCreateKategoriByNama(string $nama): object
     {
         return $this->firstOrCreateMasterRow('kategori_diklat', trim($nama));

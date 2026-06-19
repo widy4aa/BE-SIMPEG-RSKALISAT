@@ -101,16 +101,12 @@ class AdminPegawaiService
             ],
             'pribadi' => [
                 'jenis_kelamin' => $pribadi?->jenis_kelamin,
-                'tempat_lahir' => $pribadi?->tempat_lahir,
                 'tanggal_lahir' => $pribadi?->tanggal_lahir?->format('Y-m-d'),
                 'agama' => $pribadi?->agama,
                 'status_perkawinan' => $pribadi?->status_perkawinan,
                 'alamat' => $pribadi?->alamat,
                 'no_hp' => $pribadi?->no_hp ?? $pribadi?->no_telp,
                 'no_telp' => $pribadi?->no_telp,
-                'npwp' => $pribadi?->npwp,
-                'bpjs_kesehatan' => $pribadi?->bpjs_kesehatan,
-                'bpjs_ketenagakerjaan' => $pribadi?->bpjs_ketenagakerjaan,
             ],
             'keluarga' => [
                 'pasangan' => $pegawai->pasangan?->map(fn($p) => [

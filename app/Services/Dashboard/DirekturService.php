@@ -2,11 +2,11 @@
 
 namespace App\Services\Dashboard;
 
-use App\Repositories\Dashboard\HrdDashboardRepository;
+use App\Repositories\Dashboard\DirekturDashboardRepository;
 
 class DirekturService
 {
-    public function __construct(private readonly HrdDashboardRepository $repository)
+    public function __construct(private readonly DirekturDashboardRepository $repository)
     {
     }
 
