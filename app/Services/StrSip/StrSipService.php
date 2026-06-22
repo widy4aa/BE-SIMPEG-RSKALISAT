@@ -4,6 +4,7 @@ namespace App\Services\StrSip;
 
 use App\Repositories\StrSip\StrSipRepository;
 use Carbon\Carbon;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class StrSipService
 {
@@ -18,9 +19,21 @@ class StrSipService
         $items = $this->buildItems();
         $summary = $this->buildSummary($items);
 
+        $perPage = (int) request()->get('per_page', 15);
+        $page = (int) request()->get('page', 1);
+        $offset = ($page - 1) * $perPage;
+
+        $paginatedItems = new LengthAwarePaginator(
+            array_values(array_slice($items, $offset, $perPage, true)),
+            count($items),
+            $perPage,
+            $page,
+            ['path' => request()->url(), 'query' => request()->query()]
+        );
+
         return [
             'summary' => $summary,
-            'items' => $items,
+            'items' => $paginatedItems,
         ];
     }
 
