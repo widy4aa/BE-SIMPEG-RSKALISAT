@@ -89,7 +89,7 @@ class StrSipService
                 continue;
             }
 
-            if ($item['status'] === 'Hampir Habis') {
+            if (str_starts_with($item['status'], 'Hampir Habis')) {
                 $hampirHabis++;
                 continue;
             }
@@ -117,10 +117,10 @@ class StrSipService
             return 'Tidak Aktif';
         }
 
-        $sisaHari = $today->diffInDays($tanggalHabis, false);
+        $sisaHari = (int) $today->diffInDays($tanggalHabis, false);
 
         if ($sisaHari <= self::HAMPIR_HABIS_DAYS) {
-            return 'Hampir Habis';
+            return "Hampir Habis ($sisaHari Hari)";
         }
 
         return 'Aktif';
