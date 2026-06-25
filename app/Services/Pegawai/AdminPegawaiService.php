@@ -107,6 +107,8 @@ class AdminPegawaiService
                 'alamat' => $pribadi?->alamat,
                 'no_hp' => $pribadi?->no_hp ?? $pribadi?->no_telp,
                 'no_telp' => $pribadi?->no_telp,
+                'ktp_file_path' => $pribadi?->ktp_file_path,
+                'kk_file_path' => $pribadi?->kk_file_path,
             ],
             'keluarga' => [
                 'pasangan' => $pegawai->pasangan?->map(fn($p) => [
@@ -142,6 +144,15 @@ class AdminPegawaiService
                 ]) ?? [],
             ],
             'riwayat_karir' => [
+                'pendidikan' => $pegawai->pendidikan?->map(fn($pd) => [
+                    'id' => $pd->id,
+                    'jenjang' => $pd->jenjang,
+                    'institusi' => $pd->institusi,
+                    'jurusan' => $pd->jurusan,
+                    'tahun_lulus' => $pd->tahun_lulus,
+                    'nomor_ijazah' => $pd->nomor_ijazah,
+                    'ijazah_file_path' => $pd->ijazah_file_path,
+                ]) ?? [],
                 'jabatan' => $pegawai->jabatanPegawai?->map(fn($jp) => [
                     'id' => $jp->id,
                     'jabatan' => $jp->jabatan?->nama,

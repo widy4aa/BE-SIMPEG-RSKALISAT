@@ -49,6 +49,9 @@ Route::middleware([
     // Generate CV
     Route::get('/generate/cv', [CvController::class, 'generate']);
 
+    // Me - ringkasan identitas user login
+    Route::get('/me', [ProfileController::class, 'me']);
+
     // Profile
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::patch('/profile', [ProfileController::class, 'update']);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Services\StrSip\StrSipService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class StrSipController extends Controller
 {
@@ -12,9 +13,9 @@ class StrSipController extends Controller
     {
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $payload = $this->strSipService->getSummary();
+        $payload = $this->strSipService->getSummary($request->query());
 
         return response()->json([
             'success' => true,

@@ -18,6 +18,28 @@ class ProfileController extends Controller
     {
     }
 
+    public function me(Request $request): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        $data = $this->profileService->getMe($role, $userId);
+
+        if ($data === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Data pegawai tidak ditemukan.',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'OK',
+            'data' => $data,
+        ]);
+    }
+
     public function show(Request $request): JsonResponse
     {
         $claims = $request->input('_jwt_claims', []);

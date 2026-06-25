@@ -14,13 +14,13 @@ class StrSipService
     {
     }
 
-    public function getSummary(): array
+    public function getSummary(array $filters = []): array
     {
-        $items = $this->buildItems();
+        $items = $this->buildItems($filters);
         $summary = $this->buildSummary($items);
 
-        $perPage = (int) request()->get('per_page', 15);
-        $page = (int) request()->get('page', 1);
+        $perPage = max(1, min((int) ($filters['per_page'] ?? 15), 100));
+        $page = max(1, (int) ($filters['page'] ?? 1));
         $offset = ($page - 1) * $perPage;
 
         $paginatedItems = new LengthAwarePaginator(
@@ -37,54 +37,61 @@ class StrSipService
         ];
     }
 
-    private function buildItems(): array
+    private function buildItems(array $filters = []): array
     {
+        $tipe = strtoupper(trim((string) ($filters['tipe'] ?? '')));
         $items = [];
 
-        foreach ($this->repository->getAllStr() as $str) {
-            $tanggalHabis = $str->tanggal_kadaluarsa;
+        $repoFilters = array_intersect_key($filters, array_flip([
+            'search', 'status', 'tanggal_dari', 'tanggal_sampai', 'jenis_sip',
+        ]));
 
-            $items[] = [
-                'id' => (int) $str->id,
-                'pegawai_id' => (int) $str->pegawai_id,
-                'nama' => (string) ($str->pegawai?->nama ?? ''),
-                'nip' => (string) ($str->pegawai?->nip ?? ''),
-                'profesi' => (string) ($str->pegawai?->profesi?->nama ?? ''),
-                'str_sip' => 'STR',
-                'jenis' => null,
-                'nomor' => $str->nomor_str,
-                'link_pdf' => $this->resolveDokumenUrl($str->sk_file_path),
-                'tanggal_terbit' => $str->tanggal_terbit?->toDateString(),
-                'tanggal_selesai' => $tanggalHabis?->toDateString(),
-                'status' => $this->resolveStatus($tanggalHabis),
-                'is_current' => (bool) $str->is_current,
-            ];
+        if ($tipe !== 'SIP') {
+            foreach ($this->repository->getAllStr($repoFilters) as $str) {
+                $tanggalHabis = $str->tanggal_kadaluarsa;
+
+                $items[] = [
+                    'id' => (int) $str->id,
+                    'pegawai_id' => (int) $str->pegawai_id,
+                    'nama' => (string) ($str->pegawai?->nama ?? ''),
+                    'nip' => (string) ($str->pegawai?->nip ?? ''),
+                    'profesi' => (string) ($str->pegawai?->profesi?->nama ?? ''),
+                    'str_sip' => 'STR',
+                    'jenis' => null,
+                    'nomor' => $str->nomor_str,
+                    'link_pdf' => $this->resolveDokumenUrl($str->sk_file_path),
+                    'tanggal_terbit' => $str->tanggal_terbit?->toDateString(),
+                    'tanggal_selesai' => $tanggalHabis?->toDateString(),
+                    'status' => $this->resolveStatus($tanggalHabis),
+                    'is_current' => (bool) $str->is_current,
+                ];
+            }
         }
 
-        foreach ($this->repository->getAllSip() as $sip) {
-            $tanggalHabis = $sip->tanggal_kadaluarsa;
+        if ($tipe !== 'STR') {
+            foreach ($this->repository->getAllSip($repoFilters) as $sip) {
+                $tanggalHabis = $sip->tanggal_kadaluarsa;
 
-            $items[] = [
-                'id' => (int) $sip->id,
-                'pegawai_id' => (int) $sip->pegawai_id,
-                'nama' => (string) ($sip->pegawai?->nama ?? ''),
-                'nip' => (string) ($sip->pegawai?->nip ?? ''),
-                'profesi' => (string) ($sip->pegawai?->profesi?->nama ?? ''),
-                'str_sip' => 'SIP',
-                'jenis' => $sip->jenisSip?->nama,
-                'nomor' => $sip->nomor_sip,
-                'link_pdf' => $this->resolveDokumenUrl($sip->sk_file_path),
-                'tanggal_terbit' => $sip->tanggal_terbit?->toDateString(),
-                'tanggal_selesai' => $tanggalHabis?->toDateString(),
-                'status' => $this->resolveStatus($tanggalHabis),
-                'is_current' => (bool) $sip->is_current,
-            ];
+                $items[] = [
+                    'id' => (int) $sip->id,
+                    'pegawai_id' => (int) $sip->pegawai_id,
+                    'nama' => (string) ($sip->pegawai?->nama ?? ''),
+                    'nip' => (string) ($sip->pegawai?->nip ?? ''),
+                    'profesi' => (string) ($sip->pegawai?->profesi?->nama ?? ''),
+                    'str_sip' => 'SIP',
+                    'jenis' => $sip->jenisSip?->nama,
+                    'nomor' => $sip->nomor_sip,
+                    'link_pdf' => $this->resolveDokumenUrl($sip->sk_file_path),
+                    'tanggal_terbit' => $sip->tanggal_terbit?->toDateString(),
+                    'tanggal_selesai' => $tanggalHabis?->toDateString(),
+                    'status' => $this->resolveStatus($tanggalHabis),
+                    'is_current' => (bool) $sip->is_current,
+                ];
+            }
         }
 
         return collect($items)
-            ->sortBy(function (array $item) {
-                return $item['tanggal_selesai'] ?? '9999-12-31';
-            })
+            ->sortBy(fn (array $item) => $item['tanggal_selesai'] ?? '9999-12-31')
             ->values()
             ->all();
     }

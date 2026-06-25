@@ -33,6 +33,49 @@ class ProfileService
         };
     }
 
+    public function getMe(string $role, int $userId): ?array
+    {
+        $user = $this->pegawaiProfileRepository->findUserWithPegawaiPribadiById($userId);
+
+        if ($user === null || $user->pegawai === null) {
+            return null;
+        }
+
+        $pegawai = $user->pegawai;
+        $fotoPath = (string) ($pegawai->pribadi?->foto_path ?? '');
+
+        return [
+            'nama' => $this->stringOrNull($pegawai->nama),
+            'nik' => $this->stringOrNull($pegawai->nik),
+            'foto_profil' => $this->buildPhotoUrl($fotoPath),
+            'role' => $role,
+        ];
+    }
+
+    private function buildPhotoUrl(string $path): ?string
+    {
+        if ($path === '') {
+            return null;
+        }
+
+        if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) {
+            return $path;
+        }
+
+        return '/'.$path;
+    }
+
+    private function stringOrNull(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
+    }
+
     /**
      * Simpan pengajuan perubahan data (header + detail) tanpa langsung mengubah tabel master.
      *

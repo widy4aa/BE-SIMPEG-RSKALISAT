@@ -21,7 +21,8 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
 1. [Logout](#1-logout)
 2. [Ganti Password (Saat Login)](#2-ganti-password-saat-login)
 3. [Cek Role Login](#3-cek-role-login)
-2. [Dashboard](#4-dashboard)
+4. [Me — Identitas Login](#4-me--identitas-login)
+5. [Dashboard](#5-dashboard)
   - [Response Dashboard Untuk Role Pegawai](#response-dashboard-untuk-role-pegawai)
   - [Response Dashboard Untuk Role Admin](#response-dashboard-untuk-role-admin)
   - [Response Dashboard Untuk Role HRD](#response-dashboard-untuk-role-hrd)
@@ -178,7 +179,7 @@ Catatan umum syarat akses:
 
 - Endpoint public tanpa token: `GET /api/health`, `POST /api/login`
 - Endpoint dengan token saja: `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`, semua `GET /api/form/*`
-- Endpoint semua role (`admin`, `pegawai`, `hrd`, `direktur`): `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/generate/cv`, `GET/PATCH /api/profile`, upload file profile/KTP/KK, semua CRUD keluarga, semua CRUD riwayat karir
+- Endpoint semua role (`admin`, `pegawai`, `hrd`, `direktur`): `GET /api/me`, `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/generate/cv`, `GET/PATCH /api/profile`, upload file profile/KTP/KK, semua CRUD keluarga, semua CRUD riwayat karir
 - Endpoint `admin`, `hrd`, `direktur`: `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `POST /api/pesan/pegawai/{id}`
 - Endpoint `pegawai`, `hrd`, `direktur`: `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
 - Endpoint `hrd`, `direktur`: `GET /api/diklat/all`
@@ -503,7 +504,51 @@ Contoh response `403 Forbidden` (role tidak diizinkan):
 }
 ```
 
-### 4. Dashboard
+### 4. Me — Identitas Login
+
+- Method: `GET`
+- URL: `/api/me`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `pegawai`, `hrd`, `direktur`
+
+Mengambil ringkasan identitas user yang sedang login: nama, NIK, foto profil, dan role. Cocok digunakan untuk header/navbar aplikasi frontend.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "OK",
+  "data": {
+    "nama": "Budi Santoso",
+    "nik": "3174010101010001",
+    "foto_profil": "/dokumen/foto/profile-1-1782360593.jpg",
+    "role": "pegawai"
+  }
+}
+```
+
+Keterangan field:
+
+| Field | Tipe | Keterangan |
+|-------|------|------------|
+| `nama` | string \| null | Nama lengkap pegawai |
+| `nik` | string \| null | NIK pegawai |
+| `foto_profil` | string \| null | URL foto profil (relatif dari root), `null` jika belum diunggah |
+| `role` | string | Role aktif dari JWT: `admin`, `pegawai`, `hrd`, atau `direktur` |
+
+Contoh response `404 Not Found` (data pegawai belum tersedia):
+
+```json
+{
+  "success": false,
+  "message": "Data pegawai tidak ditemukan."
+}
+```
+
+---
+
+### 5. Dashboard
 
 - Method: `GET`
 - URL: `/api/dashboard`
@@ -3684,13 +3729,15 @@ Contoh response sukses (`200 OK`):
       "tmt_pns": "2021-01-01"
     },
     "pribadi": {
-      "jenis_kelamin": "Laki-laki",
+      "jenis_kelamin": "L",
       "tanggal_lahir": "1990-01-01",
       "agama": "Islam",
       "status_perkawinan": "Menikah",
       "alamat": "Jl. Mawar No. 1",
       "no_hp": "0812...",
-      "no_telp": null
+      "no_telp": null,
+      "ktp_file_path": "dokumen/ktp/ktp-1-1713500000.jpg",
+      "kk_file_path": "dokumen/kk/kk-1-1713500000.pdf"
     },
     "keluarga": {
       "pasangan": [],
@@ -3700,39 +3747,66 @@ Contoh response sukses (`200 OK`):
       "tanggungan_lain": []
     },
     "riwayat_karir": {
+      "pendidikan": [
+        {
+          "id": 1,
+          "jenjang": "S1/D4",
+          "institusi": "Universitas Jember",
+          "jurusan": "Kedokteran",
+          "tahun_lulus": "2015",
+          "nomor_ijazah": "IJZ/2015/001",
+          "ijazah_file_path": "dokumen/ijazah/ijazah-1-1713500000.pdf"
+        }
+      ],
       "jabatan": [
         {
           "id": 1,
-          "nama": "Dokter Umum",
+          "jabatan": "Dokter Umum",
+          "unit_kerja": "IGD",
+          "tanggal_mulai": "2020-01-01",
+          "tanggal_selesai": null,
+          "is_current": true,
           "file_path": "dokumen/sk/sk-jabatan-123.pdf"
         }
       ],
       "pangkat": [
         {
           "id": 1,
-          "nama": "Penata",
-          "golongan": "III/c",
-          "sk_file_path": "dokumen/sk-pangkat/sk-pangkat-123.pdf"
+          "pangkat": "Penata",
+          "pejabat_penetap": "Bupati Jember",
+          "tanggal_mulai": "2021-01-01",
+          "tanggal_selesai": null,
+          "is_current": true
         }
       ],
       "str": [
         {
           "id": 1,
-          "no_str": "123456789",
+          "nomor_str": "123456789",
+          "tanggal_terbit": "2023-01-01",
+          "tanggal_kadaluarsa": "2028-01-01",
+          "is_current": true,
           "file_path": "dokumen/str/str-123.pdf"
         }
       ],
       "sip": [
         {
           "id": 1,
-          "no_sip": "987654321",
+          "jenis_sip": "SIP Dokter Umum",
+          "nomor_sip": "987654321",
+          "tanggal_terbit": "2023-01-01",
+          "tanggal_kadaluarsa": "2028-01-01",
+          "is_current": true,
           "file_path": "dokumen/sip/sip-123.pdf"
         }
       ],
       "penugasan_klinis": [
         {
           "id": 1,
-          "no_surat": "PK-001",
+          "nomor_surat": "PK-001",
+          "tanggal_mulai": "2023-01-01",
+          "tanggal_kadaluarsa": "2026-01-01",
+          "is_current": true,
           "file_path": "dokumen/penugasan-klinis/pk-123.pdf"
         }
       ]
@@ -3902,13 +3976,40 @@ Digunakan oleh Admin untuk mengubah NIK-nya sendiri. NIK juga merupakan `usernam
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `admin`, `hrd`, `direktur`
 
-Mengambil daftar STR dan SIP seluruh pegawai beserta ringkasan statusnya.
+Mengambil daftar STR dan SIP seluruh pegawai beserta ringkasan statusnya. Mendukung pencarian, filter tipe, status, jenis SIP, dan rentang tanggal kadaluarsa.
+
+Query parameter opsional:
+
+| Parameter | Type | Default | Keterangan |
+|-----------|------|---------|------------|
+| `page` | Integer | `1` | Halaman yang diminta. |
+| `per_page` | Integer | `15` | Jumlah data per halaman. Nilai dibatasi maksimal 100. |
+| `search` | String | - | Cari berdasarkan nama pegawai. |
+| `tipe` | String | - | Filter tipe dokumen: `STR` atau `SIP`. Jika tidak diisi, menampilkan keduanya. |
+| `jenis_sip` | String | - | Filter berdasarkan nama jenis SIP, contoh `Dokter Umum`. Hanya berlaku jika `tipe=SIP`. |
+| `status` | String | - | Filter status: `aktif`, `hampir_habis`, atau `tidak_aktif`. |
+| `tanggal_dari` | String | - | Filter tanggal kadaluarsa mulai dari, format `Y-m-d`. |
+| `tanggal_sampai` | String | - | Filter tanggal kadaluarsa sampai dengan, format `Y-m-d`. |
+
+Contoh URL dengan filter:
+
+```http
+GET /api/str-sip?search=budi&tipe=SIP&status=hampir_habis
+GET /api/str-sip?tanggal_dari=2026-01-01&tanggal_sampai=2026-12-31&tipe=STR
+GET /api/str-sip?jenis_sip=Dokter+Umum&status=aktif
+```
 
 Aturan status:
 
-- **Aktif:** `tanggal_selesai >= today`
-- **Hampir Habis:** sisa hari `<= 30` dan `tanggal_selesai >= today`
+- **Aktif:** `tanggal_selesai > today + 30 hari`
+- **Hampir Habis:** `tanggal_selesai` antara `today` dan `today + 30 hari`
 - **Tidak Aktif:** `tanggal_selesai < today` atau `tanggal_selesai` kosong
+
+Catatan:
+
+- Field `summary` mencerminkan jumlah dari data yang sudah difilter (sesuai parameter yang dikirim).
+- Filter `status`, `tanggal_dari`, `tanggal_sampai`, dan `search` diterapkan pada level query database.
+- Field `jenis` pada item STR selalu `null`; field `jenis` pada item SIP berisi nama jenis SIP.
 
 Contoh response `200 OK`:
 

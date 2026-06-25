@@ -159,6 +159,7 @@ class AdminPegawaiRepository
         $pegawai->orangTua = $this->selectCollection('SELECT * FROM orang_tua WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
         $pegawai->kontakDarurat = $this->selectCollection('SELECT * FROM kontak_darurat WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
         $pegawai->tanggunganLain = $this->selectCollection('SELECT * FROM tanggungan_lain WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
+        $pegawai->pendidikan = $this->selectCollection('SELECT * FROM pendidikan WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
         $pegawai->str = $this->selectCollection('SELECT * FROM str WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tanggal_terbit', 'tanggal_kadaluarsa']);
         $pegawai->sip = $this->getSipByPegawaiId($pegawaiId);
         $pegawai->penugasanKlinis = $this->selectCollection('SELECT * FROM penugasan_klinis WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tgl_mulai', 'tgl_kadaluarsa']);
