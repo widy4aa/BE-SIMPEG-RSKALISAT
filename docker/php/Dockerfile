@@ -16,3 +16,6 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
 # Set working directory
 WORKDIR /var/www/html
+
+COPY docker/php/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
