@@ -10,8 +10,17 @@ services:
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+      - vendor_data:/var/www/html/vendor
+    env_file:
+      - .env
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
     networks:
       - laravel_network
+    depends_on:
+      db:
+        condition: service_healthy
 
   web:
     image: docker.io/library/nginx:alpine
@@ -21,6 +30,7 @@ services:
       - "8000:80"
     volumes:
       - ./:/var/www/html
+      - vendor_data:/var/www/html/vendor
       - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
     networks:
       - laravel_network
@@ -34,15 +44,18 @@ services:
     environment:
       MYSQL_DATABASE: ${DB_DATABASE:-db}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-root}
-      # If using a user other than root:
-      # MYSQL_USER: ${DB_USERNAME}
-      # MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
     networks:
       - laravel_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-root}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
 
   adminer:
     image: docker.io/library/adminer
@@ -53,7 +66,8 @@ services:
     networks:
       - laravel_network
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 networks:
   laravel_network:
@@ -61,3 +75,4 @@ networks:
 
 volumes:
   db_data:
+  vendor_data:

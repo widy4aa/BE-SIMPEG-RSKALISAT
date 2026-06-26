@@ -20,7 +20,9 @@ COPY --from=docker.io/library/composer:latest /usr/bin/composer /usr/bin/compose
 # Set working directory
 WORKDIR /var/www/html
 
+# Copy entrypoint
 COPY docker/php/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
+CMD ["php-fpm"]
