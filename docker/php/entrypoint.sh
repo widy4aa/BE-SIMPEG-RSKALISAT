@@ -1,6 +1,12 @@
 #!/bin/sh
-set -e
 
+# Install dependencies jika vendor belum ada
+if [ ! -f "vendor/autoload.php" ]; then
+  echo "vendor/ tidak ditemukan, menjalankan composer install..."
+  composer install --no-dev --optimize-autoloader --no-interaction
+fi
+
+# Buat direktori yang dibutuhkan
 mkdir -p \
   storage/framework/views \
   storage/framework/cache \
@@ -17,13 +23,33 @@ mkdir -p \
   public/dokumen/jabatan \
   public/dokumen/pangkat \
   public/dokumen/pasangan \
-  public/dokumen/anak
+  public/dokumen/anak || true
 
-chown -R www-data:www-data storage bootstrap/cache public/dokumen
-chmod -R 775 storage bootstrap/cache public/dokumen
+# Fix ownership dan permission
+chown -R www-data:www-data storage bootstrap/cache public/dokumen 2>/dev/null || true
+chmod -R 775 storage bootstrap/cache public/dokumen 2>/dev/null || true
 
-php artisan view:clear
-php artisan cache:clear
-php artisan config:clear
+# Tunggu MySQL siap
+echo "Menunggu database siap..."
+until php -r "
+  \$host = getenv('DB_HOST') ?: 'db';
+  \$port = getenv('DB_PORT') ?: 3306;
+  \$conn = @fsockopen(\$host, \$port, \$e, \$s, 3);
+  if (\$conn) { fclose(\$conn); exit(0); }
+  exit(1);
+" 2>/dev/null; do
+  echo "Database belum siap, coba lagi dalam 3 detik..."
+  sleep 3
+done
+echo "Database siap!"
 
+# Migrate dulu sebelum clear cache (karena CACHE_STORE=database)
+php artisan migrate --force || true
+
+# Baru clear cache (tabel sudah ada setelah migrate)
+php artisan view:clear || true
+php artisan cache:clear || true
+php artisan config:clear || true
+
+# Jalankan PHP-FPM
 exec php-fpm

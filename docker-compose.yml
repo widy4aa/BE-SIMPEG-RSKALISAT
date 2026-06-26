@@ -11,9 +11,7 @@ services:
     volumes:
       - ./:/var/www/html
     networks:
-      laravel_network:
-        ipv4_address: 10.150.0.5
-    command: ["/entrypoint.sh"]
+      - laravel_network
 
   web:
     image: docker.io/library/nginx:alpine
@@ -60,9 +58,6 @@ services:
 networks:
   laravel_network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 10.150.0.0/24
 
 volumes:
   db_data:
