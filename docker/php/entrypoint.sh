@@ -3,7 +3,7 @@
 # Install dependencies jika vendor belum ada
 if [ ! -f "vendor/autoload.php" ]; then
   echo "vendor/ tidak ditemukan, menjalankan composer install..."
-  composer install --no-dev --optimize-autoloader --no-interaction
+  composer install --optimize-autoloader --no-interaction
 fi
 
 # Buat direktori yang dibutuhkan
