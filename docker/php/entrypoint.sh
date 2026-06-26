@@ -5,10 +5,10 @@ echo "=== Laravel Docker Entrypoint ==="
 
 # [1/6] Install dependencies jika vendor belum ada
 if [ ! -f "vendor/autoload.php" ]; then
-  echo "[1/6] vendor/autoload.php tidak ditemukan, menjalankan composer install..."
-  composer install --optimize-autoloader --no-interaction --no-dev
+  echo "[1/6] vendor/autoload.php tidak ditemukan, menjalankan composer update..."
+  composer update --optimize-autoloader --no-interaction --no-dev
   if [ $? -ne 0 ]; then
-    echo "ERROR: Composer install GAGAL! Periksa koneksi internet atau composer.lock."
+    echo "ERROR: Composer update GAGAL! Periksa koneksi internet atau composer.json."
     exit 1
   fi
 else
