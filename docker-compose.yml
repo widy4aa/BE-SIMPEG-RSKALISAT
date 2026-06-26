@@ -7,10 +7,12 @@ services:
       dockerfile: docker/php/Dockerfile
     container_name: laravel_app
     restart: unless-stopped
+    tty: true          # fix: agar bisa exec bash / shell interaktif
+    stdin_open: true   # fix: agar bisa exec bash / shell interaktif
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
-      - vendor_data:/var/www/html/vendor
+      - vendor_data:/var/www/html/vendor  # vendor dari build image, persist di named volume
     env_file:
       - .env
     environment:
