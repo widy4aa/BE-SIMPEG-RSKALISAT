@@ -11,7 +11,8 @@ services:
     volumes:
       - ./:/var/www/html
     networks:
-      - laravel_network
+      laravel_network:
+        ipv4_address: 10.150.0.5
     command: ["/entrypoint.sh"]
 
   web:
@@ -59,6 +60,9 @@ services:
 networks:
   laravel_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 10.150.0.0/24
 
 volumes:
   db_data:
