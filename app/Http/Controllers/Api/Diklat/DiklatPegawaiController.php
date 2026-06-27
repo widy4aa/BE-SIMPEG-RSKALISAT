@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StorePegawaiDiklatRequest;
 use App\Http\Requests\Diklat\UpdatePegawaiDiklatRequest;
 use App\Services\Diklat\PegawaiDiklatLaporanService;
-use App\Services\Diklat\PegawaiService;
+use App\Services\Diklat\PegawaiDiklatMutationService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -14,7 +14,7 @@ use InvalidArgumentException;
 class DiklatPegawaiController extends Controller
 {
     public function __construct(
-        private readonly PegawaiService $pegawaiService,
+        private readonly PegawaiDiklatMutationService $mutationService,
         private readonly PegawaiDiklatLaporanService $laporanService,
     ) {}
 
@@ -27,7 +27,7 @@ class DiklatPegawaiController extends Controller
         $sertifFile = $request->file('upload_sertif');
 
         try {
-            $result = $this->pegawaiService->create($userId, $payload, $sertifFile);
+            $result = $this->mutationService->create($userId, $payload, $sertifFile);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -51,7 +51,7 @@ class DiklatPegawaiController extends Controller
         $sertifFile = $request->file('upload_sertif');
 
         try {
-            $result = $this->pegawaiService->update($id, $userId, $payload, $sertifFile);
+            $result = $this->mutationService->update($id, $userId, $payload, $sertifFile);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -72,7 +72,7 @@ class DiklatPegawaiController extends Controller
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
         try {
-            $result = $this->pegawaiService->delete($id, $userId);
+            $result = $this->mutationService->delete($id, $userId);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
