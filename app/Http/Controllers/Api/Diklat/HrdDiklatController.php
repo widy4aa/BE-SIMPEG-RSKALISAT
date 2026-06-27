@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Diklat;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StoreHrdDiklatRequest;
 use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
+use App\Services\Diklat\HrdDiklatMasterService;
 use App\Services\Diklat\HrdDiklatStatusService;
 use App\Services\Diklat\HrdService;
 use Illuminate\Http\JsonResponse;
@@ -15,6 +16,7 @@ class HrdDiklatController extends Controller
 {
     public function __construct(
         private readonly HrdService $hrdService,
+        private readonly HrdDiklatMasterService $masterService,
         private readonly HrdDiklatStatusService $statusService,
     ) {}
 
@@ -26,7 +28,7 @@ class HrdDiklatController extends Controller
         $payload = $request->validated();
 
         try {
-            $result = $this->hrdService->createMasterDiklat($userId, $payload);
+            $result = $this->masterService->createMasterDiklat($userId, $payload);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -49,7 +51,7 @@ class HrdDiklatController extends Controller
         $payload = $request->validated();
 
         try {
-            $result = $this->hrdService->updateMasterDiklat($id, $userId, $payload);
+            $result = $this->masterService->updateMasterDiklat($id, $userId, $payload);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
