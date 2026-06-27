@@ -22,10 +22,6 @@ class PegawaiFlowTest extends TestCase
             'password' => 'password'
         ]);
 
-        if ($adminLogin->status() !== 200) {
-            dump($adminLogin->json());
-        }
-
         $adminLogin->assertStatus(200);
         $adminToken = $adminLogin->json('data.token') ?? $adminLogin->json('token');
         if (!$adminToken) {
@@ -43,10 +39,6 @@ class PegawaiFlowTest extends TestCase
         ], [
             'Authorization' => "Bearer $adminToken"
         ]);
-        if ($createResponse->status() !== 201) {
-            dump($createResponse->json());
-        }
-
         $createResponse->assertStatus(201);
         $this->assertEquals($newNik, $createResponse->json('data.nik'));
 

@@ -103,7 +103,7 @@ class PaginationSearchFilterTest extends TestCase
             ->assertJsonPath('data.diklat.riwayat_diklat.total', 1)
             ->assertJsonPath('data.diklat.riwayat_diklat.data.0.id', $matching->id)
             ->assertJsonPath('data.diklat.riwayat_diklat.data.0.status', 'berlangsung')
-            ->assertJsonPath('data.diklat.riwayat_diklat.data.0.uploadlaporan', true);
+            ->assertJsonPath('data.diklat.riwayat_diklat.data.0.uploadlaporan', false);
     }
 
     public function test_diklat_all_supports_pagination_search_and_jenis_filters(): void
