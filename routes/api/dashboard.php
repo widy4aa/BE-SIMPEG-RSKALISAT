@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\Dashboard\DashboardController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;

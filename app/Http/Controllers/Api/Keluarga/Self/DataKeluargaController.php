@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Keluarga\Self;
 
 use App\Http\Controllers\Controller;
-use App\Services\DataKeluarga\DataKeluargaService;
+use App\Services\Keluarga\Self\DataKeluargaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 

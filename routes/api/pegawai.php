@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\Api\ChangeRequestAdminController;
-use App\Http\Controllers\Api\MessageController;
+use App\Http\Controllers\Api\ChangeRequest\ChangeRequestAdminController;
+use App\Http\Controllers\Api\Message\MessageController;
 use App\Http\Controllers\Api\Pegawai\Managed\PegawaiListController;
-use App\Http\Controllers\Api\SettingController;
-use App\Http\Controllers\Api\StrSipController;
+use App\Http\Controllers\Api\Setting\SettingController;
+use App\Http\Controllers\Api\StrSip\StrSipController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;

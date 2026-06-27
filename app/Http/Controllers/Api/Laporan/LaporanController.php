@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Laporan;
 
 use App\Http\Controllers\Controller;
 use App\Services\Diklat\LaporanDiklatService;

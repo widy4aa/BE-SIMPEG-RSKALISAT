@@ -14,9 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Percaya semua proxy (Cloudflare Tunnel → Nginx → PHP-FPM)
+        // Agar URL yang di-generate Laravel selalu https://
+        $middleware->trustProxies(at: '*');
+
         $middleware->alias([
             'jwt.auth' => JwtAuthMiddleware::class,
-            'role' => RoleMiddleware::class,
+            'role'     => RoleMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

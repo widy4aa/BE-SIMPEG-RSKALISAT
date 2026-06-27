@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\DataKeluargaController;
+use App\Http\Controllers\Api\Keluarga\Self\DataKeluargaController;
 use App\Http\Controllers\Api\Keluarga\Self\AnakController;
 use App\Http\Controllers\Api\Keluarga\Self\KontakDaruratController;
 use App\Http\Controllers\Api\Keluarga\Self\OrangTuaController;

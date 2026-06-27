@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\Notification\NotificationController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use Illuminate\Support\Facades\Route;
 

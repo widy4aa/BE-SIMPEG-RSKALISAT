@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\Api\MasterDataController;
+use App\Http\Controllers\Api\MasterData\MasterDataController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;

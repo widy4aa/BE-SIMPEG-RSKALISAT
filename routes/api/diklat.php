@@ -4,7 +4,7 @@ use App\Http\Controllers\Api\Diklat\Managed\DiklatController as ManagedDiklatCon
 use App\Http\Controllers\Api\Diklat\Managed\DiklatIndexController as ManagedDiklatIndexController;
 use App\Http\Controllers\Api\Diklat\Self\DiklatController as SelfDiklatController;
 use App\Http\Controllers\Api\Diklat\Self\DiklatIndexController as SelfDiklatIndexController;
-use App\Http\Controllers\Api\LaporanController;
+use App\Http\Controllers\Api\Laporan\LaporanController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;

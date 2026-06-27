@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\Api\CvController;
-use App\Http\Controllers\Api\ProfileController;
-use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\Generate\CvController;
+use App\Http\Controllers\Api\Profile\ProfileController;
+use App\Http\Controllers\Api\Role\RoleController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
