@@ -25,9 +25,16 @@ class UpdatePegawaiIntiRequest extends FormRequest
             'golongan_ruang_id' => ['sometimes', 'nullable', 'exists:golongan_ruang,id'],
             'pangkat_id'        => ['sometimes', 'nullable', 'exists:pangkat,id'],
             'status_pegawai'    => ['sometimes', 'string', 'in:aktif,nonaktif,cuti'],
-            'tgl_masuk'         => ['sometimes', 'nullable', 'date'],
+            'tgl_masuk'         => ['sometimes', 'nullable', 'date', 'before_or_equal:today'],
             'tmt_cpns'          => ['sometimes', 'nullable', 'date'],
             'tmt_pns'           => ['sometimes', 'nullable', 'date'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'tgl_masuk.before_or_equal' => 'tgl_masuk tidak boleh melebihi tanggal sekarang',
         ];
     }
 

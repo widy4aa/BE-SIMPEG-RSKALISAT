@@ -162,6 +162,13 @@ class ProfileService
         $this->appendDetailIfChanged($details, 'pegawai', 'nik', $pegawai->nik, $payload, 'nik');
         $this->appendDetailIfChanged($details, 'pegawai', 'nama', $pegawai->nama, $payload, 'nama');
         $this->appendDetailIfChanged($details, 'pegawai', 'status_pegawai', $pegawai->status_pegawai, $payload, 'status_pegawai');
+
+        if (array_key_exists('tgl_masuk', $payload) && $payload['tgl_masuk'] !== null && $payload['tgl_masuk'] !== '') {
+            if (\Carbon\Carbon::parse((string) $payload['tgl_masuk'])->startOfDay()->isAfter(\Carbon\Carbon::today())) {
+                throw new InvalidArgumentException('tgl_masuk tidak boleh melebihi tanggal sekarang');
+            }
+        }
+
         $this->appendDetailIfChangedDate($details, 'pegawai', 'tgl_masuk', $pegawai->tgl_masuk?->toDateString(), $payload, 'tgl_masuk');
         $this->appendDetailIfChangedDate($details, 'pegawai', 'tmt_cpns', $pegawai->tmt_cpns?->toDateString(), $payload, 'tmt_cpns');
         $this->appendDetailIfChangedDate($details, 'pegawai', 'tmt_pns', $pegawai->tmt_pns?->toDateString(), $payload, 'tmt_pns');

@@ -30,10 +30,17 @@ class UpdateProfileRequest extends FormRequest
             'no_kk' => ['sometimes', 'nullable', 'string', 'max:30'],
             'email' => ['sometimes', 'nullable', 'email', 'max:255'],
             'status_pegawai' => ['sometimes', 'nullable', 'string', 'max:50'],
-            'tgl_masuk' => ['sometimes', 'nullable', 'date'],
+            'tgl_masuk' => ['sometimes', 'nullable', 'date', 'before_or_equal:today'],
             'tmt_cpns' => ['sometimes', 'nullable', 'date'],
             'tmt_pns' => ['sometimes', 'nullable', 'date'],
             'note' => ['sometimes', 'nullable', 'string', 'max:1000'],
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'tgl_masuk.before_or_equal' => 'tgl_masuk tidak boleh melebihi tanggal sekarang',
         ];
     }
 

@@ -18,6 +18,12 @@ class PegawaiUpdateService
             throw new InvalidArgumentException('Data pegawai tidak ditemukan.');
         }
 
+        if (isset($data['tgl_masuk']) && $data['tgl_masuk'] !== null && $data['tgl_masuk'] !== '') {
+            if (\Carbon\Carbon::parse((string) $data['tgl_masuk'])->startOfDay()->isAfter(\Carbon\Carbon::today())) {
+                throw new InvalidArgumentException('tgl_masuk tidak boleh melebihi tanggal sekarang');
+            }
+        }
+
         $updated = $this->repository->updatePegawaiInti($pegawai, $data);
 
         return [

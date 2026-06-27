@@ -165,6 +165,12 @@ class ChangeRequestAdminService
                     continue;
                 }
 
+                if ($column === 'tgl_masuk' && $value !== null && $value !== '') {
+                    if (\Carbon\Carbon::parse((string) $value)->startOfDay()->isAfter(\Carbon\Carbon::today())) {
+                        throw new InvalidArgumentException('tgl_masuk tidak boleh melebihi tanggal sekarang');
+                    }
+                }
+
                 $pegawai->{$column} = $this->castValueForColumn($column, $value);
                 continue;
             }
