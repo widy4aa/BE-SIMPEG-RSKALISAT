@@ -9,7 +9,11 @@ use InvalidArgumentException;
 
 class PegawaiDiklatLaporanService
 {
-    public function __construct(private readonly PegawaiDiklatRepository $pegawaiDiklatRepository) {}
+    public function __construct(
+        private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
+        private readonly PegawaiDiklatFileService $fileService,
+        private readonly PegawaiDiklatResponseMapper $responseMapper,
+    ) {}
 
     public function uploadLaporan(int $diklatId, int $userId, array $payload, ?UploadedFile $laporanFile = null): array
     {
@@ -46,20 +50,7 @@ class PegawaiDiklatLaporanService
         }
 
         if ($laporanFile !== null) {
-            $folder = public_path('dokumen/sertif-diklat');
-            if (! is_dir($folder)) {
-                mkdir($folder, 0755, true);
-            }
-
-            $filename = sprintf(
-                'sertif-%d-%d.%s',
-                (int) $pegawai->id,
-                time(),
-                $laporanFile->getClientOriginalExtension()
-            );
-
-            $laporanFile->move($folder, $filename);
-            $jadwal->sertif_file_path = 'dokumen/sertif-diklat/'.$filename;
+            $jadwal->sertif_file_path = $this->fileService->storeSertifikat((int) $pegawai->id, $laporanFile);
             $jadwal->uploaded_at = now();
         }
 
@@ -71,14 +62,7 @@ class PegawaiDiklatLaporanService
 
         $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
 
-        return [
-            'id_diklat' => (int) $diklat->id,
-            'id_jadwal_diklat' => (int) $jadwal->id,
-            'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
-            'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
-            'status_validasi' => $jadwal->status_validasi,
-            'uploaded_at' => $jadwal->uploaded_at?->toDateTimeString(),
-        ];
+        return $this->responseMapper->laporanUploaded($diklat, $jadwal);
     }
 
     private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string

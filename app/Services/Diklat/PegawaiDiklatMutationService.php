@@ -10,7 +10,11 @@ use InvalidArgumentException;
 
 class PegawaiDiklatMutationService
 {
-    public function __construct(private readonly PegawaiDiklatRepository $pegawaiDiklatRepository) {}
+    public function __construct(
+        private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
+        private readonly PegawaiDiklatFileService $fileService,
+        private readonly PegawaiDiklatResponseMapper $responseMapper,
+    ) {}
 
     public function create(int $userId, array $payload, ?UploadedFile $sertifFile = null): array
     {
@@ -67,20 +71,7 @@ class PegawaiDiklatMutationService
 
         $sertifPath = null;
         if ($sertifFile !== null) {
-            $folder = public_path('dokumen/sertif-diklat');
-            if (! is_dir($folder)) {
-                mkdir($folder, 0755, true);
-            }
-
-            $filename = sprintf(
-                'sertif-%d-%d.%s',
-                (int) $pegawai->id,
-                time(),
-                $sertifFile->getClientOriginalExtension()
-            );
-
-            $sertifFile->move($folder, $filename);
-            $sertifPath = 'dokumen/sertif-diklat/'.$filename;
+            $sertifPath = $this->fileService->storeSertifikat((int) $pegawai->id, $sertifFile);
         }
 
         $statusDiklat = $this->resolveStatusDiklatByTanggal($tanggalMulai, $tanggalSelesai);
@@ -131,28 +122,13 @@ class PegawaiDiklatMutationService
             return [$diklat, $jadwal];
         });
 
-        return [
-            'id_diklat' => (int) $diklat->id,
-            'id_jadwal_diklat' => (int) $jadwal->id,
-            'nama_kegiatan' => (string) $diklat->nama_kegiatan,
-            'kategori' => (string) $kategori->nama,
-            'jenis_diklat' => (string) $jenisDiklat->nama,
-            'penyelenggara' => (string) $diklat->penyelenggara,
-            'lokasi' => (string) ($diklat->tempat ?? ''),
-            'tanggal_mulai' => optional($diklat->tanggal_mulai)?->toDateString(),
-            'tanggal_selesai' => optional($diklat->tanggal_selesai)?->toDateString(),
-            'waktu' => optional($diklat->waktu)?->format('H:i:s'),
-            'status_diklat' => (string) $jadwal->status_diklat,
-            'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
-            'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
-            'jp' => $diklat->jp,
-            'jenis_biaya' => $isInternal ? (string) ($payload['jenis_biaya'] ?? '') : null,
-            'total_biaya' => $diklat->total_biaya,
-            'catatan' => (string) ($diklat->catatan ?? ''),
-            'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
-            'status_kelayakan' => $jadwal->status_kelayakan,
-            'status_validasi' => $jadwal->status_validasi,
-        ];
+        return $this->responseMapper->mutation(
+            $diklat,
+            $jadwal,
+            $kategori,
+            $jenisDiklat,
+            $isInternal ? (string) ($payload['jenis_biaya'] ?? '') : null
+        );
     }
 
     public function update(int $diklatId, int $userId, array $payload, ?UploadedFile $sertifFile = null): array
@@ -280,20 +256,7 @@ class PegawaiDiklatMutationService
         }
 
         if ($sertifFile !== null) {
-            $folder = public_path('dokumen/sertif-diklat');
-            if (! is_dir($folder)) {
-                mkdir($folder, 0755, true);
-            }
-
-            $filename = sprintf(
-                'sertif-%d-%d.%s',
-                (int) $pegawai->id,
-                time(),
-                $sertifFile->getClientOriginalExtension()
-            );
-
-            $sertifFile->move($folder, $filename);
-            $jadwal->sertif_file_path = 'dokumen/sertif-diklat/'.$filename;
+            $jadwal->sertif_file_path = $this->fileService->storeSertifikat((int) $pegawai->id, $sertifFile);
             $jadwal->uploaded_at = now();
         }
 
@@ -309,28 +272,13 @@ class PegawaiDiklatMutationService
             $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
         });
 
-        return [
-            'id_diklat' => (int) $diklat->id,
-            'id_jadwal_diklat' => (int) $jadwal->id,
-            'nama_kegiatan' => (string) ($diklat->nama_kegiatan ?? ''),
-            'kategori' => (string) ($kategori?->nama ?? ''),
-            'jenis_diklat' => (string) ($jenisDiklat?->nama ?? ''),
-            'penyelenggara' => (string) ($diklat->penyelenggara ?? ''),
-            'lokasi' => (string) ($diklat->tempat ?? ''),
-            'tanggal_mulai' => optional($diklat->tanggal_mulai)?->toDateString(),
-            'tanggal_selesai' => optional($diklat->tanggal_selesai)?->toDateString(),
-            'waktu' => optional($diklat->waktu)?->format('H:i:s'),
-            'status_diklat' => (string) ($jadwal->status_diklat ?? ''),
-            'no_sertif' => (string) ($jadwal->no_sertif ?? ''),
-            'sertif_file_path' => (string) ($jadwal->sertif_file_path ?? ''),
-            'jp' => $diklat->jp,
-            'jenis_biaya' => (string) ($diklat->jenisBiaya?->nama ?? ''),
-            'total_biaya' => $diklat->total_biaya,
-            'catatan' => (string) ($diklat->catatan ?? ''),
-            'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
-            'status_kelayakan' => $jadwal->status_kelayakan,
-            'status_validasi' => $jadwal->status_validasi,
-        ];
+        return $this->responseMapper->mutation(
+            $diklat,
+            $jadwal,
+            $kategori,
+            $jenisDiklat,
+            (string) ($diklat->jenisBiaya?->nama ?? '')
+        );
     }
 
     public function delete(int $diklatId, int $userId): array
@@ -375,11 +323,7 @@ class PegawaiDiklatMutationService
             }
         });
 
-        return [
-            'id_diklat' => (int) $diklat->id,
-            'id_jadwal_diklat' => (int) $jadwal->id,
-            'deleted' => true,
-        ];
+        return $this->responseMapper->deleted($diklat, $jadwal);
     }
 
     private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
