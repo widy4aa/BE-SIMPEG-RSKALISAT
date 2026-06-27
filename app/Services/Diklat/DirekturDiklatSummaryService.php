@@ -4,7 +4,7 @@ namespace App\Services\Diklat;
 
 use App\Repositories\Diklat\PegawaiDiklatRepository;
 
-class DirekturService
+class DirekturDiklatSummaryService
 {
     public function __construct(
         private readonly PegawaiDiklatRepository $repository,

@@ -2,7 +2,7 @@
 
 namespace App\Services\Diklat;
 
-class AdminService
+class AdminDiklatSummaryService
 {
     public function build(int $userId): array
     {

@@ -3,20 +3,20 @@
 namespace App\Http\Controllers\Api\Diklat;
 
 use App\Http\Controllers\Controller;
-use App\Services\Diklat\AdminService;
-use App\Services\Diklat\DirekturService;
-use App\Services\Diklat\HrdService;
-use App\Services\Diklat\PegawaiService;
+use App\Services\Diklat\AdminDiklatSummaryService;
+use App\Services\Diklat\DirekturDiklatSummaryService;
+use App\Services\Diklat\HrdDiklatListService;
+use App\Services\Diklat\PegawaiDiklatListService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DiklatIndexController extends Controller
 {
     public function __construct(
-        private readonly AdminService $adminService,
-        private readonly PegawaiService $pegawaiService,
-        private readonly HrdService $hrdService,
-        private readonly DirekturService $direkturService,
+        private readonly AdminDiklatSummaryService $adminService,
+        private readonly PegawaiDiklatListService $pegawaiService,
+        private readonly HrdDiklatListService $hrdService,
+        private readonly DirekturDiklatSummaryService $direkturService,
     ) {}
 
     public function index(Request $request): JsonResponse

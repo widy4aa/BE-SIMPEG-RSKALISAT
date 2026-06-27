@@ -5,7 +5,7 @@ namespace App\Services\Diklat;
 use App\Repositories\Diklat\PegawaiDiklatRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class HrdService
+class PegawaiDiklatListService
 {
     public function __construct(
         private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
@@ -32,7 +32,7 @@ class HrdService
             $paginatedRiwayat = $this->pegawaiDiklatRepository->getPaginatedRiwayatDiklatByPegawaiId((int) $pegawai->id, $perPage, $filters);
         }
 
-        $riwayat = $paginatedRiwayat->getCollection()->map(function ($jadwal): array {
+        $mappedData = $paginatedRiwayat->getCollection()->map(function ($jadwal): array {
             $diklat = $jadwal->diklat;
             $tanggalMulai = $diklat?->tanggal_mulai;
             $tanggalSelesai = $diklat?->tanggal_selesai;
@@ -71,55 +71,21 @@ class HrdService
             ];
         });
 
-        $paginatedRiwayat->setCollection($riwayat);
+        $paginatedRiwayat->setCollection($mappedData);
 
         return [
-            'welcome' => 'Daftar diklat untuk HRD berhasil diambil.',
+            'welcome' => 'Daftar diklat pegawai berhasil diambil.',
             'summary' => [
-                'label' => 'Diklat hrd',
+                'label' => 'Diklat pegawai',
                 'ringkasan' => [
                     'total_riwayat' => $totalRiwayat,
                     'selesai' => $selesai,
                     'akan_datang' => $akanDatang,
                 ],
                 'riwayat_diklat' => $paginatedRiwayat,
+                'catatan' => 'Data diklat diambil dari database untuk role pegawai.',
             ],
         ];
-    }
-
-    public function getAllDiklat(array $filters = []): \Illuminate\Pagination\LengthAwarePaginator
-    {
-        $perPage = $this->resolvePerPage($filters['per_page'] ?? null, 7);
-        $paginatedDiklat = $this->pegawaiDiklatRepository->getPaginatedMasterDiklat($perPage, $filters);
-
-        $items = $paginatedDiklat->getCollection()->map(function ($diklat): array {
-            $tanggalMulai = $diklat->tanggal_mulai;
-            $tanggalSelesai = $diklat->tanggal_selesai;
-
-            return [
-                'id_diklat' => (int) $diklat->id,
-                'nama' => (string) ($diklat->nama_kegiatan ?? ''),
-                'kategori' => (string) ($diklat->kategoriDiklat?->nama ?? ''),
-                'jenis' => (string) ($diklat->jenisDiklat?->nama ?? ''),
-                'pelaksana' => (string) ($diklat->penyelenggara ?? ''),
-                'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
-                'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
-                'status' => $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai),
-                'tempat' => (string) ($diklat->tempat ?? ''),
-                'waktu' => optional($diklat->waktu)?->format('H:i:s'),
-                'created_by' => (string) ($diklat->createdByPegawai?->nama ?? ''),
-                'jp' => $diklat->jp,
-                'total_biaya' => $diklat->total_biaya,
-                'jenis_biaya' => (string) ($diklat->jenisBiaya?->nama ?? ''),
-                'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
-                'catatan' => (string) ($diklat->catatan ?? ''),
-                'jumlah_peserta' => $diklat->jadwal_peserta_count ?? 0,
-            ];
-        });
-
-        $paginatedDiklat->setCollection($items);
-
-        return $paginatedDiklat;
     }
 
     private function resolvePerPage(mixed $value, int $default): int
@@ -131,23 +97,29 @@ class HrdService
 
     private function resolveStatusValidasiText(?string $jenisPelaksana, ?string $sertifFilePath, ?string $statusValidasi): ?string
     {
-        if (strtolower((string) $jenisPelaksana) !== 'internal') {
+        $jenisPelaksana = strtolower((string) $jenisPelaksana);
+        if ($jenisPelaksana !== 'internal') {
             return 'None';
         }
 
-        if ($sertifFilePath === null || $sertifFilePath === '') {
+        if (empty($sertifFilePath)) {
             return 'Belum upload laporan';
         }
 
-        if ($statusValidasi === null || $statusValidasi === '') {
+        if ($statusValidasi === null) {
             return 'udah upload laporan namun belum di validasi';
         }
 
+        $statusValidasi = strtolower($statusValidasi);
         if ($statusValidasi === 'tidak valid') {
             return 'Validasi di tolak';
         }
 
-        return 'sudah di validasi';
+        if ($statusValidasi === 'valid') {
+            return 'sudah di validasi';
+        }
+
+        return null;
     }
 
     private function shouldUploadLaporan(?string $jenisPelaksana, ?string $sertifFilePath, ?string $noSertif, ?string $statusValidasi, string $statusPelaksanaan): bool
@@ -158,7 +130,7 @@ class HrdService
 
         $jenisPelaksana = strtolower(trim((string) $jenisPelaksana));
         $statusValidasi = strtolower(trim((string) $statusValidasi));
-        $hasMissingLaporan = $this->hasMissingLaporan($sertifFilePath, $noSertif);
+        $hasMissingLaporan = trim((string) $sertifFilePath) === '' || trim((string) $noSertif) === '';
 
         if ($jenisPelaksana === 'external') {
             return $hasMissingLaporan;
@@ -170,10 +142,4 @@ class HrdService
 
         return $hasMissingLaporan;
     }
-
-    private function hasMissingLaporan(?string $sertifFilePath, ?string $noSertif): bool
-    {
-        return trim((string) $sertifFilePath) === '' || trim((string) $noSertif) === '';
-    }
-
 }

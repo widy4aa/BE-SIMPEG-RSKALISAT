@@ -8,7 +8,6 @@ use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
 use App\Services\Diklat\HrdDiklatMasterService;
 use App\Services\Diklat\HrdDiklatPesertaService;
 use App\Services\Diklat\HrdDiklatStatusService;
-use App\Services\Diklat\HrdService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
@@ -16,7 +15,6 @@ use InvalidArgumentException;
 class HrdDiklatController extends Controller
 {
     public function __construct(
-        private readonly HrdService $hrdService,
         private readonly HrdDiklatMasterService $masterService,
         private readonly HrdDiklatPesertaService $pesertaService,
         private readonly HrdDiklatStatusService $statusService,
