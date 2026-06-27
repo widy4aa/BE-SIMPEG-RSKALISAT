@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api\Diklat;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StoreHrdDiklatRequest;
 use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
-use App\Services\Diklat\DiklatService;
+use App\Services\Diklat\HrdService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class HrdDiklatController extends Controller
 {
-    public function __construct(private readonly DiklatService $diklatService) {}
+    public function __construct(private readonly HrdService $hrdService) {}
 
     public function storeMaster(StoreHrdDiklatRequest $request): JsonResponse
     {
@@ -22,10 +22,7 @@ class HrdDiklatController extends Controller
         $payload = $request->validated();
 
         try {
-            $result = $this->diklatService->createHrdDiklat(
-                userId: $userId,
-                payload: $payload,
-            );
+            $result = $this->hrdService->createMasterDiklat($userId, $payload);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -48,11 +45,7 @@ class HrdDiklatController extends Controller
         $payload = $request->validated();
 
         try {
-            $result = $this->diklatService->updateHrdDiklat(
-                diklatId: $id,
-                userId: $userId,
-                payload: $payload,
-            );
+            $result = $this->hrdService->updateMasterDiklat($id, $userId, $payload);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -76,7 +69,7 @@ class HrdDiklatController extends Controller
             ], 400);
         }
 
-        $result = $this->diklatService->getPesertaDiklat($id);
+        $result = $this->hrdService->getPesertaDiklat($id);
 
         return response()->json([
             'success' => true,
@@ -106,7 +99,7 @@ class HrdDiklatController extends Controller
         $pegawaiIds = array_map('intval', $pegawaiIds);
 
         try {
-            $result = $this->diklatService->syncPesertaDiklat($id, $pegawaiIds);
+            $result = $this->hrdService->syncPesertaDiklat($id, $pegawaiIds);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -123,7 +116,7 @@ class HrdDiklatController extends Controller
 
     public function menungguKelayakan(Request $request): JsonResponse
     {
-        $result = $this->diklatService->getDiklatMenungguKelayakan();
+        $result = $this->hrdService->getDiklatMenungguKelayakan();
 
         return response()->json([
             'success' => true,
@@ -134,7 +127,7 @@ class HrdDiklatController extends Controller
 
     public function menungguValidasi(Request $request): JsonResponse
     {
-        $result = $this->diklatService->getDiklatMenungguValidasi();
+        $result = $this->hrdService->getDiklatMenungguValidasi();
 
         return response()->json([
             'success' => true,
@@ -157,10 +150,7 @@ class HrdDiklatController extends Controller
         ]);
 
         try {
-            $result = $this->diklatService->updateStatusKelayakan(
-                jadwalId: $id,
-                isLayak: (bool) $validated['status_kelayakan'],
-            );
+            $result = $this->hrdService->updateStatusKelayakan($id, (bool) $validated['status_kelayakan']);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -189,10 +179,7 @@ class HrdDiklatController extends Controller
         ]);
 
         try {
-            $result = $this->diklatService->updateStatusValidasi(
-                jadwalId: $id,
-                isValid: (bool) $validated['status_validasi'],
-            );
+            $result = $this->hrdService->updateStatusValidasi($id, (bool) $validated['status_validasi']);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,

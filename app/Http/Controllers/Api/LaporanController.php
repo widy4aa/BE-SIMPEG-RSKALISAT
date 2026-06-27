@@ -3,13 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Services\Diklat\LaporanDiklatService;
 use Illuminate\Http\Request;
 
 class LaporanController extends Controller
 {
-    public function __construct(private readonly \App\Services\Diklat\HrdService $hrdService)
-    {
-    }
+    public function __construct(private readonly LaporanDiklatService $laporanDiklatService) {}
 
     public function laporanDiklat(Request $request): \Illuminate\Http\JsonResponse
     {
@@ -33,7 +32,7 @@ class LaporanController extends Controller
             ], 400);
         }
 
-        $result = $this->hrdService->generateLaporanDiklat((int) $bulanAwal, (int) $tahunAwal, (int) $bulanAkhir, (int) $tahunAkhir);
+        $result = $this->laporanDiklatService->generate((int) $bulanAwal, (int) $tahunAwal, (int) $bulanAkhir, (int) $tahunAkhir);
 
         return response()->json([
             'success' => true,

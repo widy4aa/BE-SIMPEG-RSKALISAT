@@ -3,13 +3,21 @@
 namespace App\Http\Controllers\Api\Diklat;
 
 use App\Http\Controllers\Controller;
-use App\Services\Diklat\DiklatService;
+use App\Services\Diklat\AdminService;
+use App\Services\Diklat\DirekturService;
+use App\Services\Diklat\HrdService;
+use App\Services\Diklat\PegawaiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class DiklatIndexController extends Controller
 {
-    public function __construct(private readonly DiklatService $diklatService) {}
+    public function __construct(
+        private readonly AdminService $adminService,
+        private readonly PegawaiService $pegawaiService,
+        private readonly HrdService $hrdService,
+        private readonly DirekturService $direkturService,
+    ) {}
 
     public function index(Request $request): JsonResponse
     {
@@ -17,7 +25,13 @@ class DiklatIndexController extends Controller
         $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
-        $payload = $this->diklatService->getPayloadByRole($role, $userId, $request->query());
+        $payload = match ($role) {
+            'admin' => $this->adminService->build($userId),
+            'pegawai' => $this->pegawaiService->build($userId, $request->query()),
+            'hrd' => $this->hrdService->build($userId, $request->query()),
+            'direktur' => $this->direkturService->build($userId, $request->query()),
+            default => null,
+        };
 
         if ($payload === null) {
             return response()->json([
@@ -48,7 +62,7 @@ class DiklatIndexController extends Controller
             ], 403);
         }
 
-        $diklat = $this->diklatService->getAllDiklat($request->query());
+        $diklat = $this->hrdService->getAllDiklat($request->query());
 
         return response()->json([
             'success' => true,

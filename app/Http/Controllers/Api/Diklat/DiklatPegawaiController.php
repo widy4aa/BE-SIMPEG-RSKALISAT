@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api\Diklat;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StorePegawaiDiklatRequest;
 use App\Http\Requests\Diklat\UpdatePegawaiDiklatRequest;
-use App\Services\Diklat\DiklatService;
+use App\Services\Diklat\PegawaiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class DiklatPegawaiController extends Controller
 {
-    public function __construct(private readonly DiklatService $diklatService) {}
+    public function __construct(private readonly PegawaiService $pegawaiService) {}
 
     public function store(StorePegawaiDiklatRequest $request): JsonResponse
     {
@@ -23,11 +23,7 @@ class DiklatPegawaiController extends Controller
         $sertifFile = $request->file('upload_sertif');
 
         try {
-            $result = $this->diklatService->createPegawaiDiklat(
-                userId: $userId,
-                payload: $payload,
-                sertifFile: $sertifFile,
-            );
+            $result = $this->pegawaiService->create($userId, $payload, $sertifFile);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -51,12 +47,7 @@ class DiklatPegawaiController extends Controller
         $sertifFile = $request->file('upload_sertif');
 
         try {
-            $result = $this->diklatService->updatePegawaiDiklat(
-                diklatId: $id,
-                userId: $userId,
-                payload: $payload,
-                sertifFile: $sertifFile,
-            );
+            $result = $this->pegawaiService->update($id, $userId, $payload, $sertifFile);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -77,10 +68,7 @@ class DiklatPegawaiController extends Controller
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
         try {
-            $result = $this->diklatService->deletePegawaiDiklat(
-                diklatId: $id,
-                userId: $userId,
-            );
+            $result = $this->pegawaiService->delete($id, $userId);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
@@ -109,12 +97,7 @@ class DiklatPegawaiController extends Controller
         $laporanFile = $request->file('upload_laporan');
 
         try {
-            $result = $this->diklatService->uploadLaporanPegawai(
-                diklatId: $id,
-                userId: $userId,
-                payload: $payload,
-                laporanFile: $laporanFile,
-            );
+            $result = $this->pegawaiService->uploadLaporan($id, $userId, $payload, $laporanFile);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
