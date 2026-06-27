@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Hrd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RiwayatKarir\StorePangkatRequest;
 use App\Http\Requests\RiwayatKarir\UpdatePangkatRequest;
-use App\Services\Hrd\HrdRiwayatKarirService;
+use App\Services\Hrd\RiwayatKarir\HrdPangkatService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ use InvalidArgumentException;
 
 class HrdPangkatController extends Controller
 {
-    public function __construct(private readonly HrdRiwayatKarirService $service) {}
+    public function __construct(private readonly HrdPangkatService $service) {}
 
     public function index(Request $request, int $id): JsonResponse
     {

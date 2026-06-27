@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\Hrd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RiwayatKarir\StoreStrRequest;
 use App\Http\Requests\RiwayatKarir\UpdateStrRequest;
-use App\Services\Hrd\HrdRiwayatKarirService;
+use App\Services\Hrd\RiwayatKarir\HrdStrService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -13,7 +13,7 @@ use InvalidArgumentException;
 
 class HrdStrController extends Controller
 {
-    public function __construct(private readonly HrdRiwayatKarirService $service) {}
+    public function __construct(private readonly HrdStrService $service) {}
 
     public function index(Request $request, int $id): JsonResponse
     {
