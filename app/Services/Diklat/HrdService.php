@@ -3,13 +3,13 @@
 namespace App\Services\Diklat;
 
 use App\Repositories\Diklat\PegawaiDiklatRepository;
-use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class HrdService
 {
     public function __construct(
         private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
+        private readonly DiklatStatusResolver $statusResolver,
     ) {
     }
 
@@ -45,7 +45,7 @@ class HrdService
                 'pelaksana' => (string) ($diklat?->penyelenggara ?? ''),
                 'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
                 'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
-                'status' => $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai),
+                'status' => $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai),
                 'tempat' => (string) ($diklat?->tempat ?? ''),
                 'waktu' => optional($diklat?->waktu)?->format('H:i:s'),
                 'created_by' => (string) ($diklat?->createdByPegawai?->nama ?? ''),
@@ -66,7 +66,7 @@ class HrdService
                     $jadwal->sertif_file_path,
                     $jadwal->no_sertif,
                     $jadwal->status_validasi,
-                    $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai)
+                    $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai)
                 ),
             ];
         });
@@ -104,7 +104,7 @@ class HrdService
                 'pelaksana' => (string) ($diklat->penyelenggara ?? ''),
                 'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
                 'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
-                'status' => $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai),
+                'status' => $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai),
                 'tempat' => (string) ($diklat->tempat ?? ''),
                 'waktu' => optional($diklat->waktu)?->format('H:i:s'),
                 'created_by' => (string) ($diklat->createdByPegawai?->nama ?? ''),
@@ -120,29 +120,6 @@ class HrdService
         $paginatedDiklat->setCollection($items);
 
         return $paginatedDiklat;
-    }
-
-    private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
-    {
-        $today = Carbon::today();
-
-        $mulai = $tanggalMulai instanceof Carbon
-            ? $tanggalMulai->copy()->startOfDay()
-            : ($tanggalMulai ? Carbon::parse($tanggalMulai)->startOfDay() : null);
-
-        $selesai = $tanggalSelesai instanceof Carbon
-            ? $tanggalSelesai->copy()->startOfDay()
-            : ($tanggalSelesai ? Carbon::parse($tanggalSelesai)->startOfDay() : null);
-
-        if ($mulai !== null && $today->lt($mulai)) {
-            return 'mendatang';
-        }
-
-        if ($selesai !== null && $today->gt($selesai)) {
-            return 'selesai';
-        }
-
-        return 'berlangsung';
     }
 
     private function resolvePerPage(mixed $value, int $default): int

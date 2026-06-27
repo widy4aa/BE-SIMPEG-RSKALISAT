@@ -9,7 +9,10 @@ use InvalidArgumentException;
 
 class HrdDiklatPesertaService
 {
-    public function __construct(private readonly PegawaiDiklatRepository $pegawaiDiklatRepository) {}
+    public function __construct(
+        private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
+        private readonly DiklatStatusResolver $statusResolver,
+    ) {}
 
     public function getPesertaDiklat(int $diklatId): array
     {
@@ -46,7 +49,7 @@ class HrdDiklatPesertaService
 
         $statusDiklat = null;
         if ($tanggalMulai !== null && $tanggalSelesai !== null) {
-            $statusDiklat = $this->resolveStatusDiklatByTanggal($tanggalMulai, $tanggalSelesai);
+            $statusDiklat = $this->statusResolver->jadwalStatus($tanggalMulai, $tanggalSelesai);
         }
 
         DB::transaction(function () use ($diklatId, $pegawaiIds, $statusDiklat) {
@@ -72,18 +75,4 @@ class HrdDiklatPesertaService
         ];
     }
 
-    private function resolveStatusDiklatByTanggal(Carbon $tanggalMulai, Carbon $tanggalSelesai): string
-    {
-        $today = Carbon::today();
-
-        if ($today->lt($tanggalMulai)) {
-            return 'belum terlaksana';
-        }
-
-        if ($today->gt($tanggalSelesai)) {
-            return 'sudah terlaksana';
-        }
-
-        return 'sedang terlaksana';
-    }
 }

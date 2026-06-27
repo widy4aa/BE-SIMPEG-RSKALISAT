@@ -14,6 +14,7 @@ class PegawaiDiklatMutationService
         private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
         private readonly PegawaiDiklatFileService $fileService,
         private readonly PegawaiDiklatResponseMapper $responseMapper,
+        private readonly DiklatStatusResolver $statusResolver,
     ) {}
 
     public function create(int $userId, array $payload, ?UploadedFile $sertifFile = null): array
@@ -37,7 +38,7 @@ class PegawaiDiklatMutationService
         $tanggalMulai = Carbon::parse((string) $payload['tanggal_mulai'])->startOfDay();
         $tanggalSelesai = Carbon::parse((string) $payload['tanggal_selesai'])->startOfDay();
 
-        $statusPelaksanaan = $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai);
+        $statusPelaksanaan = $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai);
         if ($statusPelaksanaan !== 'selesai') {
             throw new InvalidArgumentException('Pegawai hanya dapat menambahkan riwayat diklat mandiri yang sudah selesai dilaksanakan.');
         }
@@ -74,7 +75,7 @@ class PegawaiDiklatMutationService
             $sertifPath = $this->fileService->storeSertifikat((int) $pegawai->id, $sertifFile);
         }
 
-        $statusDiklat = $this->resolveStatusDiklatByTanggal($tanggalMulai, $tanggalSelesai);
+        $statusDiklat = $this->statusResolver->jadwalStatus($tanggalMulai, $tanggalSelesai);
 
         [$diklat, $jadwal] = DB::transaction(function () use (
             $pegawai,
@@ -186,7 +187,7 @@ class PegawaiDiklatMutationService
                 throw new InvalidArgumentException('Tanggal mulai dan tanggal selesai harus tersedia.');
             }
 
-            $statusPelaksanaan = $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai);
+            $statusPelaksanaan = $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai);
             if ($statusPelaksanaan !== 'selesai') {
                 throw new InvalidArgumentException('Pegawai hanya dapat mengubah riwayat diklat yang sudah selesai dilaksanakan.');
             }
@@ -260,7 +261,7 @@ class PegawaiDiklatMutationService
             $jadwal->uploaded_at = now();
         }
 
-        $jadwal->status_diklat = $this->resolveStatusDiklatByTanggal(
+        $jadwal->status_diklat = $this->statusResolver->jadwalStatus(
             Carbon::parse($diklat->tanggal_mulai)->startOfDay(),
             Carbon::parse($diklat->tanggal_selesai)->startOfDay()
         );
@@ -326,41 +327,4 @@ class PegawaiDiklatMutationService
         return $this->responseMapper->deleted($diklat, $jadwal);
     }
 
-    private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
-    {
-        $today = Carbon::today();
-
-        $mulai = $tanggalMulai instanceof Carbon
-            ? $tanggalMulai->copy()->startOfDay()
-            : ($tanggalMulai ? Carbon::parse($tanggalMulai)->startOfDay() : null);
-
-        $selesai = $tanggalSelesai instanceof Carbon
-            ? $tanggalSelesai->copy()->startOfDay()
-            : ($tanggalSelesai ? Carbon::parse($tanggalSelesai)->startOfDay() : null);
-
-        if ($mulai !== null && $today->lt($mulai)) {
-            return 'mendatang';
-        }
-
-        if ($selesai !== null && $today->gt($selesai)) {
-            return 'selesai';
-        }
-
-        return 'berlangsung';
-    }
-
-    private function resolveStatusDiklatByTanggal(Carbon $tanggalMulai, Carbon $tanggalSelesai): string
-    {
-        $today = Carbon::today();
-
-        if ($today->lt($tanggalMulai)) {
-            return 'belum terlaksana';
-        }
-
-        if ($today->gt($tanggalSelesai)) {
-            return 'sudah terlaksana';
-        }
-
-        return 'sedang terlaksana';
-    }
 }

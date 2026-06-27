@@ -3,7 +3,6 @@
 namespace App\Services\Diklat;
 
 use App\Repositories\Diklat\PegawaiDiklatRepository;
-use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 
@@ -13,6 +12,7 @@ class PegawaiDiklatLaporanService
         private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
         private readonly PegawaiDiklatFileService $fileService,
         private readonly PegawaiDiklatResponseMapper $responseMapper,
+        private readonly DiklatStatusResolver $statusResolver,
     ) {}
 
     public function uploadLaporan(int $diklatId, int $userId, array $payload, ?UploadedFile $laporanFile = null): array
@@ -40,7 +40,7 @@ class PegawaiDiklatLaporanService
         }
 
         $diklat = $jadwal->diklat;
-        $statusPelaksanaan = $this->resolveStatusByTanggal($diklat->tanggal_mulai, $diklat->tanggal_selesai);
+        $statusPelaksanaan = $this->statusResolver->displayStatus($diklat->tanggal_mulai, $diklat->tanggal_selesai);
         if ($statusPelaksanaan !== 'selesai') {
             throw new InvalidArgumentException('Laporan hanya bisa diupload setelah diklat selesai.');
         }
@@ -65,26 +65,4 @@ class PegawaiDiklatLaporanService
         return $this->responseMapper->laporanUploaded($diklat, $jadwal);
     }
 
-    private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
-    {
-        $today = Carbon::today();
-
-        $mulai = $tanggalMulai instanceof Carbon
-            ? $tanggalMulai->copy()->startOfDay()
-            : ($tanggalMulai ? Carbon::parse($tanggalMulai)->startOfDay() : null);
-
-        $selesai = $tanggalSelesai instanceof Carbon
-            ? $tanggalSelesai->copy()->startOfDay()
-            : ($tanggalSelesai ? Carbon::parse($tanggalSelesai)->startOfDay() : null);
-
-        if ($mulai !== null && $today->lt($mulai)) {
-            return 'mendatang';
-        }
-
-        if ($selesai !== null && $today->gt($selesai)) {
-            return 'selesai';
-        }
-
-        return 'berlangsung';
-    }
 }

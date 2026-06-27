@@ -3,13 +3,13 @@
 namespace App\Services\Diklat;
 
 use App\Repositories\Diklat\PegawaiDiklatRepository;
-use Carbon\Carbon;
 
 class DirekturService
 {
-    public function __construct(private readonly PegawaiDiklatRepository $repository)
-    {
-    }
+    public function __construct(
+        private readonly PegawaiDiklatRepository $repository,
+        private readonly DiklatStatusResolver $statusResolver,
+    ) {}
 
     public function build(int $userId, array $filters = []): array
     {
@@ -29,7 +29,7 @@ class DirekturService
                 'pelaksana' => (string) ($diklat->penyelenggara ?? ''),
                 'tanggal_mulai' => optional($tanggalMulai)?->toDateString(),
                 'tanggal_selesai' => optional($tanggalSelesai)?->toDateString(),
-                'status' => $this->resolveStatusByTanggal($tanggalMulai, $tanggalSelesai),
+                'status' => $this->statusResolver->displayStatus($tanggalMulai, $tanggalSelesai),
                 'tempat' => (string) ($diklat->tempat ?? ''),
                 'waktu' => optional($diklat->waktu)?->format('H:i:s'),
                 'created_by' => (string) ($diklat->createdByPegawai?->nama ?? ''),
@@ -57,29 +57,6 @@ class DirekturService
                 'list_diklat' => $paginatedDiklat,
             ],
         ];
-    }
-
-    private function resolveStatusByTanggal(mixed $tanggalMulai, mixed $tanggalSelesai): string
-    {
-        $today = Carbon::today();
-
-        $mulai = $tanggalMulai instanceof Carbon
-            ? $tanggalMulai->copy()->startOfDay()
-            : ($tanggalMulai ? Carbon::parse($tanggalMulai)->startOfDay() : null);
-
-        $selesai = $tanggalSelesai instanceof Carbon
-            ? $tanggalSelesai->copy()->startOfDay()
-            : ($tanggalSelesai ? Carbon::parse($tanggalSelesai)->startOfDay() : null);
-
-        if ($mulai !== null && $today->lt($mulai)) {
-            return 'mendatang';
-        }
-
-        if ($selesai !== null && $today->gt($selesai)) {
-            return 'selesai';
-        }
-
-        return 'berlangsung';
     }
 
     private function resolvePerPage(mixed $value, int $default): int
