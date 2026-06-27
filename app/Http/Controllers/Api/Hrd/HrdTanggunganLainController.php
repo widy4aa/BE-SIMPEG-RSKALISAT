@@ -3,14 +3,14 @@
 namespace App\Http\Controllers\Api\Hrd;
 
 use App\Http\Controllers\Controller;
-use App\Services\Hrd\HrdKeluargaService;
+use App\Services\Hrd\Keluarga\HrdTanggunganLainService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class HrdTanggunganLainController extends Controller
 {
-    public function __construct(private readonly HrdKeluargaService $service) {}
+    public function __construct(private readonly HrdTanggunganLainService $service) {}
 
     public function index(Request $request, int $id): JsonResponse
     {

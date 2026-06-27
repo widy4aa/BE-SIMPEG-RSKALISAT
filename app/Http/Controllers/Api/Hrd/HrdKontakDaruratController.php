@@ -5,14 +5,14 @@ namespace App\Http\Controllers\Api\Hrd;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Keluarga\StoreKontakDaruratRequest;
 use App\Http\Requests\Keluarga\UpdateKontakDaruratRequest;
-use App\Services\Hrd\HrdKeluargaService;
+use App\Services\Hrd\Keluarga\HrdKontakDaruratService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
 class HrdKontakDaruratController extends Controller
 {
-    public function __construct(private readonly HrdKeluargaService $service) {}
+    public function __construct(private readonly HrdKontakDaruratService $service) {}
 
     public function index(Request $request, int $id): JsonResponse
     {
