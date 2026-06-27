@@ -1,49 +1,55 @@
 <?php
 
-use App\Http\Controllers\Api\Diklat\DiklatIndexController;
-use App\Http\Controllers\Api\Diklat\DiklatPegawaiController;
-use App\Http\Controllers\Api\Diklat\HrdDiklatController;
+use App\Http\Controllers\Api\Diklat\Managed\DiklatController as ManagedDiklatController;
+use App\Http\Controllers\Api\Diklat\Managed\DiklatIndexController as ManagedDiklatIndexController;
+use App\Http\Controllers\Api\Diklat\Self\DiklatController as SelfDiklatController;
+use App\Http\Controllers\Api\Diklat\Self\DiklatIndexController as SelfDiklatIndexController;
 use App\Http\Controllers\Api\LaporanController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
+// Semua role: view diklat (logika berbeda per role ditangani di controller)
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':admin,pegawai,hrd,direktur',
 ])->group(function () {
-    Route::get('/diklat', [DiklatIndexController::class, 'index']);
+    Route::get('/diklat', [ManagedDiklatIndexController::class, 'index']);
 });
 
+
+// Pegawai/HRD/Direktur: mutate own diklat records
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':pegawai,hrd,direktur',
 ])->group(function () {
-    Route::post('/diklat', [DiklatPegawaiController::class, 'store']);
-    Route::patch('/diklat/{id}', [DiklatPegawaiController::class, 'update']);
-    Route::delete('/diklat/{id}', [DiklatPegawaiController::class, 'destroy']);
-    Route::post('/diklat/{id}/upload-laporan', [DiklatPegawaiController::class, 'uploadLaporan']);
+    Route::post('/diklat', [SelfDiklatController::class, 'store']);
+    Route::patch('/diklat/{id}', [SelfDiklatController::class, 'update']);
+    Route::delete('/diklat/{id}', [SelfDiklatController::class, 'destroy']);
+    Route::post('/diklat/{id}/upload-laporan', [SelfDiklatController::class, 'uploadLaporan']);
 });
 
+// HRD/Direktur: view all diklat
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':hrd,direktur',
 ])->group(function () {
-    Route::get('/diklat/all', [DiklatIndexController::class, 'all']);
+    Route::get('/diklat/all', [ManagedDiklatIndexController::class, 'all']);
 });
 
+// HRD only: manage master diklat + peserta + status
 Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':hrd',
 ])->group(function () {
-    Route::post('/hrd/diklat', [HrdDiklatController::class, 'storeMaster']);
-    Route::put('/hrd/diklat/{id}', [HrdDiklatController::class, 'updateMaster']);
-    Route::get('/hrd/diklat/{id}/peserta', [HrdDiklatController::class, 'peserta']);
-    Route::post('/hrd/diklat/{id}/peserta', [HrdDiklatController::class, 'syncPeserta']);
-    Route::get('/hrd/diklat/status/layak', [HrdDiklatController::class, 'menungguKelayakan']);
-    Route::get('/hrd/diklat/status/validasi', [HrdDiklatController::class, 'menungguValidasi']);
-    Route::patch('/hrd/diklat/{id}/status/layak', [HrdDiklatController::class, 'updateStatusKelayakan']);
-    Route::patch('/hrd/diklat/{id}/status/validasi', [HrdDiklatController::class, 'updateStatusValidasi']);
+    Route::post('/hrd/diklat', [ManagedDiklatController::class, 'storeMaster']);
+    Route::put('/hrd/diklat/{id}', [ManagedDiklatController::class, 'updateMaster']);
+    Route::get('/hrd/diklat/{id}/peserta', [ManagedDiklatController::class, 'peserta']);
+    Route::post('/hrd/diklat/{id}/peserta', [ManagedDiklatController::class, 'syncPeserta']);
+    Route::get('/hrd/diklat/status/layak', [ManagedDiklatController::class, 'menungguKelayakan']);
+    Route::get('/hrd/diklat/status/validasi', [ManagedDiklatController::class, 'menungguValidasi']);
+    Route::patch('/hrd/diklat/{id}/status/layak', [ManagedDiklatController::class, 'updateStatusKelayakan']);
+    Route::patch('/hrd/diklat/{id}/status/validasi', [ManagedDiklatController::class, 'updateStatusValidasi']);
 
     Route::get('/generate/laporan-diklat', [LaporanController::class, 'laporanDiklat']);
 });

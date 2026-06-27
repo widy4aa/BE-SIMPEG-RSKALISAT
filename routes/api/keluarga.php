@@ -1,11 +1,11 @@
 <?php
 
 use App\Http\Controllers\Api\DataKeluargaController;
-use App\Http\Controllers\Api\Keluarga\AnakController;
-use App\Http\Controllers\Api\Keluarga\KontakDaruratController;
-use App\Http\Controllers\Api\Keluarga\OrangTuaController;
-use App\Http\Controllers\Api\Keluarga\PasanganController;
-use App\Http\Controllers\Api\Keluarga\TanggunganLainController;
+use App\Http\Controllers\Api\Keluarga\Self\AnakController;
+use App\Http\Controllers\Api\Keluarga\Self\KontakDaruratController;
+use App\Http\Controllers\Api\Keluarga\Self\OrangTuaController;
+use App\Http\Controllers\Api\Keluarga\Self\PasanganController;
+use App\Http\Controllers\Api\Keluarga\Self\TanggunganLainController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
