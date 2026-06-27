@@ -1,68 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\Api\Diklat;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StoreHrdDiklatRequest;
 use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
-use App\Http\Requests\Diklat\StorePegawaiDiklatRequest;
-use App\Http\Requests\Diklat\UpdatePegawaiDiklatRequest;
 use App\Services\Diklat\DiklatService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
 
-class DiklatController extends Controller
+class HrdDiklatController extends Controller
 {
-    public function __construct(private readonly DiklatService $diklatService)
-    {
-    }
-
-    public function index(Request $request): JsonResponse
-    {
-        $claims = $request->input('_jwt_claims', []);
-        $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
-        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
-
-        $payload = $this->diklatService->getPayloadByRole($role, $userId, $request->query());
-
-        if ($payload === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Access denied.',
-            ], 403);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => $payload['welcome'],
-            'data' => [
-                'role' => $role,
-                'diklat' => $payload['summary'],
-            ],
-        ]);
-    }
-
-    public function all(Request $request): JsonResponse
-    {
-        $claims = $request->input('_jwt_claims', []);
-        $role = (string) (is_array($claims) ? ($claims['role'] ?? '') : '');
-
-        if ($role !== 'hrd' && $role !== 'direktur') {
-            return response()->json([
-                'success' => false,
-                'message' => 'Role tidak memiliki akses untuk melihat semua data diklat.',
-            ], 403);
-        }
-
-        $diklat = $this->diklatService->getAllDiklat($request->query());
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Data semua diklat berhasil diambil.',
-            'data' => $diklat,
-        ]);
-    }
+    public function __construct(private readonly DiklatService $diklatService) {}
 
     public function storeMaster(StoreHrdDiklatRequest $request): JsonResponse
     {
@@ -146,14 +96,13 @@ class DiklatController extends Controller
 
         $pegawaiIds = $request->input('pegawai_ids', []);
 
-        if (!is_array($pegawaiIds)) {
+        if (! is_array($pegawaiIds)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Parameter pegawai_ids harus berupa array.',
             ], 422);
         }
 
-        // Clean array
         $pegawaiIds = array_map('intval', $pegawaiIds);
 
         try {
@@ -254,120 +203,6 @@ class DiklatController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Status validasi berhasil diperbarui.',
-            'data' => $result,
-        ]);
-    }
-
-    public function store(StorePegawaiDiklatRequest $request): JsonResponse
-    {
-        $claims = $request->input('_jwt_claims', []);
-        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
-
-        $payload = $request->validated();
-        $sertifFile = $request->file('upload_sertif');
-
-        try {
-            $result = $this->diklatService->createPegawaiDiklat(
-                userId: $userId,
-                payload: $payload,
-                sertifFile: $sertifFile,
-            );
-        } catch (InvalidArgumentException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Diklat berhasil dibuat.',
-            'data' => $result,
-        ], 201);
-    }
-
-    public function update(UpdatePegawaiDiklatRequest $request, int $id): JsonResponse
-    {
-        $claims = $request->input('_jwt_claims', []);
-        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
-
-        $payload = $request->validated();
-        $sertifFile = $request->file('upload_sertif');
-
-        try {
-            $result = $this->diklatService->updatePegawaiDiklat(
-                diklatId: $id,
-                userId: $userId,
-                payload: $payload,
-                sertifFile: $sertifFile,
-            );
-        } catch (InvalidArgumentException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Diklat berhasil diupdate.',
-            'data' => $result,
-        ]);
-    }
-
-    public function destroy(Request $request, int $id): JsonResponse
-    {
-        $claims = $request->input('_jwt_claims', []);
-        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
-
-        try {
-            $result = $this->diklatService->deletePegawaiDiklat(
-                diklatId: $id,
-                userId: $userId,
-            );
-        } catch (InvalidArgumentException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Diklat berhasil dihapus.',
-            'data' => $result,
-        ]);
-    }
-    public function uploadLaporan(Request $request, int $id): JsonResponse
-    {
-        $claims = $request->input('_jwt_claims', []);
-        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
-
-        $request->validate([
-            'upload_laporan' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
-            'no_sertif' => ['nullable', 'string', 'max:255'],
-        ]);
-
-        $payload = $request->only('no_sertif');
-        $laporanFile = $request->file('upload_laporan');
-
-        try {
-            $result = $this->diklatService->uploadLaporanPegawai(
-                diklatId: $id,
-                userId: $userId,
-                payload: $payload,
-                laporanFile: $laporanFile,
-            );
-        } catch (InvalidArgumentException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => $exception->getMessage(),
-            ], 422);
-        }
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Laporan berhasil diupload/diedit.',
             'data' => $result,
         ]);
     }
