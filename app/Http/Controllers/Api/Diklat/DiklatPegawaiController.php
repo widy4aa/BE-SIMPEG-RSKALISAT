@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Diklat;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StorePegawaiDiklatRequest;
 use App\Http\Requests\Diklat\UpdatePegawaiDiklatRequest;
+use App\Services\Diklat\PegawaiDiklatLaporanService;
 use App\Services\Diklat\PegawaiService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -12,7 +13,10 @@ use InvalidArgumentException;
 
 class DiklatPegawaiController extends Controller
 {
-    public function __construct(private readonly PegawaiService $pegawaiService) {}
+    public function __construct(
+        private readonly PegawaiService $pegawaiService,
+        private readonly PegawaiDiklatLaporanService $laporanService,
+    ) {}
 
     public function store(StorePegawaiDiklatRequest $request): JsonResponse
     {
@@ -97,7 +101,7 @@ class DiklatPegawaiController extends Controller
         $laporanFile = $request->file('upload_laporan');
 
         try {
-            $result = $this->pegawaiService->uploadLaporan($id, $userId, $payload, $laporanFile);
+            $result = $this->laporanService->uploadLaporan($id, $userId, $payload, $laporanFile);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
