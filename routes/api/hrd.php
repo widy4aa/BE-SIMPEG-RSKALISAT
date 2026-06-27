@@ -1,14 +1,18 @@
 <?php
 
-use App\Http\Controllers\Api\Hrd\HrdKeluargaController;
+use App\Http\Controllers\Api\Hrd\HrdAnakController;
 use App\Http\Controllers\Api\Hrd\HrdJabatanController;
+use App\Http\Controllers\Api\Hrd\HrdKontakDaruratController;
 use App\Http\Controllers\Api\Hrd\HrdPangkatController;
 use App\Http\Controllers\Api\Hrd\HrdPegawaiController;
 use App\Http\Controllers\Api\Hrd\HrdPendidikanController;
 use App\Http\Controllers\Api\Hrd\HrdPenugasanKlinisController;
+use App\Http\Controllers\Api\Hrd\HrdOrangTuaController;
+use App\Http\Controllers\Api\Hrd\HrdPasanganController;
 use App\Http\Controllers\Api\Hrd\HrdReminderController;
 use App\Http\Controllers\Api\Hrd\HrdSipController;
 use App\Http\Controllers\Api\Hrd\HrdStrController;
+use App\Http\Controllers\Api\Hrd\HrdTanggunganLainController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
@@ -22,32 +26,32 @@ Route::middleware([
         Route::patch('/pribadi', [HrdPegawaiController::class, 'updatePribadi']);
         Route::post('/pribadi', [HrdPegawaiController::class, 'updatePribadi']);
 
-        Route::get('/keluarga/pasangan', [HrdKeluargaController::class, 'indexPasangan']);
-        Route::post('/keluarga/pasangan', [HrdKeluargaController::class, 'storePasangan']);
-        Route::patch('/keluarga/pasangan/{keluargaId}', [HrdKeluargaController::class, 'updatePasangan']);
-        Route::post('/keluarga/pasangan/{keluargaId}', [HrdKeluargaController::class, 'updatePasangan']);
-        Route::delete('/keluarga/pasangan/{keluargaId}', [HrdKeluargaController::class, 'destroyPasangan']);
+        Route::get('/keluarga/pasangan', [HrdPasanganController::class, 'index']);
+        Route::post('/keluarga/pasangan', [HrdPasanganController::class, 'store']);
+        Route::patch('/keluarga/pasangan/{keluargaId}', [HrdPasanganController::class, 'update']);
+        Route::post('/keluarga/pasangan/{keluargaId}', [HrdPasanganController::class, 'update']);
+        Route::delete('/keluarga/pasangan/{keluargaId}', [HrdPasanganController::class, 'destroy']);
 
-        Route::get('/keluarga/anak', [HrdKeluargaController::class, 'indexAnak']);
-        Route::post('/keluarga/anak', [HrdKeluargaController::class, 'storeAnak']);
-        Route::patch('/keluarga/anak/{keluargaId}', [HrdKeluargaController::class, 'updateAnak']);
-        Route::post('/keluarga/anak/{keluargaId}', [HrdKeluargaController::class, 'updateAnak']);
-        Route::delete('/keluarga/anak/{keluargaId}', [HrdKeluargaController::class, 'destroyAnak']);
+        Route::get('/keluarga/anak', [HrdAnakController::class, 'index']);
+        Route::post('/keluarga/anak', [HrdAnakController::class, 'store']);
+        Route::patch('/keluarga/anak/{keluargaId}', [HrdAnakController::class, 'update']);
+        Route::post('/keluarga/anak/{keluargaId}', [HrdAnakController::class, 'update']);
+        Route::delete('/keluarga/anak/{keluargaId}', [HrdAnakController::class, 'destroy']);
 
-        Route::get('/keluarga/orang-tua', [HrdKeluargaController::class, 'indexOrangTua']);
-        Route::post('/keluarga/orang-tua', [HrdKeluargaController::class, 'storeOrangTua']);
-        Route::patch('/keluarga/orang-tua/{keluargaId}', [HrdKeluargaController::class, 'updateOrangTua']);
-        Route::delete('/keluarga/orang-tua/{keluargaId}', [HrdKeluargaController::class, 'destroyOrangTua']);
+        Route::get('/keluarga/orang-tua', [HrdOrangTuaController::class, 'index']);
+        Route::post('/keluarga/orang-tua', [HrdOrangTuaController::class, 'store']);
+        Route::patch('/keluarga/orang-tua/{keluargaId}', [HrdOrangTuaController::class, 'update']);
+        Route::delete('/keluarga/orang-tua/{keluargaId}', [HrdOrangTuaController::class, 'destroy']);
 
-        Route::get('/keluarga/kontak-darurat', [HrdKeluargaController::class, 'indexKontakDarurat']);
-        Route::post('/keluarga/kontak-darurat', [HrdKeluargaController::class, 'storeKontakDarurat']);
-        Route::patch('/keluarga/kontak-darurat/{keluargaId}', [HrdKeluargaController::class, 'updateKontakDarurat']);
-        Route::delete('/keluarga/kontak-darurat/{keluargaId}', [HrdKeluargaController::class, 'destroyKontakDarurat']);
+        Route::get('/keluarga/kontak-darurat', [HrdKontakDaruratController::class, 'index']);
+        Route::post('/keluarga/kontak-darurat', [HrdKontakDaruratController::class, 'store']);
+        Route::patch('/keluarga/kontak-darurat/{keluargaId}', [HrdKontakDaruratController::class, 'update']);
+        Route::delete('/keluarga/kontak-darurat/{keluargaId}', [HrdKontakDaruratController::class, 'destroy']);
 
-        Route::get('/keluarga/tanggungan-lain', [HrdKeluargaController::class, 'indexTanggunganLain']);
-        Route::post('/keluarga/tanggungan-lain', [HrdKeluargaController::class, 'storeTanggunganLain']);
-        Route::patch('/keluarga/tanggungan-lain/{keluargaId}', [HrdKeluargaController::class, 'updateTanggunganLain']);
-        Route::delete('/keluarga/tanggungan-lain/{keluargaId}', [HrdKeluargaController::class, 'destroyTanggunganLain']);
+        Route::get('/keluarga/tanggungan-lain', [HrdTanggunganLainController::class, 'index']);
+        Route::post('/keluarga/tanggungan-lain', [HrdTanggunganLainController::class, 'store']);
+        Route::patch('/keluarga/tanggungan-lain/{keluargaId}', [HrdTanggunganLainController::class, 'update']);
+        Route::delete('/keluarga/tanggungan-lain/{keluargaId}', [HrdTanggunganLainController::class, 'destroy']);
 
         Route::get('/riwayat-karir/jabatan', [HrdJabatanController::class, 'index']);
         Route::post('/riwayat-karir/jabatan', [HrdJabatanController::class, 'store']);
