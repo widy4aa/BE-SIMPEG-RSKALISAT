@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\Hrd\HrdKeluargaController;
+use App\Http\Controllers\Api\Hrd\HrdJabatanController;
 use App\Http\Controllers\Api\Hrd\HrdPegawaiController;
+use App\Http\Controllers\Api\Hrd\HrdPendidikanController;
+use App\Http\Controllers\Api\Hrd\HrdReminderController;
 use App\Http\Controllers\Api\Hrd\HrdRiwayatKarirController;
 use App\Http\Middleware\JwtAuthMiddleware;
 use App\Http\Middleware\RoleMiddleware;
@@ -43,11 +46,11 @@ Route::middleware([
         Route::patch('/keluarga/tanggungan-lain/{keluargaId}', [HrdKeluargaController::class, 'updateTanggunganLain']);
         Route::delete('/keluarga/tanggungan-lain/{keluargaId}', [HrdKeluargaController::class, 'destroyTanggunganLain']);
 
-        Route::get('/riwayat-karir/jabatan', [HrdRiwayatKarirController::class, 'jabatan']);
-        Route::post('/riwayat-karir/jabatan', [HrdRiwayatKarirController::class, 'storeJabatan']);
-        Route::patch('/riwayat-karir/jabatan/{riwayatId}', [HrdRiwayatKarirController::class, 'updateJabatan']);
-        Route::post('/riwayat-karir/jabatan/{riwayatId}', [HrdRiwayatKarirController::class, 'updateJabatan']);
-        Route::delete('/riwayat-karir/jabatan/{riwayatId}', [HrdRiwayatKarirController::class, 'destroyJabatan']);
+        Route::get('/riwayat-karir/jabatan', [HrdJabatanController::class, 'index']);
+        Route::post('/riwayat-karir/jabatan', [HrdJabatanController::class, 'store']);
+        Route::patch('/riwayat-karir/jabatan/{riwayatId}', [HrdJabatanController::class, 'update']);
+        Route::post('/riwayat-karir/jabatan/{riwayatId}', [HrdJabatanController::class, 'update']);
+        Route::delete('/riwayat-karir/jabatan/{riwayatId}', [HrdJabatanController::class, 'destroy']);
 
         Route::get('/riwayat-karir/str', [HrdRiwayatKarirController::class, 'str']);
         Route::post('/riwayat-karir/str', [HrdRiwayatKarirController::class, 'storeStr']);
@@ -73,13 +76,13 @@ Route::middleware([
         Route::post('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePangkat']);
         Route::delete('/riwayat-karir/pangkat/{riwayatId}', [HrdRiwayatKarirController::class, 'destroyPangkat']);
 
-        Route::get('/riwayat-karir/pendidikan', [HrdRiwayatKarirController::class, 'pendidikan']);
-        Route::post('/riwayat-karir/pendidikan', [HrdRiwayatKarirController::class, 'storePendidikan']);
-        Route::patch('/riwayat-karir/pendidikan/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePendidikan']);
-        Route::post('/riwayat-karir/pendidikan/{riwayatId}', [HrdRiwayatKarirController::class, 'updatePendidikan']);
-        Route::delete('/riwayat-karir/pendidikan/{riwayatId}', [HrdRiwayatKarirController::class, 'destroyPendidikan']);
+        Route::get('/riwayat-karir/pendidikan', [HrdPendidikanController::class, 'index']);
+        Route::post('/riwayat-karir/pendidikan', [HrdPendidikanController::class, 'store']);
+        Route::patch('/riwayat-karir/pendidikan/{riwayatId}', [HrdPendidikanController::class, 'update']);
+        Route::post('/riwayat-karir/pendidikan/{riwayatId}', [HrdPendidikanController::class, 'update']);
+        Route::delete('/riwayat-karir/pendidikan/{riwayatId}', [HrdPendidikanController::class, 'destroy']);
 
-        Route::post('/reminder/str-sip', [HrdRiwayatKarirController::class, 'sendReminderStrSip']);
-        Route::post('/reminder/penugasan-klinis', [HrdRiwayatKarirController::class, 'sendReminderPenugasanKlinis']);
+        Route::post('/reminder/str-sip', [HrdReminderController::class, 'sendReminderStrSip']);
+        Route::post('/reminder/penugasan-klinis', [HrdReminderController::class, 'sendReminderPenugasanKlinis']);
     });
 });
