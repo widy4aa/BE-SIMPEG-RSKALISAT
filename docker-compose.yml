@@ -42,31 +42,15 @@ services:
       - simpeg_network
     depends_on:
       - app
-      - ssl-init
-
-  # ── One-shot: Generate self-signed SSL cert (hanya berjalan sekali) ────────
-  ssl-init:
-    image: alpine:latest
-    container_name: simpeg_ssl_init
-    volumes:
-      - ssl_certs:/ssl
     command: >
       sh -c "
-        if [ ! -f /ssl/cert.pem ] || [ ! -f /ssl/key.pem ]; then
-          echo 'Generating self-signed SSL certificate...';
+        if [ ! -f /etc/nginx/ssl/cert.pem ]; then
           apk add --no-cache openssl;
-          openssl req -x509 -nodes -days 3650 -newkey rsa:2048
-            -keyout /ssl/key.pem
-            -out /ssl/cert.pem
-            -subj '/C=ID/ST=JawaBarat/L=Bandung/O=RSKALISAT/OU=SIMPEG/CN=simpeg.rskalisat.internal'
-            -addext 'subjectAltName=IP:127.0.0.1,DNS:localhost';
-          echo 'SSL certificate generated.';
-        else
-          echo 'SSL certificate already exists, skipping.';
-        fi
+          openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/nginx/ssl/key.pem -out /etc/nginx/ssl/cert.pem -subj '/C=ID/ST=JawaBarat/L=Bandung/O=RSKALISAT/OU=SIMPEG/CN=localhost';
+        fi;
+        nginx -g 'daemon off;'
       "
-    networks:
-      - simpeg_network
+
 
   # ── MySQL ──────────────────────────────────────────────────────────────────
   db:
