@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Diklat\StoreHrdDiklatRequest;
 use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
 use App\Services\Diklat\HrdDiklatMasterService;
+use App\Services\Diklat\HrdDiklatPesertaService;
 use App\Services\Diklat\HrdDiklatStatusService;
 use App\Services\Diklat\HrdService;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +18,7 @@ class HrdDiklatController extends Controller
     public function __construct(
         private readonly HrdService $hrdService,
         private readonly HrdDiklatMasterService $masterService,
+        private readonly HrdDiklatPesertaService $pesertaService,
         private readonly HrdDiklatStatusService $statusService,
     ) {}
 
@@ -75,7 +77,7 @@ class HrdDiklatController extends Controller
             ], 400);
         }
 
-        $result = $this->hrdService->getPesertaDiklat($id);
+        $result = $this->pesertaService->getPesertaDiklat($id);
 
         return response()->json([
             'success' => true,
@@ -105,7 +107,7 @@ class HrdDiklatController extends Controller
         $pegawaiIds = array_map('intval', $pegawaiIds);
 
         try {
-            $result = $this->hrdService->syncPesertaDiklat($id, $pegawaiIds);
+            $result = $this->pesertaService->syncPesertaDiklat($id, $pegawaiIds);
         } catch (InvalidArgumentException $exception) {
             return response()->json([
                 'success' => false,
