@@ -54,7 +54,11 @@ class DiklatController extends Controller
             return response()->json(['success' => false, 'message' => 'Parameter ID diklat wajib diisi dengan format angka.'], 400);
         }
 
-        $result = $this->pesertaService->getPesertaDiklat($id);
+        try {
+            $result = $this->pesertaService->getPesertaDiklat($id);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
 
         return response()->json(['success' => true, 'message' => 'Data peserta diklat berhasil diambil.', 'data' => $result]);
     }

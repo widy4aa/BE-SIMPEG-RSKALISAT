@@ -266,6 +266,42 @@ class PaginationSearchFilterTest extends TestCase
             ->assertJsonPath('data.data.0.jumlah_peserta_belum_validasi', 1);
     }
 
+    public function test_hrd_peserta_diklat_list_includes_display_status_validasi(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9440000000000001', 'HRD Peserta Validasi');
+        $jenis = JenisDiklat::query()->create(['nama' => 'ASN Peserta Validasi']);
+        $kategori = KategoriDiklat::query()->create(['nama' => 'Teknis Peserta Validasi']);
+
+        $diklat = $this->createDiklat(
+            nama: 'Internal Peserta Status Validasi',
+            penyelenggara: 'RS Kalisat',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->subDays(3)->toDateString(),
+            selesai: now()->subDay()->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'internal'
+        );
+
+        ListJadwalDiklat::query()
+            ->where('diklat_id', $diklat->id)
+            ->where('pegawai_id', $hrd->pegawai->id)
+            ->update([
+                'sertif_file_path' => 'dokumen/sertif-diklat/peserta-valid.pdf',
+                'status_validasi' => 'valid',
+            ]);
+
+        $response = $this->withTokenFor($hrd)
+            ->getJson("/api/hrd/diklat/{$diklat->id}/peserta");
+
+        $response->assertOk()
+            ->assertJsonFragment([
+                'pegawai_id' => $hrd->pegawai->id,
+                'status' => true,
+                'status_validasi' => 'sudah di validasi',
+            ]);
+    }
+
     public function test_external_diklat_cannot_be_approved_for_kelayakan_before_laporan_is_uploaded(): void
     {
         $hrd = $this->createUserWithPegawai('hrd', '9500000000000001', 'HRD Kelayakan');

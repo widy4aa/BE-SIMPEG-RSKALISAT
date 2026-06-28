@@ -16,10 +16,20 @@ class HrdDiklatPesertaService
 
     public function getPesertaDiklat(int $diklatId): array
     {
+        $diklat = $this->pegawaiDiklatRepository->findDiklatById($diklatId);
+        if ($diklat === null) {
+            throw new InvalidArgumentException('Master Diklat tidak ditemukan.');
+        }
+
         $pesertaIds = $this->pegawaiDiklatRepository->getPesertaDiklatIds($diklatId);
+        $jadwalByPegawaiId = $this->pegawaiDiklatRepository
+            ->getJadwalPesertaDiklatByDiklatId($diklatId)
+            ->keyBy(fn ($jadwal) => (int) $jadwal->pegawai_id);
         $semuaPegawai = $this->pegawaiDiklatRepository->getAllPegawaiWithUnitKerjaProfesi();
 
-        $peserta = $semuaPegawai->map(function ($pegawai) use ($pesertaIds): array {
+        $peserta = $semuaPegawai->map(function ($pegawai) use ($pesertaIds, $jadwalByPegawaiId, $diklat): array {
+            $jadwal = $jadwalByPegawaiId->get((int) $pegawai->id);
+
             return [
                 'pegawai_id' => (int) $pegawai->id,
                 'nama' => (string) $pegawai->nama,
@@ -27,6 +37,11 @@ class HrdDiklatPesertaService
                 'unit_kerja' => (string) ($pegawai->jabatan?->unitKerja?->nama ?? ''),
                 'profesi' => (string) ($pegawai->profesi?->nama ?? ''),
                 'status' => in_array($pegawai->id, $pesertaIds, true),
+                'status_validasi' => $jadwal === null ? null : $this->resolveStatusValidasiText(
+                    $diklat->jenis_pelaksanaan,
+                    $jadwal->sertif_file_path,
+                    $jadwal->status_validasi
+                ),
             ];
         })->values()->all();
 
@@ -35,6 +50,33 @@ class HrdDiklatPesertaService
             'total_pegawai' => count($peserta),
             'list' => $peserta,
         ];
+    }
+
+    private function resolveStatusValidasiText(?string $jenisPelaksana, ?string $sertifFilePath, ?string $statusValidasi): ?string
+    {
+        $jenisPelaksana = strtolower((string) $jenisPelaksana);
+        if ($jenisPelaksana !== 'internal') {
+            return 'None';
+        }
+
+        if (empty($sertifFilePath)) {
+            return 'Belum upload laporan';
+        }
+
+        if ($statusValidasi === null || $statusValidasi === '') {
+            return 'udah upload laporan namun belum di validasi';
+        }
+
+        $statusValidasi = strtolower($statusValidasi);
+        if ($statusValidasi === 'tidak valid') {
+            return 'Validasi di tolak';
+        }
+
+        if ($statusValidasi === 'valid') {
+            return 'sudah di validasi';
+        }
+
+        return null;
     }
 
     public function syncPesertaDiklat(int $diklatId, array $pegawaiIds): array

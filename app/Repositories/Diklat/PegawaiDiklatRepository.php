@@ -375,6 +375,23 @@ class PegawaiDiklatRepository
         );
     }
 
+    public function getJadwalPesertaDiklatByDiklatId(int $diklatId): Collection
+    {
+        return collect(DB::select('
+            SELECT
+                id,
+                pegawai_id,
+                sertif_file_path,
+                no_sertif,
+                status_diklat,
+                status_kelayakan,
+                status_validasi
+            FROM list_jadwal_diklat
+            WHERE diklat_id = ?
+                AND deleted_at IS NULL
+        ', [$diklatId]));
+    }
+
     public function deleteJadwalNotInPegawaiIds(int $diklatId, array $pegawaiIds): void
     {
         $now = Carbon::now()->toDateTimeString();

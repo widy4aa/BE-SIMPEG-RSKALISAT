@@ -1293,7 +1293,7 @@ Contoh response sukses (`200`):
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `hrd`
 
-Endpoint ini digunakan oleh HRD untuk melihat daftar semua pegawai beserta status apakah mereka mengikuti diklat tertentu atau tidak.
+Endpoint ini digunakan oleh HRD untuk melihat daftar semua pegawai beserta status apakah mereka mengikuti diklat tertentu atau tidak. Untuk pegawai yang menjadi peserta (`status=true`), response juga menyertakan `status_validasi` dalam bentuk teks tampilan yang sama seperti halaman diklat pegawai.
 
 Contoh request:
 `GET /api/hrd/diklat/13/peserta`
@@ -1314,7 +1314,8 @@ Contoh response sukses (`200 OK`):
         "nik": "350912345678",
         "unit_kerja": "IGD",
         "profesi": "Dokter Umum",
-        "status": true
+        "status": true,
+        "status_validasi": "sudah di validasi"
       },
       {
         "pegawai_id": 2,
@@ -1322,12 +1323,22 @@ Contoh response sukses (`200 OK`):
         "nik": "350987654321",
         "unit_kerja": "Poli Gigi",
         "profesi": "Dokter Gigi",
-        "status": false
+        "status": false,
+        "status_validasi": null
       }
     ]
   }
 }
 ```
+
+Keterangan `status_validasi` pada list peserta:
+
+- `sudah di validasi`: peserta diklat internal sudah divalidasi dengan status database `valid`.
+- `Validasi di tolak`: peserta diklat internal sudah divalidasi dengan status database `tidak valid`.
+- `udah upload laporan namun belum di validasi`: peserta diklat internal sudah upload sertifikat/laporan tetapi belum divalidasi.
+- `Belum upload laporan`: peserta diklat internal belum upload sertifikat/laporan.
+- `None`: peserta diklat external.
+- `null`: pegawai bukan peserta diklat tersebut (`status=false`).
 
 #### Sync Peserta Diklat (HRD)
 
