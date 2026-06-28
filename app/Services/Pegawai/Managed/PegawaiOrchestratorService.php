@@ -30,6 +30,11 @@ class PegawaiOrchestratorService
         return $this->adminService->getPegawaiDetailData($pegawaiId);
     }
 
+    public function getPegawaiDetailBagianData(int $pegawaiId, string $bagian, array $filters = []): array
+    {
+        return $this->adminService->getPegawaiDetailBagianData($pegawaiId, $bagian, $filters);
+    }
+
     public function createPegawai(string $role, array $data): ?array
     {
         return match ($role) {

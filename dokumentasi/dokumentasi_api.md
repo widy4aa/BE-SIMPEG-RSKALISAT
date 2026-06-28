@@ -113,6 +113,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
    - [CRUD Master Data (Khusus HRD)](#172-crud-master-data-khusus-hrd)
 14. [Pegawai](#18-pegawai)
   - [Get Pegawai Detail (Admin/HRD/Direktur)](#get-pegawai-detail-adminhrddirektur)
+  - [Get Pegawai Detail Per Bagian (Admin/HRD/Direktur)](#get-pegawai-detail-per-bagian-adminhrddirektur)
    - [Tambah Data Pegawai Baru (Hanya Admin)](#tambah-data-pegawai-baru-hanya-admin)
    - [Ubah Role / Status Pegawai (Hanya Admin)](#ubah-role-status-pegawai-hanya-admin)
    - [Ubah NIK Sendiri (Hanya Admin)](#ubah-nik-sendiri-hanya-admin)
@@ -173,14 +174,14 @@ Authorization: Bearer <jwt_token>
 
 ## Status Sinkronisasi Endpoint
 
-Dokumen ini sudah dicocokkan ulang dengan hasil `php artisan route:list --path=api` pada code saat ini. Total route API aktif: **177 route** (119 route lama + 55 HRD manajemen pegawai + 3 pesan & reminder WA).
+Dokumen ini sudah dicocokkan ulang dengan hasil `php artisan route:list --path=api` pada code saat ini. Total route API aktif: **178 route** (119 route lama + 55 HRD manajemen pegawai + 3 pesan & reminder WA + 1 detail bagian pegawai).
 
 Catatan umum syarat akses:
 
 - Endpoint public tanpa token: `GET /api/health`, `POST /api/login`
 - Endpoint dengan token saja: `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`, semua `GET /api/form/*`
 - Endpoint semua role (`admin`, `pegawai`, `hrd`, `direktur`): `GET /api/me`, `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/generate/cv`, `GET/PATCH /api/profile`, upload file profile/KTP/KK, semua CRUD keluarga, semua CRUD riwayat karir
-- Endpoint `admin`, `hrd`, `direktur`: `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `POST /api/pesan/pegawai/{id}`
+- Endpoint `admin`, `hrd`, `direktur`: `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/pegawai/{id}/{bagian}`, `GET /api/str-sip`, `POST /api/pesan/pegawai/{id}`
 - Endpoint `pegawai`, `hrd`, `direktur`: `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
 - Endpoint `hrd`, `direktur`: `GET /api/diklat/all`
 - Endpoint khusus `admin`: `POST /api/pegawai`, `PATCH /api/pegawai/{id}/change-role`, `PATCH /api/auth/change-nik`, semua `/api/admin/change-requests/*`
@@ -3820,15 +3821,132 @@ Contoh response sukses (`200 OK`):
         "penyelenggara": "RS Kalisat",
         "tanggal_mulai": "2023-01-01",
         "tanggal_selesai": "2023-01-02",
+        "waktu": "08:00:00",
+        "created_by": "HRD SIMPEG",
         "jp": 16,
+        "total_biaya": "2500000.00",
+        "jenis_biaya": "BLUD",
+        "jenis_pelaksana": "internal",
+        "catatan": "Contoh catatan diklat.",
+        "sertif": "dokumen/sertif-diklat/sertif-pegawai.pdf",
+        "no_sertif": "SERTIF/INT/RSK/2026/0001",
         "status_diklat": "sudah terlaksana",
-        "status_validasi": "sudah di validasi",
-        "status_kelayakan": true
+        "status_kelayakan": "layak",
+        "status_validasi": "valid"
       }
     ]
   }
 }
 ```
+
+#### Get Pegawai Detail Per Bagian (Admin/HRD/Direktur)
+
+- Method: `GET`
+- URL: `/api/pegawai/{id}/{bagian}`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`, `hrd`, `direktur`
+
+Endpoint ini digunakan ketika frontend hanya membutuhkan satu bagian dari detail pegawai, tanpa mengambil seluruh payload detail. Nilai `{bagian}` yang valid:
+
+| Bagian | URL | Isi `data` |
+|--------|-----|------------|
+| `pegawai` | `/api/pegawai/{id}/pegawai` | Hanya objek `pegawai` |
+| `keluarga` | `/api/pegawai/{id}/keluarga` | Hanya objek `keluarga` |
+| `riwayat-karir` | `/api/pegawai/{id}/riwayat-karir` | Hanya objek `riwayat_karir` |
+| `diklat` | `/api/pegawai/{id}/diklat` | Paginator data `diklat` |
+
+Query parameter khusus `/api/pegawai/{id}/diklat`:
+
+| Parameter | Type | Default | Keterangan |
+|-----------|------|---------|------------|
+| `page` | Integer | `1` | Halaman data diklat. |
+| `per_page` | Integer | `10` | Jumlah data per halaman. Nilai dibatasi maksimal 100. |
+| `search` | String | - | Cari pada nama diklat, jenis, kategori, penyelenggara, pembuat, jenis biaya, jenis pelaksana, catatan, sertifikat, nomor sertifikat, dan status. |
+| `kelayakan` / `status_kelayakan` | String | - | Default menyembunyikan diklat dengan `status_kelayakan` `tidak layak` atau `false`. Gunakan `all` / `semua` untuk menampilkan semua, atau isi `layak` / `tidak layak` untuk filter spesifik. |
+| `all` | Boolean/String | - | Alternatif untuk menampilkan semua diklat. Nilai yang diterima: `true`, `1`, `yes`, `all`, atau `semua`. |
+| `jenis` | String | - | Filter nama jenis diklat. |
+| `kategori` | String | - | Filter nama kategori diklat. |
+| `status_diklat` | String | - | Filter status pelaksanaan diklat. |
+| `status_validasi` | String | - | Filter status validasi. |
+| `jenis_pelaksana` / `jenis_pelaksanaan` | String | - | Filter jenis pelaksanaan, contoh `internal` atau `external`. |
+| `jenis_biaya` | String | - | Filter jenis biaya. |
+| `created_by` | String | - | Filter nama pembuat diklat. |
+
+Contoh URL:
+
+```http
+GET /api/pegawai/3/diklat?page=1&per_page=10&search=keselamatan
+GET /api/pegawai/3/diklat?kelayakan=all&page=1&per_page=10
+GET /api/pegawai/3/diklat?status_kelayakan=tidak%20layak
+GET /api/pegawai/3/diklat?jenis=Tenkes&kategori=Teknis&status_diklat=sudah%20terlaksana
+```
+
+Contoh response `GET /api/pegawai/3/diklat`:
+
+```json
+{
+  "success": true,
+  "message": "Detail data pegawai berhasil diambil",
+  "data": {
+    "diklat": {
+      "current_page": 1,
+      "data": [
+        {
+          "id": 2,
+          "nama": "Internal - Pelatihan Keselamatan Pasien",
+          "jenis": "Tenkes",
+          "kategori": "Teknis",
+          "penyelenggara": "Bagian SDM RS Kalisat",
+          "tanggal_mulai": "2026-06-15",
+          "tanggal_selesai": "2026-06-17",
+          "waktu": "09:00:00",
+          "created_by": "HRD SIMPEG",
+          "jp": 12,
+          "total_biaya": "1800000.00",
+          "jenis_biaya": "APBD",
+          "jenis_pelaksana": "internal",
+          "catatan": "Contoh internal lengkap dan sudah valid.",
+          "sertif": "dokumen/sertif-diklat/budi-keselamatan-pasien.pdf",
+          "no_sertif": "SERTIF/INT/RSK/2026/0001",
+          "status_diklat": "sudah terlaksana",
+          "status_kelayakan": "layak",
+          "status_validasi": "valid"
+        }
+      ],
+      "from": 1,
+      "last_page": 1,
+      "per_page": 10,
+      "to": 1,
+      "total": 1
+    }
+  }
+}
+```
+
+Contoh response `GET /api/pegawai/3/keluarga`:
+
+```json
+{
+  "success": true,
+  "message": "Detail data pegawai berhasil diambil",
+  "data": {
+    "keluarga": {
+      "pasangan": [],
+      "anak": [],
+      "orang_tua": [],
+      "kontak_darurat": [],
+      "tanggungan_lain": []
+    }
+  }
+}
+```
+
+Catatan:
+
+- `/api/pegawai/{id}` tetap mengembalikan semua bagian: `pegawai`, `pribadi`, `keluarga`, `riwayat_karir`, dan `diklat`.
+- `/api/pegawai/{id}/pegawai` hanya mengembalikan objek `pegawai`. Data `pribadi` tetap tersedia pada endpoint full detail `/api/pegawai/{id}`.
+- `/api/pegawai/{id}/diklat` secara default tidak menampilkan diklat dengan `status_kelayakan` `tidak layak` atau `false`. Gunakan `?kelayakan=all` atau `?all=true` untuk menampilkan semua diklat.
+- Route `{bagian}` dibatasi pada `pegawai`, `keluarga`, `riwayat-karir`, dan `diklat`.
 
 #### Tambah Data Pegawai Baru (Hanya Admin)
 
@@ -4746,7 +4864,7 @@ Berikut rangkuman endpoint yang bisa diakses masing-masing role. Semua endpoint 
 
 ### Admin
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `GET /api/generate/cv`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/pegawai/{id}/{bagian}`, `GET /api/str-sip`, `GET /api/generate/cv`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
 - **Master Data Dropdown:** `GET /api/form/kategori-diklat`, `GET /api/form/tipe-diklat`, `GET /api/form/jenis-pegawai`, `GET /api/form/unit-kerja`, `GET /api/form/jenis-biaya`, `GET /api/form/golongan-ruang`, `GET /api/form/profesi`, `GET /api/form/jenis-sip`
@@ -4927,7 +5045,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### HRD
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `GET /api/generate/cv`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/pegawai/{id}/{bagian}`, `GET /api/str-sip`, `GET /api/generate/cv`
 - **Diklat:** `GET /api/diklat/all`, `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
 - **Diklat HRD:** `POST /api/hrd/diklat`, `PUT /api/hrd/diklat/{id}`, `GET /api/hrd/diklat/{id}/peserta`, `POST /api/hrd/diklat/{id}/peserta`, `GET /api/hrd/diklat/status/layak`, `PATCH /api/hrd/diklat/{id}/status/layak`, `GET /api/hrd/diklat/status/validasi`, `PATCH /api/hrd/diklat/{id}/status/validasi`
 - **Laporan:** `GET /api/generate/laporan-diklat`
@@ -4948,7 +5066,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 ### Direktur
 
-- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/str-sip`, `GET /api/generate/cv`
+- **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/pegawai/{id}/{bagian}`, `GET /api/str-sip`, `GET /api/generate/cv`
 - **Diklat:** `GET /api/diklat/all`, `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`

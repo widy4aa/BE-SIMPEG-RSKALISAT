@@ -15,6 +15,7 @@ class PegawaiRouteRefactorTest extends TestCase
     {
         $this->assertRouteAction('GET', 'api/pegawai', PegawaiListController::class.'@index');
         $this->assertRouteAction('GET', 'api/pegawai/{id}', PegawaiListController::class.'@show');
+        $this->assertRouteAction('GET', 'api/pegawai/{id}/{bagian}', PegawaiListController::class.'@showBagian');
         $this->assertRouteAction('POST', 'api/pegawai', PegawaiListController::class.'@store');
         $this->assertRouteAction('PATCH', 'api/pegawai/{id}/change-role', PegawaiListController::class.'@changeRole');
     }

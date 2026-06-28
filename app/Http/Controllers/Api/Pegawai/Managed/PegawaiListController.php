@@ -52,6 +52,28 @@ class PegawaiListController extends Controller
         }
     }
 
+    public function showBagian(Request $request, int $id, string $bagian): JsonResponse
+    {
+        try {
+            $payload = $this->pegawaiService->getPegawaiDetailBagianData($id, $bagian, $request->query());
+            return response()->json([
+                'success' => true,
+                'message' => 'Detail data pegawai berhasil diambil',
+                'data'    => $payload,
+            ]);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        } catch (\RuntimeException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+            ], 404);
+        }
+    }
+
     public function store(\App\Http\Requests\Pegawai\StorePegawaiRequest $request): JsonResponse
     {
         $claims = $request->input('_jwt_claims', []);

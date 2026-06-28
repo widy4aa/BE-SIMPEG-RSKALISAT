@@ -220,6 +220,142 @@ class AdminPegawaiService
         ];
     }
 
+    public function getPegawaiDetailBagianData(int $pegawaiId, string $bagian, array $filters = []): array
+    {
+        $payload = $this->getPegawaiDetailData($pegawaiId);
+        $bagian = $this->normalizeDetailBagian($bagian);
+
+        if ($bagian === 'diklat') {
+            return ['diklat' => $this->filterAndPaginateDiklat($payload['diklat'], $filters)];
+        }
+
+        return [$bagian => $payload[$bagian]];
+    }
+
+    private function filterAndPaginateDiklat(mixed $diklat, array $filters): array
+    {
+        $items = collect($diklat);
+        $statusKelayakanFilter = $this->filledFilter($filters['status_kelayakan'] ?? $filters['kelayakan'] ?? null);
+
+        if (! $this->includeAllDiklat($filters) && $statusKelayakanFilter === null) {
+            $items = $items->reject(fn($item) => $this->isTidakLayakDiklat($item['status_kelayakan'] ?? null));
+        }
+
+        $search = $this->filledFilter($filters['search'] ?? null);
+        if ($search !== null) {
+            $needle = strtolower($search);
+            $items = $items->filter(function (array $item) use ($needle): bool {
+                $haystack = [
+                    $item['nama'] ?? null,
+                    $item['jenis'] ?? null,
+                    $item['kategori'] ?? null,
+                    $item['penyelenggara'] ?? null,
+                    $item['created_by'] ?? null,
+                    $item['jenis_biaya'] ?? null,
+                    $item['jenis_pelaksana'] ?? null,
+                    $item['catatan'] ?? null,
+                    $item['sertif'] ?? null,
+                    $item['no_sertif'] ?? null,
+                    $item['status_diklat'] ?? null,
+                    $item['status_kelayakan'] ?? null,
+                    $item['status_validasi'] ?? null,
+                ];
+
+                foreach ($haystack as $value) {
+                    if ($value !== null && str_contains(strtolower((string) $value), $needle)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            });
+        }
+
+        $filterMap = [
+            'jenis' => 'jenis',
+            'kategori' => 'kategori',
+            'status_diklat' => 'status_diklat',
+            'status_kelayakan' => 'status_kelayakan',
+            'kelayakan' => 'status_kelayakan',
+            'status_validasi' => 'status_validasi',
+            'jenis_pelaksana' => 'jenis_pelaksana',
+            'jenis_pelaksanaan' => 'jenis_pelaksana',
+            'jenis_biaya' => 'jenis_biaya',
+            'created_by' => 'created_by',
+        ];
+
+        foreach ($filterMap as $queryKey => $itemKey) {
+            $value = $this->filledFilter($filters[$queryKey] ?? null);
+            if ($value === null || in_array(strtolower($value), ['all', 'semua'], true)) {
+                continue;
+            }
+
+            $items = $items->filter(fn(array $item): bool => str_contains(
+                strtolower((string) ($item[$itemKey] ?? '')),
+                strtolower($value)
+            ));
+        }
+
+        $items = $items->values();
+        $total = $items->count();
+        $perPage = $this->resolvePerPage($filters['per_page'] ?? null, 10);
+        $page = max(1, (int) ($filters['page'] ?? 1));
+        $lastPage = max(1, (int) ceil($total / $perPage));
+        $page = min($page, $lastPage);
+        $pageItems = $items->slice(($page - 1) * $perPage, $perPage)->values();
+
+        return [
+            'current_page' => $page,
+            'data' => $pageItems,
+            'from' => $total === 0 ? null : (($page - 1) * $perPage) + 1,
+            'last_page' => $lastPage,
+            'per_page' => $perPage,
+            'to' => $total === 0 ? null : (($page - 1) * $perPage) + $pageItems->count(),
+            'total' => $total,
+        ];
+    }
+
+    private function includeAllDiklat(array $filters): bool
+    {
+        $all = $this->filledFilter($filters['all'] ?? null);
+        $kelayakan = $this->filledFilter($filters['kelayakan'] ?? $filters['status_kelayakan'] ?? null);
+
+        return in_array(strtolower((string) $all), ['1', 'true', 'yes', 'all', 'semua'], true)
+            || in_array(strtolower((string) $kelayakan), ['all', 'semua'], true);
+    }
+
+    private function isTidakLayakDiklat(mixed $value): bool
+    {
+        if ($value === false || $value === 0) {
+            return true;
+        }
+
+        return in_array(strtolower(trim((string) $value)), ['tidak layak', 'false', '0'], true);
+    }
+
+    private function filledFilter(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $value = trim((string) $value);
+
+        return $value === '' ? null : $value;
+    }
+
+    private function normalizeDetailBagian(string $bagian): string
+    {
+        $normalized = str_replace('-', '_', strtolower(trim($bagian)));
+        $allowed = ['pegawai', 'keluarga', 'riwayat_karir', 'diklat'];
+
+        if (! in_array($normalized, $allowed, true)) {
+            throw new \InvalidArgumentException('Endpoint detail pegawai tidak valid. Gunakan salah satu: pegawai, keluarga, riwayat-karir, diklat.');
+        }
+
+        return $normalized;
+    }
+
     public function createPegawai(array $data): array
     {
         $pegawai = $this->repository->createPegawaiData($data);

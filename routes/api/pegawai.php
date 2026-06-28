@@ -15,6 +15,8 @@ Route::middleware([
 ])->group(function () {
     Route::get('/pegawai', [PegawaiListController::class, 'index']);
     Route::get('/pegawai/{id}', [PegawaiListController::class, 'show']);
+    Route::get('/pegawai/{id}/{bagian}', [PegawaiListController::class, 'showBagian'])
+        ->whereIn('bagian', ['pegawai', 'keluarga', 'riwayat-karir', 'diklat']);
 
     Route::get('/str-sip', [StrSipController::class, 'index']);
     Route::post('/pesan/pegawai/{id}', [MessageController::class, 'sendToPegawai']);
