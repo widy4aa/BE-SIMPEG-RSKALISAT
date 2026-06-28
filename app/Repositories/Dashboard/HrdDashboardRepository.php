@@ -19,7 +19,7 @@ class HrdDashboardRepository
         if ($type === null || $type === 'pegawai') {
             // Pegawai kurang lengkap: 
             // Either pribadi doesn't exist, or has null in important fields, or pegawai has null in important fields.
-            $totalKurangLengkap = $this->countRaw('
+            $totalKurangLengkap = $this->countRaw("
                 SELECT COUNT(*) AS total
                 FROM pegawai p
                 LEFT JOIN pegawai_pribadi pp
@@ -43,7 +43,7 @@ class HrdDashboardRepository
                         OR pp.kk_file_path IS NULL
                         OR pp.kk_file_path = ''
                     )
-            ');
+            ");
 
             $totalLengkap = max(0, $totalPegawai - $totalKurangLengkap);
 

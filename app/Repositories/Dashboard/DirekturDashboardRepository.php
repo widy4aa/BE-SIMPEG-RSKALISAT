@@ -17,7 +17,7 @@ class DirekturDashboardRepository
         ');
 
         if ($type === null || $type === 'pegawai') {
-            $totalKurangLengkap = $this->countRaw('
+            $totalKurangLengkap = $this->countRaw("
                 SELECT COUNT(*) AS total
                 FROM pegawai p
                 LEFT JOIN pegawai_pribadi pp
@@ -41,7 +41,7 @@ class DirekturDashboardRepository
                         OR pp.kk_file_path IS NULL
                         OR pp.kk_file_path = ''
                     )
-            ');
+            ");
 
             $totalLengkap = max(0, $totalPegawai - $totalKurangLengkap);
 
