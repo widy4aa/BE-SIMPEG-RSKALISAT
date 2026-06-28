@@ -141,6 +141,83 @@ class PegawaiDiklatMutationTest extends TestCase
         ]);
     }
 
+    public function test_upload_laporan_external_resets_kelayakan_status(): void
+    {
+        $user = $this->createUserWithPegawai('pegawai', '9700000000000005', 'Pegawai Upload External');
+        $diklat = $this->createOwnedDiklat($user->pegawai, jenisPelaksanaan: 'external');
+        $jadwal = ListJadwalDiklat::query()->where('diklat_id', $diklat->id)->firstOrFail();
+        $jadwal->update(['status_kelayakan' => 'tidak layak']);
+
+        $response = $this->withTokenFor($user)->postJson("/api/diklat/{$diklat->id}/upload-laporan", [
+            'no_sertif' => 'CERT-EXT-RESET-001',
+            'upload_sertif' => UploadedFile::fake()->create('sertif.pdf', 100, 'application/pdf'),
+        ]);
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Laporan berhasil diupload/diedit.')
+            ->assertJsonPath('data.no_sertif', 'CERT-EXT-RESET-001')
+            ->assertJsonPath('data.status_kelayakan', null);
+
+        $this->assertDatabaseHas('list_jadwal_diklat', [
+            'id' => $jadwal->id,
+            'no_sertif' => 'CERT-EXT-RESET-001',
+            'status_kelayakan' => null,
+        ]);
+    }
+
+    public function test_external_diklat_full_lifecycle_pending_layak_lock_and_rejection_reset(): void
+    {
+        $user = $this->createUserWithPegawai('pegawai', '9700000000000006', 'Pegawai External Lifecycle');
+
+        // 1. Habis input awal -> status kelayakan pending (null) dan sudah ada sertif
+        $createResponse = $this->withTokenFor($user)->postJson('/api/diklat', $this->diklatPayload([
+            'nama_kegiatan' => 'Seminar External Awal',
+            'jenis_pelaksana' => 'external',
+            'no_sertif' => 'CERT-LIFECYCLE-1',
+            'upload_sertif' => UploadedFile::fake()->create('sertif1.pdf', 100, 'application/pdf'),
+        ]));
+
+        $createResponse->assertCreated()->assertJsonPath('data.status_kelayakan', null);
+        $diklatId = (int) $createResponse->json('data.id_diklat');
+        $jadwal = ListJadwalDiklat::query()->where('diklat_id', $diklatId)->firstOrFail();
+        $this->assertNull($jadwal->status_kelayakan);
+
+        // 2. Selama masih pending, pegawai masih bisa up sertif baru lagi dan edit diklat
+        $editResponse = $this->withTokenFor($user)->postJson("/api/diklat/{$diklatId}/upload-laporan", [
+            'no_sertif' => 'CERT-LIFECYCLE-2',
+            'upload_sertif' => UploadedFile::fake()->create('sertif2.pdf', 100, 'application/pdf'),
+        ]);
+        $editResponse->assertOk()->assertJsonPath('data.status_kelayakan', null);
+        $jadwal->refresh();
+        $this->assertSame('CERT-LIFECYCLE-2', $jadwal->no_sertif);
+
+        // 3. Kalo validasi kelayakan maka layak statusnya berubah jadi layak (ga bisa di edit / up laporan lagi)
+        $jadwal->update(['status_kelayakan' => 'layak']);
+
+        $lockResponse = $this->withTokenFor($user)->postJson("/api/diklat/{$diklatId}/upload-laporan", [
+            'no_sertif' => 'CERT-LIFECYCLE-FAIL',
+            'upload_sertif' => UploadedFile::fake()->create('sertif3.pdf', 100, 'application/pdf'),
+        ]);
+        $lockResponse->assertStatus(422)
+            ->assertJsonPath('message', 'Sertifikat tidak bisa diupload/diedit karena status kelayakan sudah layak.');
+
+        // 4. Jika ditolak balik ke status kelayakannya null dan bisa di edit + upload laporan
+        $jadwal->update(['status_kelayakan' => 'tidak layak']);
+
+        $resetResponse = $this->withTokenFor($user)->postJson("/api/diklat/{$diklatId}/upload-laporan", [
+            'no_sertif' => 'CERT-LIFECYCLE-FIXED',
+            'upload_sertif' => UploadedFile::fake()->create('sertif4.pdf', 100, 'application/pdf'),
+        ]);
+        $resetResponse->assertOk()
+            ->assertJsonPath('data.no_sertif', 'CERT-LIFECYCLE-FIXED')
+            ->assertJsonPath('data.status_kelayakan', null);
+
+        $jadwal->refresh();
+        $this->assertNull($jadwal->status_kelayakan);
+        $this->assertSame('CERT-LIFECYCLE-FIXED', $jadwal->no_sertif);
+    }
+
     private function withTokenFor(User $user): self
     {
         $token = app(JwtService::class)->generate([

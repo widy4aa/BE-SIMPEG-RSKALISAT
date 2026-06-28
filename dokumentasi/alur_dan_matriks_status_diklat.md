@@ -101,7 +101,91 @@ Dokumen ini berisi gambaran lengkap mengenai perbedaan status, alur validasi (sk
 
 ---
 
-## 3. Matriks Hak Akses & Aksi Diklat Berdasarkan Status
+## 3. Gambaran Alur Kelayakan Diklat Eksternal (Bentuk Kotak / Text Boxes)
+
+### A. Alur Utama (Normal / Sukses)
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. PENGAJUAN KLAIM DIKLAT EKSTERNAL OLEH PEGAWAI                │
+├─────────────────────────────────────────────────────────────────┤
+│ • Kondisi           : Pelatihan di luar RS yang sudah selesai   │
+│ • Wajib Isi         : File Sertifikat & Nomor Sertifikat        │
+│ • Status Kelayakan  : pending (null)                            │
+│ • Status Validasi   : None (Tidak Berlaku)                      │
+│ • Tampilan Frontend : Masuk antrean "Menunggu Kelayakan"        │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. PEMERIKSAAN & PENILAIAN OLEH HRD                             │
+├─────────────────────────────────────────────────────────────────┤
+│ • HRD memeriksa keabsahan sertifikat & relevansi pelatihan      │
+│ • Menekan tombol persetujuan di menu "Menunggu Kelayakan"       │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 3. DISETUJUI (LAYAK)                                            │
+├─────────────────────────────────────────────────────────────────┤
+│ • Status Kelayakan  : "layak"                                   │
+│ • Status Validasi   : None                                      │
+│ • Tampilan Frontend : "Layak"                                   │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 4. SELESAI & TERKUNCI                                           │
+├─────────────────────────────────────────────────────────────────┤
+│ • Riwayat diklat eksternal sah dan diakui oleh rumah sakit      │
+│ • Pegawai tidak dapat mengubah / menghapus pengajuan lagi       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### B. Alur Alternatif (Penolakan & Revisi Sertifikat)
+
+```text
+┌─────────────────────────────────────────────────────────────────┐
+│ 1. PENGAJUAN DIKLAT EKSTERNAL (PENDING KELAYAKAN)               │
+│ • Status Kelayakan  : pending (null)                            │
+│ • Masuk ke antrean menu HRD: "Menunggu Kelayakan"               │
+└─────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│ 2. PEMERIKSAAN OLEH HRD                                         │
+└─────────────────────────────────────────────────────────────────┘
+                │                                 │
+        [Ditolak / Salah]                 [Disetujui / Sah]
+                │                                 │
+                ▼                                 ▼
+┌───────────────────────────────┐ ┌───────────────────────────────┐
+│ 3A. KELAYAKAN DITOLAK         │ │ 3B. KELAYAKAN BERHASIL        │
+├───────────────────────────────┤ ├───────────────────────────────┤
+│ • Status : "tidak layak"      │ │ • Status : "layak"            │
+│ • Teks   : "Tidak Layak"      │ │ • Teks   : "Layak"            │
+└───────────────────────────────┘ └───────────────────────────────┘
+                │                                 │
+                ▼                                 ▼
+┌───────────────────────────────┐ ┌───────────────────────────────┐
+│ 4. REVISI & UPLOAD ULANG      │ │ SELESAI & TERKUNCI            │
+├───────────────────────────────┤ └───────────────────────────────┘
+│ • Pegawai dapat info alasan   │
+│ • Upload perbaikan sertifikat │
+└───────────────────────────────┘
+                │
+                ▼
+┌───────────────────────────────┐
+│ 5. RESET OTOMATIS OLEH SISTEM │
+├───────────────────────────────┤
+│ • Status direset -> pending   │
+│ • Kembali ke antrean HRD No.1 │
+└───────────────────────────────┘
+```
+
+---
+
+## 4. Matriks Hak Akses & Aksi Diklat Berdasarkan Status
 
 ### A. Berdasarkan Status Pelaksanaan (Waktu Pelaksanaan)
 
@@ -113,12 +197,11 @@ Dokumen ini berisi gambaran lengkap mengenai perbedaan status, alur validasi (sk
 
 ### B. Berdasarkan Status Kelayakan (Diklat Eksternal)
 
-| Status Kelayakan | Kondisi Laporan | Aksi Pegawai | Aksi HRD |
+| Status Kelayakan | Tampilan / Kondisi | Aksi Pegawai | Aksi HRD |
 | :--- | :--- | :--- | :--- |
-| **`pending`** | Belum Upload | • Mengunggah bukti laporan/sertifikat (`uploadLaporan`).<br>• Masih bisa mengedit atau membatalkan pengajuan. | • *Belum bisa* menilai kelayakan (karena bukti laporan belum ada). |
-| **`pending`** | Sudah Upload | • Bisa memperbarui/mengganti file laporan jika merasa ada yang salah unggah. | • **Menilai Kelayakan:** Menyetujui (`layak`) atau Menolak (`tidak layak`) di menu *Menunggu Kelayakan*. |
-| **`layak`** | Sudah Upload | • Melihat status kelayakan disetujui.<br>• **Terkunci:** Tidak bisa lagi mengedit atau menghapus data pengajuan diklat ini. | • Data diklat eksternal pegawai sah dan tercatat di riwayat pengembangan karir. |
-| **`tidak layak`** | Sudah Upload | • Menerima notifikasi penolakan dari HRD.<br>• Bisa berkoordinasi dengan HRD jika ada kesalahan lampiran. | • Pengajuan dianggap tidak memenuhi syarat rumah sakit. |
+| **`pending` (`null`)** | *"Menunggu Kelayakan"*<br>*(Habis input / revisi)* | • **Bisa edit diklat & upload sertifikat baru** jika sadar ada keliru sebelum diperiksa HRD.<br>• *(Karena saat awal input wajib upload sertifikat, file bukti pasti sudah ada)*. | • **Menilai Kelayakan:** Memeriksa berkas dan menekan tombol **Layak** atau **Tidak Layak** di menu *Menunggu Kelayakan*. |
+| **`layak`** | *"Layak"* | • **Terkunci Permanen:** Pegawai **tidak bisa lagi edit diklat ataupun upload ulang laporan/sertifikat**.<br>• Data diklat sah diakui oleh RS. | • Data diklat eksternal selesai diverifikasi dan tercatat resmi di riwayat kompetensi pegawai. |
+| **`tidak layak`** | *"Tidak Layak"* | • **Revisi Terbuka:** Pegawai **bisa edit diklat & upload laporan/sertifikat perbaikan** sesuai alasan penolakan HRD.<br>• *(Begitu diedit atau diupload ulang, status otomatis kembali menjadi **`pending` (`null`)**)*. | • Menunggu pegawai melakukan perbaikan dan mengunggah kembali sertifikat yang valid. |
 
 ### C. Berdasarkan Status Validasi (Diklat Internal)
 

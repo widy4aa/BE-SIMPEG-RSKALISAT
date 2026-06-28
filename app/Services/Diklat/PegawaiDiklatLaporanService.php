@@ -35,8 +35,15 @@ class PegawaiDiklatLaporanService
             throw new InvalidArgumentException('Data diklat tidak ditemukan atau bukan milik pegawai login.');
         }
 
-        if ((string) ($jadwal->status_validasi ?? '') === 'valid') {
+        $diklat = $jadwal->diklat;
+        $jenisPelaksanaCurrent = strtolower((string) ($diklat->jenis_pelaksanaan ?? ''));
+
+        if ($jenisPelaksanaCurrent === 'internal' && (string) ($jadwal->status_validasi ?? '') === 'valid') {
             throw new InvalidArgumentException('Laporan tidak bisa diupload/diedit karena status validasi sudah valid.');
+        }
+
+        if ($jenisPelaksanaCurrent === 'external' && (string) ($jadwal->status_kelayakan ?? '') === 'layak') {
+            throw new InvalidArgumentException('Sertifikat tidak bisa diupload/diedit karena status kelayakan sudah layak.');
         }
 
         $diklat = $jadwal->diklat;
@@ -54,10 +61,10 @@ class PegawaiDiklatLaporanService
             $jadwal->uploaded_at = now();
         }
 
-        $jenisPelaksanaCurrent = (string) ($diklat->jenis_pelaksanaan ?? '');
-
         if ($jenisPelaksanaCurrent === 'internal') {
             $jadwal->status_validasi = null;
+        } else {
+            $jadwal->status_kelayakan = null;
         }
 
         $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);

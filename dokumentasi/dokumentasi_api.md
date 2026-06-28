@@ -1758,8 +1758,13 @@ Field request:
 
 Aturan bisnis:
 
-- Jika `status_validasi = valid`, maka laporan tidak dapat diupload/diedit.
-- Jika diklat berjenis `internal`, proses upload laporan akan mereset `status_validasi` menjadi `null` agar divalidasi ulang oleh HRD.
+- Untuk diklat berjenis `internal`:
+  - Jika `status_validasi = valid`, maka laporan tidak dapat diupload/diedit lagi.
+  - Proses upload laporan/sertifikat baru akan mereset `status_validasi` menjadi `null` (`pending`) agar divalidasi ulang oleh HRD.
+- Untuk diklat berjenis `external`:
+  - Jika `status_kelayakan = layak`, maka sertifikat/laporan tidak dapat diupload/diedit lagi.
+  - Selama status kelayakan masih `null` (`pending`) atau `tidak layak` (ditolak), pegawai dapat mengupload ulang sertifikat perbaikan.
+  - Proses upload sertifikat baru akan mereset `status_kelayakan` kembali menjadi `null` (`pending`) agar dinilai ulang kelayakannya oleh HRD.
 
 Contoh response sukses (`200`):
 
