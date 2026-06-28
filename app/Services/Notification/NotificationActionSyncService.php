@@ -77,6 +77,40 @@ class NotificationActionSyncService
             }
         }
 
+        $pribadi = $pegawai->pribadi;
+        $profileKeterangan = [];
+        if (blank($pegawai->nik) && blank($pegawai->nip)) $profileKeterangan[] = 'NIK / NIP belum terisi';
+        if (blank($pegawai->jenis_pegawai_id)) $profileKeterangan[] = 'Jenis pegawai belum terisi';
+        if (blank($pegawai->profesi_id)) $profileKeterangan[] = 'Profesi belum terisi';
+        if (blank($pegawai->tgl_masuk)) $profileKeterangan[] = 'Tanggal masuk belum terisi';
+        if (!$pribadi) {
+            $profileKeterangan[] = 'Data pribadi belum terisi';
+        } else {
+            if (blank($pribadi->tanggal_lahir)) $profileKeterangan[] = 'Tanggal lahir belum terisi';
+            if (blank($pribadi->jenis_kelamin)) $profileKeterangan[] = 'Jenis kelamin belum terisi';
+            if (blank($pribadi->agama)) $profileKeterangan[] = 'Agama belum terisi';
+            if (blank($pribadi->alamat)) $profileKeterangan[] = 'Alamat belum terisi';
+            if (blank($pribadi->no_telp)) $profileKeterangan[] = 'Nomor telepon belum terisi';
+            if (blank($pribadi->pendidikan_terakhir)) $profileKeterangan[] = 'Pendidikan terakhir belum terisi';
+            if (blank($pribadi->ktp_file_path)) $profileKeterangan[] = 'Dokumen KTP belum diunggah';
+            if (blank($pribadi->kk_file_path)) $profileKeterangan[] = 'Dokumen KK belum diunggah';
+        }
+
+        if (!empty($profileKeterangan)) {
+            $activeUniqueKeys[] = 'dashboard.profile.incomplete';
+            $this->notificationRepository->upsertAction(
+                userId: $userId,
+                uniqueKey: 'dashboard.profile.incomplete',
+                actionCode: 'profile_incomplete',
+                title: 'Data profil belum lengkap',
+                message: 'Silakan lengkapi data profil pribadi dan dokumen Anda.',
+                payload: [
+                    'status_lengkap' => false,
+                    'keterangan' => $profileKeterangan,
+                ],
+            );
+        }
+
         $pasangan = $pegawai->pribadi?->pasangan ?? collect();
         $anak = $pegawai->pribadi?->anak ?? collect();
         $orangTua = $pegawai->pribadi?->orangTua ?? collect();

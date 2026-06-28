@@ -11,14 +11,24 @@ use App\Models\Pegawai;
 use App\Models\PegawaiPribadi;
 use App\Models\UnitKerja;
 use App\Models\User;
+use App\Services\Diklat\PegawaiDiklatFileService;
 use App\Services\Security\JwtService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 class PegawaiDiklatMutationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->mock(PegawaiDiklatFileService::class, function ($mock) {
+            $mock->shouldReceive('storeSertifikat')->andReturn('dokumen/sertif-diklat/dummy.pdf');
+        });
+    }
 
     public function test_pegawai_can_create_finished_internal_diklat(): void
     {
@@ -115,6 +125,7 @@ class PegawaiDiklatMutationTest extends TestCase
 
         $response = $this->withTokenFor($user)->postJson("/api/diklat/{$diklat->id}/upload-laporan", [
             'no_sertif' => 'CERT-RESET-001',
+            'upload_laporan' => UploadedFile::fake()->create('laporan.pdf', 100, 'application/pdf'),
         ]);
 
         $response->assertOk()
@@ -190,6 +201,7 @@ class PegawaiDiklatMutationTest extends TestCase
             'tanggal_mulai' => now()->subDays(5)->toDateString(),
             'tanggal_selesai' => now()->subDay()->toDateString(),
             'no_sertif' => 'CERT-MUT-001',
+            'upload_sertif' => UploadedFile::fake()->create('sertif.pdf', 100, 'application/pdf'),
             'jp' => 8,
             'jenis_biaya' => 'Mandiri',
             'total_biaya' => 250000,

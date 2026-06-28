@@ -27,7 +27,7 @@ class UpdateHrdDiklatRequest extends FormRequest
             'jenis_biaya' => ['required_if:jenis_pelaksana,internal', 'nullable', 'string', 'max:100'],
             'total_biaya' => ['required_if:jenis_pelaksana,internal', 'nullable', 'numeric', 'min:0'],
             'catatan' => ['nullable', 'string', 'max:1000'],
-            'jenis_pelaksana' => ['required', 'in:internal,external'],
+            'jenis_pelaksana' => ['required', 'in:internal'],
             'waktu' => ['nullable', 'string', 'regex:/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/'],
         ];
     }

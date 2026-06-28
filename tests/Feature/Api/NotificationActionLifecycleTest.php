@@ -36,6 +36,14 @@ class NotificationActionLifecycleTest extends TestCase
             'is_resolved' => false,
             'unique_key' => 'dashboard.keluarga.incomplete',
         ]);
+
+        $this->assertDatabaseHas('notification', [
+            'user_id' => $user->id,
+            'type' => 'action',
+            'action_code' => 'profile_incomplete',
+            'is_resolved' => false,
+            'unique_key' => 'dashboard.profile.incomplete',
+        ]);
     }
 
     public function test_sync_resolves_old_action_and_creates_new_str_action_after_data_change(): void

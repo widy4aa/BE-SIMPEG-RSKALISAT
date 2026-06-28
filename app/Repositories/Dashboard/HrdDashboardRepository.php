@@ -27,7 +27,7 @@ class HrdDashboardRepository
                     AND pp.deleted_at IS NULL
                 WHERE p.deleted_at IS NULL
                     AND (
-                        p.nip IS NULL
+                        ((p.nik IS NULL OR p.nik = '') AND (p.nip IS NULL OR p.nip = ''))
                         OR p.jenis_pegawai_id IS NULL
                         OR p.profesi_id IS NULL
                         OR p.tgl_masuk IS NULL
@@ -38,6 +38,10 @@ class HrdDashboardRepository
                         OR pp.alamat IS NULL
                         OR pp.no_telp IS NULL
                         OR pp.pendidikan_terakhir IS NULL
+                        OR pp.ktp_file_path IS NULL
+                        OR pp.ktp_file_path = ''
+                        OR pp.kk_file_path IS NULL
+                        OR pp.kk_file_path = ''
                     )
             ');
 

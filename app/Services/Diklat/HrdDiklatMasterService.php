@@ -24,8 +24,8 @@ class HrdDiklatMasterService
         $jenisPelaksana = strtolower((string) ($payload['jenis_pelaksana'] ?? ''));
         $isInternal = $jenisPelaksana === 'internal';
 
-        if (! in_array($jenisPelaksana, ['internal', 'external'], true)) {
-            throw new InvalidArgumentException('Jenis pelaksana tidak valid.');
+        if ($jenisPelaksana !== 'internal') {
+            throw new InvalidArgumentException('Master Diklat yang dibuat HRD wajib berjenis internal.');
         }
 
         $tanggalMulai = Carbon::parse((string) $payload['tanggal_mulai'])->startOfDay();
@@ -106,8 +106,8 @@ class HrdDiklatMasterService
         $jenisPelaksana = strtolower((string) ($payload['jenis_pelaksana'] ?? ''));
         $isInternal = $jenisPelaksana === 'internal';
 
-        if (! in_array($jenisPelaksana, ['internal', 'external'], true)) {
-            throw new InvalidArgumentException('Jenis pelaksana tidak valid.');
+        if ($jenisPelaksana !== 'internal') {
+            throw new InvalidArgumentException('Master Diklat yang dibuat HRD wajib berjenis internal.');
         }
 
         $tanggalMulai = Carbon::parse((string) $payload['tanggal_mulai'])->startOfDay();

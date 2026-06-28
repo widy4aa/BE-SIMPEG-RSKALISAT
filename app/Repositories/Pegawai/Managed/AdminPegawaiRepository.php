@@ -355,8 +355,7 @@ class AdminPegawaiRepository
     private function profileCompleteSql(): string
     {
         return "(
-            p.nik IS NOT NULL
-            AND p.nik <> ''
+            ((p.nik IS NOT NULL AND p.nik <> '') OR (p.nip IS NOT NULL AND p.nip <> ''))
             AND p.jenis_pegawai_id IS NOT NULL
             AND p.profesi_id IS NOT NULL
             AND p.tgl_masuk IS NOT NULL
@@ -372,6 +371,10 @@ class AdminPegawaiRepository
             AND pp.no_telp <> ''
             AND pp.pendidikan_terakhir IS NOT NULL
             AND pp.pendidikan_terakhir <> ''
+            AND pp.ktp_file_path IS NOT NULL
+            AND pp.ktp_file_path <> ''
+            AND pp.kk_file_path IS NOT NULL
+            AND pp.kk_file_path <> ''
         )";
     }
 

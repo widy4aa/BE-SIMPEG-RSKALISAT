@@ -72,12 +72,13 @@ class DiklatController extends Controller
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
         $request->validate([
-            'upload_laporan' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'],
-            'no_sertif'      => ['nullable', 'string', 'max:255'],
+            'upload_laporan' => ['required_without:upload_sertif', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
+            'upload_sertif'  => ['required_without:upload_laporan', 'file', 'mimes:pdf,jpg,jpeg,png,webp', 'max:5120'],
+            'no_sertif'      => ['required', 'string', 'max:255'],
         ]);
 
         $payload     = $request->only('no_sertif');
-        $laporanFile = $request->file('upload_laporan');
+        $laporanFile = $request->file('upload_laporan') ?? $request->file('upload_sertif');
 
         try {
             $result = $this->laporanService->uploadLaporan($id, $userId, $payload, $laporanFile);

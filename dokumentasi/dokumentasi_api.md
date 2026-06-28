@@ -622,8 +622,8 @@ Keterangan field dashboard pegawai:
 - `jumlah_diklat_selesai`: jumlah diklat dengan status `sudah terlaksana`.
 - `jumlah_diklat_dijadwalkan_belum_selesai`: jumlah diklat dengan status `belum terlaksana` atau `sedang terlaksana`.
 - `list_jadwal_diklat_mendatang`: list diklat yang statusnya `belum terlaksana`.
-- `list_aksi`: daftar notifikasi bertipe `action` yang belum `is_resolved`.
-- `list_aksi.action_payload`: detail data aksi, misalnya status STR atau kelengkapan keluarga.
+- `list_aksi`: daftar notifikasi bertipe `action` yang belum `is_resolved` (memberikan peringatan/info jika data pegawai belum lengkap).
+- `list_aksi.action_payload`: detail data aksi, misalnya status STR, kelengkapan keluarga, atau kelengkapan profil pribadi (`keterangan` berisi daftar kolom/dokumen yang belum diisi seperti KTP, KK, profesi, NIK/NIP, dll).
 
 Contoh response `401 Unauthorized` (token tidak valid/tidak ada):
 
@@ -799,6 +799,9 @@ Contoh response `200 OK`:
   }
 }
 ```
+
+Catatan indikator kelengkapan data pegawai (`total_pegawai_kurang_lengkap` dan `total_pegawai_lengkap`):
+Seorang pegawai dihitung **lengkap** apabila telah melengkapi parameter Data Inti (`nik`/`nip`, `jenis_pegawai_id`, `profesi_id`, `tgl_masuk`) serta Data Pribadi (`tanggal_lahir`, `jenis_kelamin`, `agama`, `alamat`, `no_telp`, `pendidikan_terakhir`, dokumen KTP `ktp_file_path`, dan dokumen Kartu Keluarga `kk_file_path`).
 
 ### 5. Diklat
 
@@ -1166,7 +1169,7 @@ Field request:
 - `jenis_biaya` (required jika `jenis_pelaksana=internal`, nullable, string, max 100)
 - `total_biaya` (required jika `jenis_pelaksana=internal`, nullable, numeric, min 0)
 - `catatan` (nullable, string, max 1000)
-- `jenis_pelaksana` (required: `internal|external`)
+- `jenis_pelaksana` (required: wajib `internal`, tidak bisa `external`)
 
 Contoh request payload (JSON):
 
@@ -1238,7 +1241,7 @@ Field request:
 - `jenis_biaya` (required jika `jenis_pelaksana=internal`, nullable, string, max 100)
 - `total_biaya` (required jika `jenis_pelaksana=internal`, nullable, numeric, min 0)
 - `catatan` (nullable, string, max 1000)
-- `jenis_pelaksana` (required: `internal|external`)
+- `jenis_pelaksana` (required: wajib `internal`, tidak bisa `external`)
 
 Contoh request payload (JSON):
 
@@ -1623,8 +1626,8 @@ Field request:
 - `tanggal_mulai` (required, date)
 - `tanggal_selesai` (required, date, harus sama atau setelah `tanggal_mulai`)
 - `waktu` (nullable, string, format: `HH:MM` atau `HH:MM:SS`)
-- `no_sertif` (nullable, string, max 100)
-- `upload_sertif` (nullable, file: pdf/jpg/jpeg/png/webp, max 5MB)
+- `no_sertif` (required, string, max 100)
+- `upload_sertif` (required, file: pdf/jpg/jpeg/png/webp, max 5MB)
 - `jp` (required, integer, min 1)
 - `jenis_biaya` (required jika `jenis_pelaksana=internal`, nullable, string, max 100)
 - `total_biaya` (required jika `jenis_pelaksana=internal`, nullable, numeric, min 0)
@@ -1750,8 +1753,8 @@ Endpoint ini digunakan khusus untuk mengupload laporan (sertifikat) atau mengedi
 
 Field request:
 
-- `upload_laporan` (nullable, file: pdf/jpg/jpeg/png, max 2MB)
-- `no_sertif` (nullable, string, max 255)
+- `upload_laporan` / `upload_sertif` (required, file: pdf/jpg/jpeg/png/webp, max 5MB)
+- `no_sertif` (required, string, max 255)
 
 Aturan bisnis:
 
@@ -3665,6 +3668,7 @@ GET /api/pegawai?tgl_masuk_dari=2022-01-01&tgl_masuk_sampai=2024-12-31
 Catatan:
 
 - Filter hanya memengaruhi data di paginator `pegawai`.
+- Parameter filter `status_kelengkapan=lengkap` akan memvalidasi apakah pegawai telah mengisi Data Inti (`nik`/`nip`, `jenis_pegawai_id`, `profesi_id`, `tgl_masuk`) serta Data Pribadi lengkap beserta unggahan dokumen KTP (`ktp_file_path`) dan Kartu Keluarga (`kk_file_path`).
 - `total_pegawai`, `jumlah_dokter`, `jumlah_perawat`, dan `jumlah_profesi` adalah ringkasan global sesuai implementasi saat ini.
 - `jumlah_pegawai_aktif`, `jumlah_hrd`, dan `jumlah_direktur` adalah jumlah global user berdasarkan role dan tidak ikut terfilter oleh parameter pencarian.
 

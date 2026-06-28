@@ -450,6 +450,8 @@ class PaginationSearchFilterTest extends TestCase
             'agama' => $complete ? 'Islam' : null,
             'alamat' => $complete ? 'Jl. Filter' : null,
             'no_telp' => $complete ? '081234567890' : null,
+            'ktp_file_path' => $complete ? 'ktp.pdf' : null,
+            'kk_file_path' => $complete ? 'kk.pdf' : null,
             'email' => strtolower(str_replace(' ', '.', $nama)).'@example.test',
         ]);
 
