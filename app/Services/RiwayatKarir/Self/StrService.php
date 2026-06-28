@@ -61,7 +61,6 @@ class StrService
             'nomor_str' => $payload['nomor_str'],
             'tanggal_terbit' => $payload['tanggal_terbit'],
             'tanggal_kadaluarsa' => $payload['tanggal_kadaluarsa'] ?? null,
-            'is_current' => (bool) $payload['is_current'],
             'sk_file_path' => $skFilePath,
         ];
 
@@ -107,7 +106,6 @@ class StrService
         if (array_key_exists('nomor_str', $payload)) $data['nomor_str'] = $payload['nomor_str'];
         if (array_key_exists('tanggal_terbit', $payload)) $data['tanggal_terbit'] = $payload['tanggal_terbit'];
         if (array_key_exists('tanggal_kadaluarsa', $payload)) $data['tanggal_kadaluarsa'] = $payload['tanggal_kadaluarsa'];
-        if (array_key_exists('is_current', $payload)) $data['is_current'] = (bool) $payload['is_current'];
         if ($skFile !== null) $data['sk_file_path'] = $skFilePath;
 
         $updatedStr = $this->strRepository->updateStr($str, $data);
@@ -141,8 +139,19 @@ class StrService
             'nomor_str' => $item->nomor_str,
             'tanggal_terbit' => $item->tanggal_terbit?->format('Y-m-d'),
             'tanggal_kadaluarsa' => $item->tanggal_kadaluarsa?->format('Y-m-d'),
-            'is_current' => (bool) $item->is_current,
+            'status' => $this->resolveTanggalStatus($item->tanggal_kadaluarsa),
             'link_sk' => $item->sk_file_path ? '/'.$item->sk_file_path : null,
         ];
+    }
+
+    private function resolveTanggalStatus(mixed $tanggalKadaluarsa): string
+    {
+        if ($tanggalKadaluarsa === null || $tanggalKadaluarsa === '') {
+            return 'aktif';
+        }
+
+        return \Carbon\Carbon::parse($tanggalKadaluarsa)->lt(\Carbon\Carbon::today())
+            ? 'tidak aktif'
+            : 'aktif';
     }
 }

@@ -29,7 +29,6 @@ class SipService extends BaseRiwayatKarirService
             'nomor_sip'          => $payload['nomor_sip'],
             'tanggal_terbit'     => $payload['tanggal_terbit'],
             'tanggal_kadaluarsa' => $payload['tanggal_kadaluarsa'] ?? null,
-            'is_current'         => (bool) $payload['is_current'],
             'sk_file_path'       => $skFilePath,
         ];
 
@@ -50,7 +49,6 @@ class SipService extends BaseRiwayatKarirService
         if (array_key_exists('nomor_sip', $payload))           $data['nomor_sip'] = $payload['nomor_sip'];
         if (array_key_exists('tanggal_terbit', $payload))      $data['tanggal_terbit'] = $payload['tanggal_terbit'];
         if (array_key_exists('tanggal_kadaluarsa', $payload))  $data['tanggal_kadaluarsa'] = $payload['tanggal_kadaluarsa'];
-        if (array_key_exists('is_current', $payload))          $data['is_current'] = (bool) $payload['is_current'];
 
         if ($file !== null) {
             $data['sk_file_path'] = $this->handleFileUpload('dokumen/sip', 'sk-sip', $pegawaiId, $file, $sip->sk_file_path);
@@ -86,7 +84,7 @@ class SipService extends BaseRiwayatKarirService
             'nomor_sip'          => $item->nomor_sip,
             'tanggal_terbit'     => $item->tanggal_terbit?->format('Y-m-d'),
             'tanggal_kadaluarsa' => $item->tanggal_kadaluarsa?->format('Y-m-d'),
-            'is_current'         => (bool) $item->is_current,
+            'status'             => $this->resolveTanggalStatus($item->tanggal_kadaluarsa),
             'link_sk'            => $item->sk_file_path ? '/'.$item->sk_file_path : null,
         ];
     }

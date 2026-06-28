@@ -167,7 +167,7 @@ class AdminPegawaiService
                     'nomor_str' => $s->nomor_str,
                     'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
                     'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
-                    'is_current' => (bool)$s->is_current,
+                    'status' => $this->resolveTanggalStatus($s->tanggal_kadaluarsa),
                     'file_path' => $s->sk_file_path,
                 ]) ?? [],
                 'sip' => $pegawai->sip?->map(fn($s) => [
@@ -176,7 +176,7 @@ class AdminPegawaiService
                     'nomor_sip' => $s->nomor_sip,
                     'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
                     'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
-                    'is_current' => (bool)$s->is_current,
+                    'status' => $this->resolveTanggalStatus($s->tanggal_kadaluarsa),
                     'file_path' => $s->sk_file_path,
                 ]) ?? [],
                 'penugasan_klinis' => $pegawai->penugasanKlinis?->map(fn($pk) => [
@@ -184,7 +184,7 @@ class AdminPegawaiService
                     'nomor_surat' => $pk->nomor_surat,
                     'tanggal_mulai' => $pk->tgl_mulai?->format('Y-m-d'),
                     'tanggal_kadaluarsa' => $pk->tgl_kadaluarsa?->format('Y-m-d'),
-                    'is_current' => (bool)$pk->is_current,
+                    'status' => $this->resolveTanggalStatus($pk->tgl_kadaluarsa),
                     'file_path' => $pk->dokumen_file_path,
                 ]) ?? [],
                 'pangkat' => $pegawai->riwayatPangkat?->map(fn($p) => [
@@ -394,5 +394,16 @@ class AdminPegawaiService
         $perPage = is_numeric($value) ? (int) $value : $default;
 
         return max(1, min($perPage, 100));
+    }
+
+    private function resolveTanggalStatus(mixed $tanggalKadaluarsa): string
+    {
+        if ($tanggalKadaluarsa === null || $tanggalKadaluarsa === '') {
+            return 'aktif';
+        }
+
+        return \Carbon\Carbon::parse($tanggalKadaluarsa)->lt(\Carbon\Carbon::today())
+            ? 'tidak aktif'
+            : 'aktif';
     }
 }

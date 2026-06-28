@@ -28,7 +28,6 @@ class PenugasanKlinisService extends BaseRiwayatKarirService
             'nomor_surat'       => $payload['nomor_surat'],
             'tgl_mulai'         => $payload['tgl_mulai'],
             'tgl_kadaluarsa'    => $payload['tgl_kadaluarsa'] ?? null,
-            'is_current'        => (bool) $payload['is_current'],
             'dokumen_file_path' => $filePath,
         ];
 
@@ -48,7 +47,6 @@ class PenugasanKlinisService extends BaseRiwayatKarirService
         if (array_key_exists('nomor_surat', $payload))    $data['nomor_surat'] = $payload['nomor_surat'];
         if (array_key_exists('tgl_mulai', $payload))      $data['tgl_mulai'] = $payload['tgl_mulai'];
         if (array_key_exists('tgl_kadaluarsa', $payload)) $data['tgl_kadaluarsa'] = $payload['tgl_kadaluarsa'];
-        if (array_key_exists('is_current', $payload))     $data['is_current'] = (bool) $payload['is_current'];
 
         if ($file !== null) {
             $data['dokumen_file_path'] = $this->handleFileUpload('dokumen/penugasan-klinis', 'sk-penugasan-klinis', $pegawaiId, $file, $pk->dokumen_file_path);
@@ -82,7 +80,7 @@ class PenugasanKlinisService extends BaseRiwayatKarirService
             'nomor_surat'   => $item->nomor_surat,
             'tgl_mulai'     => $item->tgl_mulai?->format('Y-m-d'),
             'tgl_kadaluarsa' => $item->tgl_kadaluarsa?->format('Y-m-d'),
-            'is_current'    => (bool) $item->is_current,
+            'status'        => $this->resolveTanggalStatus($item->tgl_kadaluarsa),
             'link_dokumen'  => $item->dokumen_file_path ? '/'.$item->dokumen_file_path : null,
         ];
     }

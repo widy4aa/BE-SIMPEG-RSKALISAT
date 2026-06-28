@@ -19,7 +19,6 @@ class UpdateStrRequest extends FormRequest
             'nomor_str' => ['sometimes', 'required', 'string', 'max:255'],
             'tanggal_terbit' => ['sometimes', 'required', 'date'],
             'tanggal_kadaluarsa' => ['sometimes', 'nullable', 'date', 'after_or_equal:tanggal_terbit'],
-            'is_current' => ['sometimes', 'required', 'boolean'],
             'sk_str' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
         ];
     }

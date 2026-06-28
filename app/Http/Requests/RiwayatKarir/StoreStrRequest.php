@@ -19,7 +19,6 @@ class StoreStrRequest extends FormRequest
             'nomor_str' => ['required', 'string', 'max:255'],
             'tanggal_terbit' => ['required', 'date'],
             'tanggal_kadaluarsa' => ['nullable', 'date', 'after_or_equal:tanggal_terbit'],
-            'is_current' => ['required', 'boolean'],
             'sk_str' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
         ];
     }

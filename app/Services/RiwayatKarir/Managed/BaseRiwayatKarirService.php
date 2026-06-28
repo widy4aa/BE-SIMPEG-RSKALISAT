@@ -37,4 +37,15 @@ abstract class BaseRiwayatKarirService
 
         return $folder.'/'.$filename;
     }
+
+    protected function resolveTanggalStatus(mixed $tanggalKadaluarsa): string
+    {
+        if ($tanggalKadaluarsa === null || $tanggalKadaluarsa === '') {
+            return 'aktif';
+        }
+
+        return \Carbon\Carbon::parse($tanggalKadaluarsa)->lt(\Carbon\Carbon::today())
+            ? 'tidak aktif'
+            : 'aktif';
+    }
 }

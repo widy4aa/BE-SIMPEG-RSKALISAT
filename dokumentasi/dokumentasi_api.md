@@ -2585,7 +2585,7 @@ Response `200 OK`:
         "nomor_sip": "SIP.123/456/2023",
         "tanggal_terbit": "2023-01-01",
         "tanggal_kadaluarsa": "2028-01-01",
-        "is_current": true,
+        "status": "aktif",
         "link_sk": "/dokumen/sip/sk-sip-1-123456789.pdf"
       }
     ]
@@ -2605,7 +2605,6 @@ Response `200 OK`:
 | `nomor_sip` | String | Ya | `required`, `string`, `max:255` | Nomor surat SIP |
 | `tanggal_terbit` | Date | Ya | `required`, `date` | Tanggal terbit (YYYY-MM-DD) |
 | `tanggal_kadaluarsa` | Date | Tidak | `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | SIP masih aktif? |
 | `sk_sip` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK SIP (maks 5MB) |
 
 Contoh raw input (form-data):
@@ -2615,7 +2614,6 @@ jenis_sip_id: 1
 nomor_sip: SIP.Baru/789/2024
 tanggal_terbit: 2024-01-01
 tanggal_kadaluarsa: 2029-01-01
-is_current: 1
 sk_sip: <File Binary>
 ```
 
@@ -2632,7 +2630,7 @@ Response `201 Created`:
     "nomor_sip": "SIP.Baru/789/2024",
     "tanggal_terbit": "2024-01-01",
     "tanggal_kadaluarsa": "2029-01-01",
-    "is_current": true,
+    "status": "aktif",
     "link_sk": "/dokumen/sip/sk-sip-2-123456789.pdf"
   }
 }
@@ -2651,7 +2649,6 @@ Gunakan `POST` kalau kirim file. File SK lama otomatis dihapus saat upload baru.
 | `nomor_sip` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nomor SIP |
 | `tanggal_terbit` | Date | Opsional | `sometimes`, `required`, `date` | Tanggal terbit |
 | `tanggal_kadaluarsa` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | SIP masih aktif? |
 | `sk_sip` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK (maks 5MB) |
 
 Response `200 OK`:
@@ -2667,7 +2664,7 @@ Response `200 OK`:
     "nomor_sip": "SIP.123/456/2023",
     "tanggal_terbit": "2023-01-01",
     "tanggal_kadaluarsa": "2028-01-01",
-    "is_current": false,
+    "status": "aktif",
     "link_sk": null
   }
 }
@@ -2717,7 +2714,7 @@ Response `200 OK`:
         "nomor_str": "STR.123/456/2023",
         "tanggal_terbit": "2023-01-01",
         "tanggal_kadaluarsa": "2028-01-01",
-        "is_current": true,
+        "status": "aktif",
         "link_sk": "/dokumen/str/sk-str-1-123456789.pdf"
       }
     ]
@@ -2736,7 +2733,6 @@ Response `200 OK`:
 | `nomor_str` | String | Ya | `required`, `string`, `max:255` | Nomor surat STR |
 | `tanggal_terbit` | Date | Ya | `required`, `date` | Tanggal terbit (YYYY-MM-DD) |
 | `tanggal_kadaluarsa` | Date | Tidak | `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | STR masih aktif? |
 | `sk_str` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK STR (maks 5MB) |
 
 Contoh raw input (form-data):
@@ -2745,7 +2741,6 @@ Contoh raw input (form-data):
 nomor_str: STR.Baru/789/2024
 tanggal_terbit: 2024-01-01
 tanggal_kadaluarsa: 2029-01-01
-is_current: 1
 sk_str: <File Binary>
 ```
 
@@ -2760,7 +2755,7 @@ Response `201 Created`:
     "nomor_str": "STR.Baru/789/2024",
     "tanggal_terbit": "2024-01-01",
     "tanggal_kadaluarsa": "2029-01-01",
-    "is_current": true,
+    "status": "aktif",
     "link_sk": "/dokumen/str/sk-str-2-123456789.pdf"
   }
 }
@@ -2778,7 +2773,6 @@ Gunakan `POST` kalau kirim file. File SK lama otomatis dihapus saat upload baru.
 | `nomor_str` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nomor STR |
 | `tanggal_terbit` | Date | Opsional | `sometimes`, `required`, `date` | Tanggal terbit |
 | `tanggal_kadaluarsa` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:tanggal_terbit` | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | STR masih aktif? |
 | `sk_str` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File SK (maks 5MB) |
 
 Response `200 OK`:
@@ -2792,7 +2786,7 @@ Response `200 OK`:
     "nomor_str": "STR.123/456/2023",
     "tanggal_terbit": "2023-01-01",
     "tanggal_kadaluarsa": "2028-01-01",
-    "is_current": false,
+    "status": "aktif",
     "link_sk": null
   }
 }
@@ -2842,7 +2836,7 @@ Response `200 OK`:
         "nomor_surat": "PK.123/456/2023",
         "tgl_mulai": "2023-01-01",
         "tgl_kadaluarsa": "2028-01-01",
-        "is_current": true,
+        "status": "aktif",
         "link_dokumen": "/dokumen/penugasan-klinis/sk-penugasan-klinis-1-123456789.pdf"
       }
     ]
@@ -2861,7 +2855,6 @@ Response `200 OK`:
 | `nomor_surat` | String | Ya | `required`, `string`, `max:255` | Nomor surat penugasan klinis |
 | `tgl_mulai` | Date | Ya | `required`, `date` | Tanggal mulai (YYYY-MM-DD) |
 | `tgl_kadaluarsa` | Date | Tidak | `nullable`, `date`, `after_or_equal:tgl_mulai` | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | Penugasan masih aktif? |
 | `dokumen_file` | File | Tidak | `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File dokumen (maks 5MB) |
 
 Contoh raw input (form-data):
@@ -2870,7 +2863,6 @@ Contoh raw input (form-data):
 nomor_surat: PK.Baru/789/2024
 tgl_mulai: 2024-01-01
 tgl_kadaluarsa: 2029-01-01
-is_current: 1
 dokumen_file: <File Binary>
 ```
 
@@ -2885,7 +2877,7 @@ Response `201 Created`:
     "nomor_surat": "PK.Baru/789/2024",
     "tgl_mulai": "2024-01-01",
     "tgl_kadaluarsa": "2029-01-01",
-    "is_current": true,
+    "status": "aktif",
     "link_dokumen": "/dokumen/penugasan-klinis/sk-penugasan-klinis-2-123456789.pdf"
   }
 }
@@ -2903,7 +2895,6 @@ Gunakan `POST` kalau kirim file. File dokumen lama otomatis dihapus saat upload 
 | `nomor_surat` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nomor surat |
 | `tgl_mulai` | Date | Opsional | `sometimes`, `required`, `date` | Tanggal mulai |
 | `tgl_kadaluarsa` | Date | Opsional | `sometimes`, `nullable`, `date`, `after_or_equal:tgl_mulai` | Tanggal kedaluwarsa |
-| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | Penugasan masih aktif? |
 | `dokumen_file` | File | Opsional | `sometimes`, `nullable`, `file`, `mimes:pdf,jpg,jpeg,png`, `max:5120` | File dokumen (maks 5MB) |
 
 Response `200 OK`:
@@ -2917,7 +2908,7 @@ Response `200 OK`:
     "nomor_surat": "PK.123/456/2023",
     "tgl_mulai": "2023-01-01",
     "tgl_kadaluarsa": "2028-01-01",
-    "is_current": false,
+    "status": "aktif",
     "link_dokumen": null
   }
 }
@@ -3786,7 +3777,7 @@ Contoh response sukses (`200 OK`):
           "nomor_str": "123456789",
           "tanggal_terbit": "2023-01-01",
           "tanggal_kadaluarsa": "2028-01-01",
-          "is_current": true,
+          "status": "aktif",
           "file_path": "dokumen/str/str-123.pdf"
         }
       ],
@@ -3797,7 +3788,7 @@ Contoh response sukses (`200 OK`):
           "nomor_sip": "987654321",
           "tanggal_terbit": "2023-01-01",
           "tanggal_kadaluarsa": "2028-01-01",
-          "is_current": true,
+          "status": "aktif",
           "file_path": "dokumen/sip/sip-123.pdf"
         }
       ],
@@ -3807,7 +3798,7 @@ Contoh response sukses (`200 OK`):
           "nomor_surat": "PK-001",
           "tanggal_mulai": "2023-01-01",
           "tanggal_kadaluarsa": "2026-01-01",
-          "is_current": true,
+          "status": "aktif",
           "file_path": "dokumen/penugasan-klinis/pk-123.pdf"
         }
       ]
@@ -3947,6 +3938,14 @@ Catatan:
 - `/api/pegawai/{id}/pegawai` hanya mengembalikan objek `pegawai`. Data `pribadi` tetap tersedia pada endpoint full detail `/api/pegawai/{id}`.
 - `/api/pegawai/{id}/diklat` secara default tidak menampilkan diklat dengan `status_kelayakan` `tidak layak` atau `false`. Gunakan `?kelayakan=all` atau `?all=true` untuk menampilkan semua diklat.
 - Route `{bagian}` dibatasi pada `pegawai`, `keluarga`, `riwayat-karir`, dan `diklat`.
+
+Catatan status STR/SIP/Penugasan Klinis:
+
+- Field `status` pada STR dan SIP dihitung dari `tanggal_kadaluarsa`.
+- Field `status` pada Penugasan Klinis dihitung dari `tgl_kadaluarsa` / `tanggal_kadaluarsa`.
+- Jika tanggal kadaluarsa sudah lewat dari tanggal hari ini, status bernilai `tidak aktif`.
+- Jika tanggal kadaluarsa masih hari ini atau di masa depan, status bernilai `aktif`.
+- Jika tanggal kadaluarsa kosong, status dianggap `aktif`.
 
 #### Tambah Data Pegawai Baru (Hanya Admin)
 
@@ -4252,8 +4251,7 @@ Contoh response `200 OK`:
       {
         "nomor_str": "1234567890",
         "tanggal_terbit": "2020-05-10",
-        "tanggal_kadaluarsa": "2025-05-10",
-        "is_current": true
+        "tanggal_kadaluarsa": "2025-05-10"
       }
     ],
     "sip": [
@@ -4261,16 +4259,14 @@ Contoh response `200 OK`:
         "jenis_sip": "SIP Praktik Rumah Sakit",
         "nomor_sip": "SIP-1234",
         "tanggal_terbit": "2021-06-01",
-        "tanggal_kadaluarsa": "2026-06-01",
-        "is_current": true
+        "tanggal_kadaluarsa": "2026-06-01"
       }
     ],
     "penugasan_klinis": [
       {
         "nomor_surat": "SK-KLINIS-2022",
         "tanggal_mulai": "2022-01-01",
-        "tanggal_kadaluarsa": "2026-12-31",
-        "is_current": true
+        "tanggal_kadaluarsa": "2026-12-31"
       }
     ],
     "ttd": {
@@ -4624,7 +4620,6 @@ Body `POST` tambah STR (`multipart/form-data`):
 | `nomor_str` | string, required | Nomor STR |
 | `tanggal_terbit` | date, required | Tanggal terbit STR |
 | `tanggal_kadaluarsa` | date, nullable | Tanggal kadaluarsa |
-| `is_current` | boolean, required | STR aktif |
 | `sk_str` | file, nullable | File STR (pdf/jpg/png, max 5 MB) |
 
 ---
@@ -4646,7 +4641,6 @@ Body `POST` tambah SIP (`multipart/form-data`):
 | `nomor_sip` | string, required | Nomor SIP |
 | `tanggal_terbit` | date, required | Tanggal terbit SIP |
 | `tanggal_kadaluarsa` | date, nullable | Tanggal kadaluarsa |
-| `is_current` | boolean, required | SIP aktif |
 | `sk_sip` | file, nullable | File SIP (pdf/jpg/png, max 5 MB) |
 
 ---
@@ -4667,7 +4661,6 @@ Body `POST` tambah penugasan klinis (`multipart/form-data`):
 | `nomor_surat` | string, required | Nomor surat penugasan |
 | `tgl_mulai` | date, required | Tanggal mulai |
 | `tgl_kadaluarsa` | date, nullable | Tanggal kadaluarsa |
-| `is_current` | boolean, required | Penugasan aktif |
 | `dokumen_file` | file, nullable | Dokumen penugasan (pdf/jpg/png, max 5 MB) |
 
 ---
@@ -5299,7 +5292,6 @@ curl -X POST http://127.0.0.1:8000/api/riwayat-karir/sip \
   -F "nomor_sip=SIP.123" \
   -F "tanggal_terbit=2024-01-01" \
   -F "tanggal_kadaluarsa=2029-01-01" \
-  -F "is_current=1" \
   -F "sk_sip=@/path/to/sk.pdf"
 ```
 
@@ -5333,7 +5325,6 @@ curl -X POST http://127.0.0.1:8000/api/riwayat-karir/str \
   -F "nomor_str=STR.123" \
   -F "tanggal_terbit=2024-01-01" \
   -F "tanggal_kadaluarsa=2029-01-01" \
-  -F "is_current=1" \
   -F "sk_str=@/path/to/sk.pdf"
 ```
 
@@ -5367,7 +5358,6 @@ curl -X POST http://127.0.0.1:8000/api/riwayat-karir/penugasan-klinis \
   -F "nomor_surat=PK.123" \
   -F "tgl_mulai=2024-01-01" \
   -F "tgl_kadaluarsa=2029-01-01" \
-  -F "is_current=1" \
   -F "dokumen_file=@/path/to/dokumen.pdf"
 ```
 

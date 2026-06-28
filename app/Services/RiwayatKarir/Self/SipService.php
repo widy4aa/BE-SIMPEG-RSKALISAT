@@ -62,7 +62,6 @@ class SipService
             'nomor_sip' => $payload['nomor_sip'],
             'tanggal_terbit' => $payload['tanggal_terbit'],
             'tanggal_kadaluarsa' => $payload['tanggal_kadaluarsa'] ?? null,
-            'is_current' => (bool) $payload['is_current'],
             'sk_file_path' => $skFilePath,
         ];
 
@@ -109,7 +108,6 @@ class SipService
         if (array_key_exists('nomor_sip', $payload)) $data['nomor_sip'] = $payload['nomor_sip'];
         if (array_key_exists('tanggal_terbit', $payload)) $data['tanggal_terbit'] = $payload['tanggal_terbit'];
         if (array_key_exists('tanggal_kadaluarsa', $payload)) $data['tanggal_kadaluarsa'] = $payload['tanggal_kadaluarsa'];
-        if (array_key_exists('is_current', $payload)) $data['is_current'] = (bool) $payload['is_current'];
         if ($skFile !== null) $data['sk_file_path'] = $skFilePath;
 
         $updatedSip = $this->sipRepository->updateSip($sip, $data);
@@ -145,8 +143,19 @@ class SipService
             'nomor_sip' => $item->nomor_sip,
             'tanggal_terbit' => $item->tanggal_terbit?->format('Y-m-d'),
             'tanggal_kadaluarsa' => $item->tanggal_kadaluarsa?->format('Y-m-d'),
-            'is_current' => (bool) $item->is_current,
+            'status' => $this->resolveTanggalStatus($item->tanggal_kadaluarsa),
             'link_sk' => $item->sk_file_path ? '/'.$item->sk_file_path : null,
         ];
+    }
+
+    private function resolveTanggalStatus(mixed $tanggalKadaluarsa): string
+    {
+        if ($tanggalKadaluarsa === null || $tanggalKadaluarsa === '') {
+            return 'aktif';
+        }
+
+        return \Carbon\Carbon::parse($tanggalKadaluarsa)->lt(\Carbon\Carbon::today())
+            ? 'tidak aktif'
+            : 'aktif';
     }
 }

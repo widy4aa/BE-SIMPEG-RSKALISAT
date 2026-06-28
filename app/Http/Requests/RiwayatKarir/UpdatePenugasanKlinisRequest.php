@@ -19,7 +19,6 @@ class UpdatePenugasanKlinisRequest extends FormRequest
             'nomor_surat' => ['sometimes', 'required', 'string', 'max:255'],
             'tgl_mulai' => ['sometimes', 'required', 'date'],
             'tgl_kadaluarsa' => ['sometimes', 'nullable', 'date', 'after_or_equal:tgl_mulai'],
-            'is_current' => ['sometimes', 'required', 'boolean'],
             'dokumen_file' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
         ];
     }

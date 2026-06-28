@@ -20,7 +20,6 @@ class UpdateSipRequest extends FormRequest
             'nomor_sip' => ['sometimes', 'required', 'string', 'max:255'],
             'tanggal_terbit' => ['sometimes', 'required', 'date'],
             'tanggal_kadaluarsa' => ['sometimes', 'nullable', 'date', 'after_or_equal:tanggal_terbit'],
-            'is_current' => ['sometimes', 'required', 'boolean'],
             'sk_sip' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
         ];
     }

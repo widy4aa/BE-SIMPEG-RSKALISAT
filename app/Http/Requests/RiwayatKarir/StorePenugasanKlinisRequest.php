@@ -19,7 +19,6 @@ class StorePenugasanKlinisRequest extends FormRequest
             'nomor_surat' => ['required', 'string', 'max:255'],
             'tgl_mulai' => ['required', 'date'],
             'tgl_kadaluarsa' => ['nullable', 'date', 'after_or_equal:tgl_mulai'],
-            'is_current' => ['required', 'boolean'],
             'dokumen_file' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max
         ];
     }
