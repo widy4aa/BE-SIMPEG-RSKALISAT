@@ -55,7 +55,8 @@ class DiklatController extends Controller
         }
 
         try {
-            $result = $this->pesertaService->getPesertaDiklat($id);
+            $section = $request->query('section', $request->input('section'));
+            $result = $this->pesertaService->getPesertaDiklat($id, $section);
         } catch (InvalidArgumentException $exception) {
             return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
         }

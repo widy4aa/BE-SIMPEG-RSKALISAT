@@ -269,6 +269,7 @@ class PaginationSearchFilterTest extends TestCase
     public function test_hrd_peserta_diklat_list_includes_display_status_validasi(): void
     {
         $hrd = $this->createUserWithPegawai('hrd', '9440000000000001', 'HRD Peserta Validasi');
+        $pegawaiLain = $this->createUserWithPegawai('pegawai', '9440000000000002', 'Pegawai Bukan Peserta');
         $jenis = JenisDiklat::query()->create(['nama' => 'ASN Peserta Validasi']);
         $kategori = KategoriDiklat::query()->create(['nama' => 'Teknis Peserta Validasi']);
 
@@ -300,6 +301,19 @@ class PaginationSearchFilterTest extends TestCase
                 'status' => true,
                 'status_validasi' => 'sudah di validasi',
             ]);
+
+        $list = $response->json('data.list');
+        $this->assertCount(1, $list);
+        $this->assertEquals($hrd->pegawai->id, $list[0]['pegawai_id']);
+        $this->assertTrue($list[0]['status']);
+        $this->assertNotNull($list[0]['status_validasi']);
+
+        $responseAll = $this->withTokenFor($hrd)
+            ->getJson("/api/hrd/diklat/{$diklat->id}/peserta?section=all");
+        $responseAll->assertOk();
+        $listAll = collect($responseAll->json('data.list'));
+        $this->assertTrue($listAll->contains('pegawai_id', $pegawaiLain->pegawai->id));
+        $this->assertTrue($listAll->contains('pegawai_id', $hrd->pegawai->id));
     }
 
     public function test_external_diklat_cannot_be_approved_for_kelayakan_before_laporan_is_uploaded(): void

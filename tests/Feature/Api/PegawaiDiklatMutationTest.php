@@ -90,6 +90,22 @@ class PegawaiDiklatMutationTest extends TestCase
         ]);
     }
 
+    public function test_pegawai_cannot_edit_external_diklat_that_has_been_seen_by_hrd(): void
+    {
+        $user = $this->createUserWithPegawai('pegawai', '9700000000000010', 'Pegawai Edit External Diklat');
+        $diklat = $this->createOwnedDiklat($user->pegawai, jenisPelaksanaan: 'external');
+        $jadwal = ListJadwalDiklat::query()->where('diklat_id', $diklat->id)->firstOrFail();
+        $jadwal->update(['status_kelayakan' => 'layak']);
+
+        $response = $this->withTokenFor($user)->patchJson("/api/diklat/{$diklat->id}", [
+            'nama_kegiatan' => 'External Update Ditolak',
+        ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Diklat sudah dilihat oleh HRD, sehingga diklat external tidak bisa diedit lagi.');
+    }
+
     public function test_upload_laporan_internal_resets_validation_status(): void
     {
         $user = $this->createUserWithPegawai('pegawai', '9700000000000004', 'Pegawai Upload Laporan');

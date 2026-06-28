@@ -168,7 +168,7 @@ class PegawaiDiklatMutationService
         }
 
         if ($jenisPelaksanaCurrent === 'external' && (string) ($jadwal->status_kelayakan ?? '') === 'layak') {
-            throw new InvalidArgumentException('Diklat eksternal yang sudah layak tidak bisa diedit.');
+            throw new InvalidArgumentException('Diklat sudah dilihat oleh HRD, sehingga diklat external tidak bisa diedit lagi.');
         }
 
         $kategori = $diklat->kategoriDiklat;

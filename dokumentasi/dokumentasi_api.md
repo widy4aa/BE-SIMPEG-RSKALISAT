@@ -1290,15 +1290,16 @@ Contoh response sukses (`200`):
 - Method: `GET`
 - URL: `/api/hrd/diklat/{id}/peserta`
 - Parameter URL: `id` (required, int) - ID dari Master Diklat
+- Parameter Query Opsional: `section` (string, contoh: `?section=all` atau `?section=semua_pegawai` untuk memunculkan seluruh pegawai di dalam array `list`)
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `hrd`
 
-Endpoint ini digunakan oleh HRD untuk melihat daftar semua pegawai beserta status apakah mereka mengikuti diklat tertentu atau tidak. Untuk pegawai yang menjadi peserta (`status=true`), response juga menyertakan `status_validasi` dalam bentuk teks tampilan yang sama seperti halaman diklat pegawai.
+Endpoint ini digunakan oleh HRD untuk melihat data peserta diklat. Secara default (`GET /api/hrd/diklat/{id}/peserta`), array `list` hanya menampilkan peserta yang sudah terdaftar (`status=true`) lengkap dengan `status_validasi` mereka. Jika frontend membutuhkan daftar seluruh pegawai di dalam array `list` (misalnya saat membuka modal checklist update/patch peserta), cukup tambahkan parameter query `?section=all`.
 
 Contoh request:
-`GET /api/hrd/diklat/13/peserta`
+`GET /api/hrd/diklat/13/peserta` atau `GET /api/hrd/diklat/13/peserta?section=all`
 
-Contoh response sukses (`200 OK`):
+Contoh response sukses (`200 OK` untuk request default):
 
 ```json
 {
@@ -1306,7 +1307,33 @@ Contoh response sukses (`200 OK`):
   "message": "Data peserta diklat berhasil diambil.",
   "data": {
     "diklat_id": 13,
+    "total_peserta": 1,
     "total_pegawai": 2,
+    "list": [
+      {
+        "pegawai_id": 1,
+        "nama": "Budi Santoso",
+        "nik": "350912345678",
+        "unit_kerja": "IGD",
+        "profesi": "Dokter Umum",
+        "status": true,
+        "status_validasi": "sudah di validasi"
+      }
+    ]
+  }
+}
+```
+
+Contoh response sukses (`200 OK` untuk request `GET /api/hrd/diklat/13/peserta?section=all`):
+
+```json
+{
+  "success": true,
+  "message": "Data peserta diklat berhasil diambil.",
+  "data": {
+    "diklat_id": 13,
+    "total_peserta": 1,
+    "total_pegawai": 150,
     "list": [
       {
         "pegawai_id": 1,
@@ -1676,7 +1703,7 @@ Aturan bisnis edit:
 
 - `jenis_pelaksana` (`internal`/`external`) tidak bisa diubah.
 - Jika diklat `internal` and `status_validasi = valid`, data tidak bisa diedit. (Jika status validasi nya `null` atau `tidak valid`/ditolak, data bisa diedit lagi).
-- Jika diklat `external` and `status_kelayakan = layak`, data tidak bisa diedit. (Jika status kelayakan nya `null` atau `tidak layak`/ditolak, data bisa diedit lagi).
+- Jika diklat `external` sudah dilihat/diterima HRD (`status_kelayakan = layak`), data tidak bisa diedit lagi. Response error: `Diklat sudah dilihat oleh HRD, sehingga diklat external tidak bisa diedit lagi.` Jika status kelayakan masih `null` atau `tidak layak`/ditolak, data bisa diedit lagi.
 - Untuk diklat `internal`, saat diedit `status_kelayakan` dipertahankan `layak`, dan `status_validasi` akan di-reset menjadi `null` agar divalidasi ulang oleh HRD.
 - Untuk diklat `external`, saat diedit `jenis_biaya`, `total_biaya`, dan `status_validasi` diset `null`, serta `status_kelayakan` akan di-reset menjadi `null` agar dievaluasi ulang.
 

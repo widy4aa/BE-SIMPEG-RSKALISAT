@@ -14,7 +14,7 @@ class HrdDiklatPesertaService
         private readonly DiklatStatusResolver $statusResolver,
     ) {}
 
-    public function getPesertaDiklat(int $diklatId): array
+    public function getPesertaDiklat(int $diklatId, ?string $section = null): array
     {
         $diklat = $this->pegawaiDiklatRepository->findDiklatById($diklatId);
         if ($diklat === null) {
@@ -45,10 +45,18 @@ class HrdDiklatPesertaService
             ];
         })->values()->all();
 
+        $pesertaTerdaftar = array_values(array_filter($peserta, fn ($p) => $p['status'] === true));
+
+        $sectionClean = strtolower(trim((string) $section));
+        $showAll = ($sectionClean !== '' && !in_array($sectionClean, ['terdaftar', 'peserta', 'registered'], true));
+
+        $selectedList = $showAll ? $peserta : $pesertaTerdaftar;
+
         return [
             'diklat_id' => $diklatId,
+            'total_peserta' => count($pesertaTerdaftar),
             'total_pegawai' => count($peserta),
-            'list' => $peserta,
+            'list' => $selectedList,
         ];
     }
 
@@ -76,7 +84,7 @@ class HrdDiklatPesertaService
             return 'sudah di validasi';
         }
 
-        return null;
+        return 'udah upload laporan namun belum di validasi';
     }
 
     public function syncPesertaDiklat(int $diklatId, array $pegawaiIds): array
