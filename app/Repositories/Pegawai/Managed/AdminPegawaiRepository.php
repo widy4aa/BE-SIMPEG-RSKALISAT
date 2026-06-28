@@ -526,13 +526,22 @@ class AdminPegawaiRepository
                 d.penyelenggara,
                 d.tanggal_mulai,
                 d.tanggal_selesai,
+                d.waktu,
                 d.jp,
+                d.total_biaya,
+                d.jenis_pelaksanaan,
+                d.catatan,
                 kd.nama AS kategori_nama,
-                jd.nama AS jenis_nama
+                jd.nama AS jenis_nama,
+                jb.nama AS jenis_biaya_nama,
+                cb.id AS created_by_id,
+                cb.nama AS created_by_nama
             FROM list_jadwal_diklat ljd
             LEFT JOIN diklat d ON d.id = ljd.diklat_id AND d.deleted_at IS NULL
             LEFT JOIN kategori_diklat kd ON kd.id = d.kategori_diklat_id
             LEFT JOIN jenis_diklat jd ON jd.id = d.jenis_diklat_id
+            LEFT JOIN jenis_biaya jb ON jb.id = d.jenis_biaya_id
+            LEFT JOIN pegawai cb ON cb.id = d.created_by AND cb.deleted_at IS NULL
             WHERE ljd.pegawai_id = ?
                 AND ljd.deleted_at IS NULL
             ORDER BY ljd.id DESC
@@ -543,9 +552,18 @@ class AdminPegawaiRepository
                 'penyelenggara' => $row->penyelenggara ?? null,
                 'tanggal_mulai' => $this->dateOrNull($row->tanggal_mulai ?? null),
                 'tanggal_selesai' => $this->dateOrNull($row->tanggal_selesai ?? null),
+                'waktu' => $row->waktu ?? null,
                 'jp' => $row->jp ?? null,
+                'total_biaya' => $row->total_biaya ?? null,
+                'jenis_pelaksanaan' => $row->jenis_pelaksanaan ?? null,
+                'catatan' => $row->catatan ?? null,
                 'kategoriDiklat' => (object) ['nama' => $row->kategori_nama ?? null],
                 'jenisDiklat' => (object) ['nama' => $row->jenis_nama ?? null],
+                'jenisBiaya' => (object) ['nama' => $row->jenis_biaya_nama ?? null],
+                'createdByPegawai' => (object) [
+                    'id' => $row->created_by_id !== null ? (int) $row->created_by_id : null,
+                    'nama' => $row->created_by_nama ?? null,
+                ],
             ];
 
             return $row;
