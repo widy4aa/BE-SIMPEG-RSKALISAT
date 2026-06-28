@@ -218,6 +218,54 @@ class PaginationSearchFilterTest extends TestCase
             ->assertJsonPath('data.data.0.jumlah_peserta', 1);
     }
 
+    public function test_diklat_all_returns_validation_participant_counts(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9430000000000001', 'HRD Validasi Count');
+        $pegawaiValid = $this->createUserWithPegawai('pegawai', '9430000000000002', 'Pegawai Validasi Valid');
+        $pegawaiBelum = $this->createUserWithPegawai('pegawai', '9430000000000003', 'Pegawai Validasi Belum');
+        $jenis = JenisDiklat::query()->create(['nama' => 'ASN Validasi Count']);
+        $kategori = KategoriDiklat::query()->create(['nama' => 'Teknis Validasi Count']);
+
+        $diklat = $this->createDiklat(
+            nama: 'Internal Count Validasi Peserta',
+            penyelenggara: 'RS Kalisat',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->subDays(3)->toDateString(),
+            selesai: now()->subDay()->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'internal'
+        );
+
+        ListJadwalDiklat::query()
+            ->where('diklat_id', $diklat->id)
+            ->where('pegawai_id', $hrd->pegawai->id)
+            ->update(['status_validasi' => 'valid']);
+
+        ListJadwalDiklat::query()->create([
+            'diklat_id' => $diklat->id,
+            'pegawai_id' => $pegawaiValid->pegawai->id,
+            'status_diklat' => 'sudah terlaksana',
+            'status_validasi' => 'tidak valid',
+        ]);
+
+        ListJadwalDiklat::query()->create([
+            'diklat_id' => $diklat->id,
+            'pegawai_id' => $pegawaiBelum->pegawai->id,
+            'status_diklat' => 'sudah terlaksana',
+            'status_validasi' => null,
+        ]);
+
+        $response = $this->withTokenFor($hrd)
+            ->getJson('/api/diklat/all?page=1&per_page=10&search=Count%20Validasi');
+
+        $response->assertOk()
+            ->assertJsonPath('data.total', 1)
+            ->assertJsonPath('data.data.0.jumlah_peserta', 3)
+            ->assertJsonPath('data.data.0.jumlah_peserta_sudah_validasi', 2)
+            ->assertJsonPath('data.data.0.jumlah_peserta_belum_validasi', 1);
+    }
+
     public function test_external_diklat_cannot_be_approved_for_kelayakan_before_laporan_is_uploaded(): void
     {
         $hrd = $this->createUserWithPegawai('hrd', '9500000000000001', 'HRD Kelayakan');

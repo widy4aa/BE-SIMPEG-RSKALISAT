@@ -594,7 +594,25 @@ class PegawaiDiklatRepository
                     FROM list_jadwal_diklat ljd
                     WHERE ljd.diklat_id = d.id
                         AND ljd.deleted_at IS NULL
-                ) AS jadwal_peserta_count
+                ) AS jadwal_peserta_count,
+                (
+                    SELECT COUNT(*)
+                    FROM list_jadwal_diklat ljd_validasi
+                    WHERE ljd_validasi.diklat_id = d.id
+                        AND ljd_validasi.deleted_at IS NULL
+                        AND ljd_validasi.status_validasi IS NOT NULL
+                        AND ljd_validasi.status_validasi <> \'\'
+                ) AS peserta_sudah_validasi_count,
+                (
+                    SELECT COUNT(*)
+                    FROM list_jadwal_diklat ljd_belum_validasi
+                    WHERE ljd_belum_validasi.diklat_id = d.id
+                        AND ljd_belum_validasi.deleted_at IS NULL
+                        AND (
+                            ljd_belum_validasi.status_validasi IS NULL
+                            OR ljd_belum_validasi.status_validasi = \'\'
+                        )
+                ) AS peserta_belum_validasi_count
             FROM diklat d
             LEFT JOIN kategori_diklat kd ON kd.id = d.kategori_diklat_id
             LEFT JOIN jenis_diklat jd ON jd.id = d.jenis_diklat_id
@@ -708,6 +726,8 @@ class PegawaiDiklatRepository
         $row->jenisBiaya = (object) ['nama' => $row->jenis_biaya_nama ?? null];
         $row->createdByPegawai = (object) ['nama' => $row->created_by_nama ?? null];
         $row->jadwal_peserta_count = (int) ($row->jadwal_peserta_count ?? 0);
+        $row->peserta_sudah_validasi_count = (int) ($row->peserta_sudah_validasi_count ?? 0);
+        $row->peserta_belum_validasi_count = (int) ($row->peserta_belum_validasi_count ?? 0);
         $row->total_peserta = (int) ($row->total_peserta ?? 0);
         $row->total_peserta_validasi = (int) ($row->total_peserta_validasi ?? 0);
         $row->jadwalPeserta = collect();

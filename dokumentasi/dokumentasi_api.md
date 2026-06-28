@@ -1033,7 +1033,7 @@ Catatan field `status`:
 - Auth: Wajib Bearer token
 - Role yang diizinkan: `hrd`, `direktur`
 
-Endpoint ini menampilkan seluruh data diklat beserta atributnya untuk role HRD dan Direktur.
+Endpoint ini menampilkan data diklat beserta atributnya untuk role HRD dan Direktur. Secara default endpoint ini hanya menampilkan diklat `internal`. Untuk menampilkan diklat `external`, kirim query `jenis_pelaksana=external` atau `jenis_pelaksanaan=external`.
 
 Query parameter opsional:
 
@@ -1043,11 +1043,13 @@ Query parameter opsional:
 | `per_page` | Integer | `7` | Jumlah data per halaman. Nilai dibatasi maksimal 100. |
 | `search` | String | - | Cari berdasarkan `nama_kegiatan`, `penyelenggara`, nama kategori, atau nama jenis diklat. |
 | `jenis` | String | - | Filter berdasarkan nama jenis diklat, contoh `ASN` atau `Tenaga Kesehatan`. |
+| `jenis_pelaksana` / `jenis_pelaksanaan` | String | `internal` | Filter jenis pelaksanaan. Nilai valid: `internal` atau `external`. Jika tidak dikirim, default `internal`. |
 
 Contoh URL dengan filter:
 
 ```http
 GET /api/diklat/all?page=1&per_page=7&search=workshop&jenis=ASN
+GET /api/diklat/all?page=1&per_page=7&jenis_pelaksana=external
 ```
 
 Contoh response `200 OK` (dengan pagination 7 item):
@@ -1076,7 +1078,9 @@ Contoh response `200 OK` (dengan pagination 7 item):
         "jenis_biaya": "BLUD",
         "jenis_pelaksana": "internal",
         "catatan": "Usulan pelatihan unit SDM",
-        "jumlah_peserta": 5
+        "jumlah_peserta": 5,
+        "jumlah_peserta_sudah_validasi": 3,
+        "jumlah_peserta_belum_validasi": 2
       }
     ],
     "first_page_url": "http://localhost:8000/api/diklat/all?page=1",
@@ -1129,6 +1133,14 @@ Keterangan field `data` (di dalam pagination):
 - `jenis_pelaksana`: `internal` atau `external`.
 - `catatan`: catatan tambahan.
 - `jumlah_peserta`: jumlah pegawai yang terdaftar sebagai peserta pada jadwal diklat.
+- `jumlah_peserta_sudah_validasi`: jumlah peserta yang `status_validasi`-nya sudah terisi, baik `valid` maupun `tidak valid`.
+- `jumlah_peserta_belum_validasi`: jumlah peserta yang `status_validasi`-nya masih `null` atau kosong.
+
+Catatan status validasi peserta:
+
+- `valid`: peserta sudah divalidasi dan diterima.
+- `tidak valid`: peserta sudah divalidasi tetapi ditolak.
+- `null` atau kosong: peserta belum divalidasi.
 
 #### Create Master Diklat (HRD)
 

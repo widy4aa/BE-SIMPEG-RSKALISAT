@@ -114,6 +114,8 @@ class HrdDiklatListService
                 'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
                 'catatan' => (string) ($diklat->catatan ?? ''),
                 'jumlah_peserta' => $diklat->jadwal_peserta_count ?? 0,
+                'jumlah_peserta_sudah_validasi' => $diklat->peserta_sudah_validasi_count ?? 0,
+                'jumlah_peserta_belum_validasi' => $diklat->peserta_belum_validasi_count ?? 0,
             ];
         });
 
