@@ -1,115 +1,113 @@
-# Dokumentasi Notifikasi
+# Dokumentasi Notifikasi Aplikasi SIMPEG (WhatsApp & In-App)
 
-Dokumen ini menjelaskan metode notifikasi yang berjalan saat ini, data apa yang digenerate, dan kapan notifikasi dibuat atau disinkronkan.
+Dokumen ini menjelaskan seluruh sistem notifikasi yang berjalan di aplikasi SIMPEG saat ini, mencakup **Notifikasi WhatsApp (WA Gateway Fonnte)** dan **Notifikasi Dalam Aplikasi (In-App)**, lengkap dengan pemicu (trigger), waktu pengiriman, tujuan, dan hasilnya dalam bentuk diagram box.
 
-## Ringkasan Arsitektur
+---
 
+## 🟢 1. NOTIFIKASI WHATSAPP (WA)
+Notifikasi WhatsApp dikirim secara langsung melalui integrasi API WhatsApp (Fonnte) ke nomor HP/WA pegawai yang terdaftar di sistem.
 
-- Notifikasi disimpan di tabel `notification` (model: `App\\Models\\NotificationModel`).
-- Notifikasi dibagi menjadi dua tipe utama: `info` dan `action`.
-- `info` dipakai untuk notifikasi biasa (ditampilkan pada list notifikasi user).
-- `action` dipakai untuk notifikasi aksi pada dashboard pegawai (list_aksi) dan memiliki status `is_resolved`.
+```
++---------------------------------------------------------------------------------------------------+
+| 📱 1. RESET PASSWORD (OTP)                                                                        |
++---------------------------------------------------------------------------------------------------+
+| ⚡ Trigger  : Pegawai meminta kode OTP lupa password (POST /api/auth/forgot-password/request-otp).|
+| 🕒 Kapan    : Dikirim secara REAL-TIME saat itu juga (dibatasi maksimal 1x per 60 detik).        |
+| 🎯 Kemana   : Nomor WhatsApp pegawai (dari data no_telp di tabel pegawai_pribadi).                |
+| 💡 Hasilnya : Pegawai menerima pesan WA berisi 6-digit kode OTP yang berlaku selama 5 menit.      |
+|               Sistem merespons pesan sukses: "OTP berhasil dikirim ke nomor WhatsApp Anda."       |
++---------------------------------------------------------------------------------------------------+
 
-## Struktur Data Notifikasi
++---------------------------------------------------------------------------------------------------+
+| 📜 2. PENGINGAT KEDALUWARSA DOKUMEN (STR, SIP, & PENUGASAN KLINIS)                                |
++---------------------------------------------------------------------------------------------------+
+| ⚡ Trigger  : HRD menekan tombol "Kirim Pengingat WA" pada dokumen STR, SIP, atau Penugasan       |
+|               Klinis milik pegawai di panel admin HRD.                                            |
+| 🕒 Kapan    : Dikirim secara REAL-TIME setelah tombol ditekan oleh HRD.                           |
+| 🎯 Kemana   : Nomor WhatsApp pegawai pemilik dokumen terkait (otomatis diformat ke prefix 62).    |
+| 💡 Hasilnya : Pegawai menerima pesan peringatan dengan tingkat urgensi otomatis:                  |
+|               🚨 SANGAT MENDESAK (Jika sudah kedaluwarsa / < 0 hari).                             |
+|               ⚠️ PENGINGAT PENTING (Jika akan kedaluwarsa dalam <= 30 hari).                     |
+|               ℹ️ INFORMASI (Jika masa berlaku masih aktif > 30 hari).                             |
+|               *Disertai tautan link untuk meninjau/mengunduh dokumen lama.*                       |
++---------------------------------------------------------------------------------------------------+
 
-Field penting di tabel `notification`:
++---------------------------------------------------------------------------------------------------+
+| 🎓 3. HASIL VERIFIKASI DIKLAT (KELAYAKAN & VALIDASI)                                              |
++---------------------------------------------------------------------------------------------------+
+| ⚡ Trigger  : HRD mengubah status verifikasi diklat pegawai:                                      |
+|               - Status Kelayakan (Diklat Eksternal): Layak / Tidak Layak                          |
+|               - Status Validasi (Diklat Internal): Valid / Tidak Valid                            |
+| 🕒 Kapan    : Dikirim secara REAL-TIME otomatis saat HRD menyimpan status verifikasi.             |
+| 🎯 Kemana   : Nomor WhatsApp pegawai peserta diklat tersebut.                                     |
+| 💡 Hasilnya : Pegawai langsung menerima pesan status verifikasi:                                  |
+|               ✅ "Anda dinyatakan LAYAK mengikuti diklat..." / "Laporan Anda telah DIVALIDASI..." |
+|               ❌ "Anda dinyatakan TIDAK LAYAK..." / "Laporan diklat Anda DITOLAK..."              |
++---------------------------------------------------------------------------------------------------+
 
-- `user_id`: pemilik notifikasi.
-- `type`: `info` atau `action` (default `info`).
-- `title`, `message`: teks notifikasi.
-- `is_read`: status sudah dibaca.
-- `action_code`: kode aksi untuk notifikasi `action`.
-- `action_payload`: JSON payload untuk kebutuhan UI/aksi.
-- `is_resolved`: penanda aksi sudah tidak relevan.
-- `unique_key`: kunci unik per user agar idempoten.
++---------------------------------------------------------------------------------------------------+
+| 💬 4. PESAN LANGSUNG KUSTOM (CUSTOM MESSAGE)                                                      |
++---------------------------------------------------------------------------------------------------+
+| ⚡ Trigger  : Admin / HRD mengirim pesan manual melalui form kirim pesan ke pegawai.              |
+| 🕒 Kapan    : Dikirim secara REAL-TIME saat itu juga.                                             |
+| 🎯 Kemana   : Nomor WhatsApp pegawai yang dipilih.                                                |
+| 💡 Hasilnya : Pegawai menerima pesan teks persis sesuai yang diketik oleh Admin/HRD.               |
++---------------------------------------------------------------------------------------------------+
+```
 
-## Metode Notifikasi yang Ada
+---
 
-### 1) Notifikasi Info (type = info)
+## 🔵 2. NOTIFIKASI BIASA (IN-APP / DI DALAM APLIKASI)
+Notifikasi biasa disimpan di dalam database (tabel `notification`) dan ditampilkan langsung pada antarmuka aplikasi (Dashboard & Menu Notifikasi) saat pegawai login.
 
-**Cara akses**
+```
++---------------------------------------------------------------------------------------------------+
+| 🔔 A. NOTIFIKASI AKSI / PERHATIAN (ACTION NOTIFICATIONS - type: action)                           |
++---------------------------------------------------------------------------------------------------+
+| ⚡ Trigger  : Sistem melakukan verifikasi otomatis (Auto-Sync) setiap kali pegawai membuka        |
+|               Dashboard aplikasi (GET /api/dashboard) atau via Cron Scheduler (01:00 WIB).        |
+| 🕒 Kapan    : Diperiksa & disinkronkan secara OTOMATIS oleh sistem. Poin yang diperiksa:          |
+|               1. STR Belum Tersedia / Kosong (action_code: str_missing)                           |
+|               2. STR Sudah Kedaluwarsa < 0 hari (action_code: str_expired)                        |
+|               3. STR Akan Segera Kedaluwarsa <= 90 hari lagi (action_code: str_will_expire)       |
+|               4. Data Profil & Dokumen Belum Lengkap (action_code: profile_incomplete)            |
+|                  *Mengecek NIK/NIP, Profesi, Tgl Masuk, Tgl Lahir, Alamat, KTP, KK, dll.*         |
+|               5. Data Keluarga Belum Lengkap (action_code: keluarga_incomplete)                   |
+|                  *Mengecek Buku Nikah, Data Pasangan/Anak/Orang Tua/Kontak Darurat.*              |
+| 🎯 Kemana   : Ditampilkan di halaman Dashboard utama akun pegawai (sebagai banner/kartu aksi).    |
+| 💡 Hasilnya : - Pegawai melihat daftar aksi (is_resolved = false) yang harus segera dilengkapi.   |
+|               - SMART RESOLVE: Jika pegawai pergi ke menu profil/keluarga dan melengkapi datanya, |
+|                 saat kembali ke dashboard, sistem otomatis mendeteksi data sudah lengkap dan      |
+|                 menghapus/menandai notifikasi tersebut sebagai selesai (Resolved)!                |
++---------------------------------------------------------------------------------------------------+
 
-- API: `NotificationController@index` -> `NotificationService@listByUserId`.
-- Hanya menampilkan notifikasi `info` yang `is_read = false`.
++---------------------------------------------------------------------------------------------------+
+| 📬 B. NOTIFIKASI INFORMASI (INFO NOTIFICATIONS - type: info)                                      |
++---------------------------------------------------------------------------------------------------+
+| ⚡ Trigger  : Informasi umum dari sistem / riwayat pembaruan yang dikirimkan ke akun pegawai.     |
+| 🕒 Kapan    : Muncul di daftar kotak masuk notifikasi pegawai (GET /api/notifications).           |
+| 🎯 Kemana   : Menu / Ikon lonceng notifikasi di pojok atas aplikasi pegawai.                      |
+| 💡 Hasilnya : - Pegawai dapat melihat daftar pesan informasi yang belum dibaca (Unread).          |
+|               - Pegawai dapat mengklik/menandai pesan tersebut agar berubah status menjadi        |
+|                 "Sudah Dibaca" (Mark as Read via PUT /api/notifications/{id}/read).              |
++---------------------------------------------------------------------------------------------------+
+```
 
-**Cara dibuat**
+---
 
-- Saat ini notifikasi `info` dibuat melalui seeder:
-  - `database/seeders/PegawaiNotificationSeeder.php`
-  - `database/seeders/PegawaiSeeder.php` (bagian `notifications`)
+## 🏗️ Struktur & Endpoint Terkait
 
-**Kapan dibuat**
+### Tabel `notification` (Model: `App\Models\NotificationModel`)
+- `user_id`: ID user pemilik notifikasi.
+- `type`: `info` (kotak masuk biasa) atau `action` (aksi dashboard).
+- `title`, `message`: Judul dan isi pesan.
+- `action_code`: Kode spesifik (`str_missing`, `profile_incomplete`, dll.).
+- `action_payload`: Payload JSON untuk data tambahan di frontend.
+- `is_read`: Status apakah pesan sudah dibaca.
+- `is_resolved`: Status apakah masalah/kewajiban sudah diselesaikan pegawai.
+- `unique_key`: Kunci unik (contoh: `dashboard.str.missing`) untuk menjamin idempotensi.
 
-- Saat menjalankan seeding database.
-- Belum ada flow aplikasi yang membuat `info` secara otomatis di runtime.
-
-### 2) Notifikasi Action (type = action)
-
-**Fungsi utama**
-
-- Dipakai untuk `list_aksi` pada dashboard pegawai.
-- Bersifat idempoten karena menggunakan `unique_key` dan `updateOrCreate`.
-
-**Cara dibuat / disinkronkan**
-
-- Service: `App\\Services\\Notification\\NotificationActionSyncService`.
-- Repository: `App\\Repositories\\Notification\\NotificationRepository::upsertAction`.
-- Jika kondisi aksi tidak lagi relevan, notifikasi lama ditandai `is_resolved = true` via `resolveActionsNotIn`.
-
-**Kapan dibuat**
-
-1) **On-request** saat dashboard pegawai dipanggil:
-   - `App\\Services\\Dashboard\\PegawaiService::build` memanggil `syncDashboardActionsByUserId`.
-2) **Scheduled job** harian (batch):
-   - Command `notifications:sync-dashboard-actions` terdaftar di `routes/console.php`.
-   - Scheduler menjalankan setiap hari pukul 01:00.
-
-**Seeder**
-
-- `database/seeders/PegawaiActionNotificationSeeder.php` menambahkan contoh notifikasi action untuk data awal.
-
-## Rule Notifikasi Action (Yang Digenerate)
-
-Berikut rule yang dievaluasi di `NotificationActionSyncService`:
-
-### A) STR
-
-1) **STR tidak tersedia**
-   - `unique_key`: `dashboard.str.missing`
-   - `action_code`: `str_missing`
-   - Kondisi: data STR tidak ada atau `tanggal_kadaluarsa` kosong.
-   - Payload: `status_lengkap = false`, `sisa_hari = null`, `keterangan = ['STR belum tersedia']`
-
-2) **STR sudah kadaluarsa**
-   - `unique_key`: `dashboard.str.expired`
-   - `action_code`: `str_expired`
-   - Kondisi: `sisa_hari < 0`.
-   - Payload: `status_lengkap = true`, `sisa_hari` (negatif), `keterangan = ['STR sudah kadaluarsa']`
-
-3) **STR akan segera kadaluarsa**
-   - `unique_key`: `dashboard.str.will_expire`
-   - `action_code`: `str_will_expire`
-   - Kondisi: `sisa_hari <= 90`.
-   - Payload: `status_lengkap = true`, `sisa_hari`, `keterangan = ['STR aktif']`
-
-### B) Data Keluarga
-
-4) **Data keluarga belum lengkap**
-   - `unique_key`: `dashboard.keluarga.incomplete`
-   - `action_code`: `keluarga_incomplete`
-   - Kondisi:
-     - `buku_nikah_file_path` kosong, atau
-     - data keluarga kosong (pasangan, anak, orang tua, kontak darurat), atau
-     - pasangan/anak ada tapi nama atau tanggal lahir kosong.
-   - Payload: `status_lengkap = false`, `keterangan` berisi daftar masalah.
-
-## Endpoint Notifikasi
-
-- `GET /api/notifications` -> daftar notifikasi `info` belum dibaca.
-- `PATCH /api/notifications/{id}/read` -> tandai satu notifikasi dibaca.
-- `PATCH /api/notifications/read-all` -> tandai semua notifikasi dibaca.
-
-## Catatan
-
-- Sistem saat ini hanya menggunakan penyimpanan notifikasi di database.
-- Tidak ditemukan implementasi email/push/SMS untuk notifikasi pada codebase ini.
+### Endpoint API Notifikasi
+- `GET /api/notifications`: Mengambil daftar notifikasi info yang belum dibaca.
+- `PUT /api/notifications/{id}/read`: Menandai satu notifikasi info sebagai sudah dibaca.
+- `PUT /api/notifications/read-all`: Menandai seluruh notifikasi info sebagai sudah dibaca.
