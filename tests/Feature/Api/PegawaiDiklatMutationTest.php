@@ -218,6 +218,76 @@ class PegawaiDiklatMutationTest extends TestCase
         $this->assertSame('CERT-LIFECYCLE-FIXED', $jadwal->no_sertif);
     }
 
+    public function test_internal_diklat_full_lifecycle_pending_valid_lock_and_rejection_reset(): void
+    {
+        $user = $this->createUserWithPegawai('pegawai', '9700000000000007', 'Pegawai Internal Lifecycle');
+
+        // 1. Habis daftar diklat internal selesai -> belum upload laporan
+        $createResponse = $this->withTokenFor($user)->postJson('/api/diklat', $this->diklatPayload([
+            'nama_kegiatan' => 'Pelatihan Internal RS',
+            'jenis_pelaksana' => 'internal',
+            'no_sertif' => 'CERT-INT-1',
+            'upload_sertif' => UploadedFile::fake()->create('laporan1.pdf', 100, 'application/pdf'),
+        ]));
+        $createResponse->assertCreated();
+        $diklatId = (int) $createResponse->json('data.id_diklat');
+        $jadwal = ListJadwalDiklat::query()->where('diklat_id', $diklatId)->firstOrFail();
+        
+        // Simulasikan sebelum upload laporan di tabel jadwal (misal saat pendaftaran awal HRD)
+        $jadwal->update(['sertif_file_path' => null, 'no_sertif' => null, 'status_validasi' => null]);
+
+        $listRes1 = $this->withTokenFor($user)->getJson('/api/diklat');
+        $item1 = collect($listRes1->json('data.diklat.riwayat_diklat.data'))->firstWhere('id', $diklatId);
+        $this->assertSame('Belum upload laporan', $item1['status_validasi']);
+
+        // 2. Pegawai upload laporan -> status pending (udah upload laporan namun belum di validasi)
+        $uploadRes = $this->withTokenFor($user)->postJson("/api/diklat/{$diklatId}/upload-laporan", [
+            'no_sertif' => 'CERT-INT-UPLOADED',
+            'upload_sertif' => UploadedFile::fake()->create('laporan_akhir.pdf', 100, 'application/pdf'),
+        ]);
+        $uploadRes->assertOk();
+
+        $listRes2 = $this->withTokenFor($user)->getJson('/api/diklat');
+        $item2 = collect($listRes2->json('data.diklat.riwayat_diklat.data'))->firstWhere('id', $diklatId);
+        $this->assertSame('udah upload laporan namun belum di validasi', $item2['status_validasi']);
+
+        // 3. HRD menyetujui validasi -> valid (sudah di validasi) & Terkunci
+        $jadwal->update(['status_validasi' => 'valid']);
+
+        $listRes3 = $this->withTokenFor($user)->getJson('/api/diklat');
+        $item3 = collect($listRes3->json('data.diklat.riwayat_diklat.data'))->firstWhere('id', $diklatId);
+        $this->assertSame('sudah di validasi', $item3['status_validasi']);
+
+        // Pegawai tidak bisa edit / upload lagi saat sudah valid
+        $this->withTokenFor($user)->postJson("/api/diklat/{$diklatId}/upload-laporan", [
+            'no_sertif' => 'CERT-INT-ILLEGAL',
+            'upload_sertif' => UploadedFile::fake()->create('laporan_illegal.pdf', 100, 'application/pdf'),
+        ])->assertStatus(422)
+          ->assertJsonPath('message', 'Laporan tidak bisa diupload/diedit karena status validasi sudah valid.');
+
+        // 4. Jika ditolak HRD -> tidak valid (Validasi di tolak)
+        $jadwal->update(['status_validasi' => 'tidak valid']);
+
+        $listRes4 = $this->withTokenFor($user)->getJson('/api/diklat');
+        $item4 = collect($listRes4->json('data.diklat.riwayat_diklat.data'))->firstWhere('id', $diklatId);
+        $this->assertSame('Validasi di tolak', $item4['status_validasi']);
+
+        // 5. Pegawai upload laporan revisi -> status otomatis reset ke null (pending)
+        $revisiRes = $this->withTokenFor($user)->postJson("/api/diklat/{$diklatId}/upload-laporan", [
+            'no_sertif' => 'CERT-INT-REVISED',
+            'upload_sertif' => UploadedFile::fake()->create('laporan_revisi.pdf', 100, 'application/pdf'),
+        ]);
+        $revisiRes->assertOk();
+
+        $jadwal->refresh();
+        $this->assertNull($jadwal->status_validasi);
+        $this->assertSame('CERT-INT-REVISED', $jadwal->no_sertif);
+
+        $listRes5 = $this->withTokenFor($user)->getJson('/api/diklat');
+        $item5 = collect($listRes5->json('data.diklat.riwayat_diklat.data'))->firstWhere('id', $diklatId);
+        $this->assertSame('udah upload laporan namun belum di validasi', $item5['status_validasi']);
+    }
+
     private function withTokenFor(User $user): self
     {
         $token = app(JwtService::class)->generate([

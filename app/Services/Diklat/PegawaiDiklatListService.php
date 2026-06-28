@@ -106,7 +106,7 @@ class PegawaiDiklatListService
             return 'Belum upload laporan';
         }
 
-        if ($statusValidasi === null) {
+        if ($statusValidasi === null || $statusValidasi === '') {
             return 'udah upload laporan namun belum di validasi';
         }
 
