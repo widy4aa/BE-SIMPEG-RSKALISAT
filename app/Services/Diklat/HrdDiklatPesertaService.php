@@ -44,6 +44,10 @@ class HrdDiklatPesertaService
             throw new InvalidArgumentException('Master Diklat tidak ditemukan.');
         }
 
+        if (strtolower((string) ($diklat->jenis_pelaksanaan ?? '')) === 'external' && count($pegawaiIds) > 1) {
+            throw new InvalidArgumentException('Diklat external hanya boleh memiliki satu peserta pegawai.');
+        }
+
         $tanggalMulai = $diklat->tanggal_mulai ? Carbon::parse($diklat->tanggal_mulai)->startOfDay() : null;
         $tanggalSelesai = $diklat->tanggal_selesai ? Carbon::parse($diklat->tanggal_selesai)->startOfDay() : null;
 

@@ -143,6 +143,81 @@ class PaginationSearchFilterTest extends TestCase
             ->assertJsonPath('data.data.0.jenis', 'ASN');
     }
 
+    public function test_diklat_all_defaults_to_internal_diklat_only(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9410000000000001', 'HRD Default Internal');
+        $jenis = JenisDiklat::query()->create(['nama' => 'ASN Default']);
+        $kategori = KategoriDiklat::query()->create(['nama' => 'Teknis Default']);
+
+        $internal = $this->createDiklat(
+            nama: 'Internal Default Visible',
+            penyelenggara: 'RS Kalisat',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->addDays(10)->toDateString(),
+            selesai: now()->addDays(11)->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'internal'
+        );
+
+        $this->createDiklat(
+            nama: 'External Default Hidden',
+            penyelenggara: 'Vendor',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->addDays(12)->toDateString(),
+            selesai: now()->addDays(13)->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'external'
+        );
+
+        $response = $this->withTokenFor($hrd)
+            ->getJson('/api/diklat/all?page=1&per_page=10');
+
+        $response->assertOk()
+            ->assertJsonPath('data.total', 1)
+            ->assertJsonPath('data.data.0.id_diklat', $internal->id)
+            ->assertJsonPath('data.data.0.jenis_pelaksana', 'internal');
+    }
+
+    public function test_diklat_all_can_filter_external_diklat(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9420000000000001', 'HRD External Filter');
+        $jenis = JenisDiklat::query()->create(['nama' => 'ASN External']);
+        $kategori = KategoriDiklat::query()->create(['nama' => 'Teknis External']);
+
+        $this->createDiklat(
+            nama: 'Internal External Filter Hidden',
+            penyelenggara: 'RS Kalisat',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->addDays(10)->toDateString(),
+            selesai: now()->addDays(11)->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'internal'
+        );
+
+        $external = $this->createDiklat(
+            nama: 'External Filter Visible',
+            penyelenggara: 'Vendor',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->addDays(12)->toDateString(),
+            selesai: now()->addDays(13)->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'external'
+        );
+
+        $response = $this->withTokenFor($hrd)
+            ->getJson('/api/diklat/all?page=1&per_page=10&jenis_pelaksana=external');
+
+        $response->assertOk()
+            ->assertJsonPath('data.total', 1)
+            ->assertJsonPath('data.data.0.id_diklat', $external->id)
+            ->assertJsonPath('data.data.0.jenis_pelaksana', 'external')
+            ->assertJsonPath('data.data.0.jumlah_peserta', 1);
+    }
+
     public function test_external_diklat_cannot_be_approved_for_kelayakan_before_laporan_is_uploaded(): void
     {
         $hrd = $this->createUserWithPegawai('hrd', '9500000000000001', 'HRD Kelayakan');
@@ -168,6 +243,33 @@ class PaginationSearchFilterTest extends TestCase
         $response->assertStatus(422)
             ->assertJsonPath('success', false)
             ->assertJsonPath('message', 'belum upload laporan');
+    }
+
+    public function test_external_diklat_cannot_sync_more_than_one_peserta(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9510000000000001', 'HRD Peserta External');
+        $pegawai = $this->createUserWithPegawai('pegawai', '9510000000000002', 'Pegawai Peserta External');
+        $jenis = JenisDiklat::query()->create(['nama' => 'External Peserta']);
+        $kategori = KategoriDiklat::query()->create(['nama' => 'Teknis Peserta']);
+        $diklat = $this->createDiklat(
+            nama: 'External Maksimal Satu Peserta',
+            penyelenggara: 'Vendor',
+            jenis: $jenis,
+            kategori: $kategori,
+            mulai: now()->addDays(2)->toDateString(),
+            selesai: now()->addDays(3)->toDateString(),
+            pegawai: $hrd->pegawai,
+            jenisPelaksanaan: 'external'
+        );
+
+        $response = $this->withTokenFor($hrd)
+            ->postJson("/api/hrd/diklat/{$diklat->id}/peserta", [
+                'pegawai_ids' => [$hrd->pegawai->id, $pegawai->pegawai->id],
+            ]);
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Diklat external hanya boleh memiliki satu peserta pegawai.');
     }
 
     public function test_internal_diklat_cannot_be_approved_for_validasi_before_laporan_is_uploaded(): void

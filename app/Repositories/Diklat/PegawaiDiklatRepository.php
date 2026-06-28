@@ -89,6 +89,7 @@ class PegawaiDiklatRepository
     {
         $page = Paginator::resolveCurrentPage();
         $offset = ($page - 1) * $perPage;
+        $filters = $this->withDefaultJenisPelaksanaan($filters, 'internal');
         [$whereSql, $bindings] = $this->buildDiklatFilterSql($filters, 'd');
 
         $totalRow = DB::selectOne("
@@ -111,6 +112,7 @@ class PegawaiDiklatRepository
 
     public function getMasterDiklatStats(array $filters = []): array
     {
+        $filters = $this->withDefaultJenisPelaksanaan($filters, 'internal');
         [$whereSql, $bindings] = $this->buildDiklatFilterSql($filters, 'd');
         $today = Carbon::today()->toDateString();
 
@@ -624,6 +626,14 @@ class PegawaiDiklatRepository
             $bindings[] = "%{$jenis}%";
         }
 
+        $jenisPelaksanaan = $this->filledString(
+            $filters['jenis_pelaksana'] ?? $filters['jenis_pelaksanaan'] ?? null
+        );
+        if ($jenisPelaksanaan !== null) {
+            $where[] = "LOWER({$alias}.jenis_pelaksanaan) = ?";
+            $bindings[] = strtolower($jenisPelaksanaan);
+        }
+
         $status = $this->filledString($filters['status'] ?? null);
         if ($status !== null) {
             $today = Carbon::today()->toDateString();
@@ -641,6 +651,18 @@ class PegawaiDiklatRepository
         }
 
         return [implode(' AND ', $where), $bindings];
+    }
+
+    private function withDefaultJenisPelaksanaan(array $filters, string $default): array
+    {
+        if (
+            ! array_key_exists('jenis_pelaksana', $filters)
+            && ! array_key_exists('jenis_pelaksanaan', $filters)
+        ) {
+            $filters['jenis_pelaksana'] = $default;
+        }
+
+        return $filters;
     }
 
     private function mapJadwalRow(object $row): object

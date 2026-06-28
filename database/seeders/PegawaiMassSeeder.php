@@ -381,7 +381,7 @@ class PegawaiMassSeeder extends Seeder
                     'jp'                 => $d['jp'],
                     'jenis_diklat_id'    => $jenisDiklatMap[$d['jenis']] ?? null,
                     'kategori_diklat_id' => $kategoriDiklatMap[$d['kategori']] ?? null,
-                    'jenis_pelaksanaan'  => $faker->randomElement(['Online', 'Offline', 'Hybrid']),
+                    'jenis_pelaksanaan'  => $faker->randomElement(['internal', 'external']),
                     'tempat'             => $faker->city(),
                 ]
             );
