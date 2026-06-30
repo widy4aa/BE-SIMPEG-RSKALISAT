@@ -4,6 +4,7 @@ namespace App\Services\Diklat;
 
 use App\Models\Pegawai;
 use App\Repositories\Diklat\PegawaiDiklatRepository;
+use App\Repositories\Notification\NotificationRepository;
 use App\Services\Notification\WhatsappService;
 use InvalidArgumentException;
 
@@ -12,6 +13,7 @@ class HrdDiklatStatusService
     public function __construct(
         private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
         private readonly WhatsappService $whatsapp,
+        private readonly NotificationRepository $notificationRepository,
     ) {}
 
     public function getDiklatMenungguKelayakan(): array
@@ -56,16 +58,10 @@ class HrdDiklatStatusService
         $jadwal->status_kelayakan = $isLayak ? 'layak' : 'tidak layak';
         $this->pegawaiDiklatRepository->saveJadwalDiklat($jadwal);
 
-        $namaDiklat = (string) ($jadwal->diklat?->nama_kegiatan ?? 'Diklat');
-        $pesanStatus = $isLayak
-            ? "✅ Anda dinyatakan *LAYAK* mengikuti diklat *{$namaDiklat}*."
-            : "❌ Anda dinyatakan *TIDAK LAYAK* mengikuti diklat *{$namaDiklat}*.";
-        $this->sendNotifDiklatWa((int) ($jadwal->pegawai_id ?? 0), $namaDiklat, $pesanStatus);
-
         return [
             'id_jadwal_diklat' => (int) $jadwal->id,
-            'diklat_id' => (int) ($jadwal->diklat_id ?? 0),
-            'pegawai_id' => (int) ($jadwal->pegawai_id ?? 0),
+            'diklat_id'        => (int) ($jadwal->diklat_id ?? 0),
+            'pegawai_id'       => (int) ($jadwal->pegawai_id ?? 0),
             'status_kelayakan' => (string) ($jadwal->status_kelayakan ?? ''),
         ];
     }
@@ -93,6 +89,25 @@ class HrdDiklatStatusService
             ? "✅ Laporan diklat *{$namaDiklat}* Anda telah *DIVALIDASI* oleh HRD."
             : "❌ Laporan diklat *{$namaDiklat}* Anda *DITOLAK*. Harap koordinasi dengan HRD untuk revisi.";
         $this->sendNotifDiklatWa((int) ($jadwal->pegawai_id ?? 0), $namaDiklat, $pesanStatus);
+
+        // Notifikasi in-app
+        $pegawai = Pegawai::find((int) ($jadwal->pegawai_id ?? 0));
+        $userIdPegawai = (int) ($pegawai?->user_id ?? 0);
+        if ($userIdPegawai > 0) {
+            if ($isValid) {
+                $this->notificationRepository->createInfo(
+                    $userIdPegawai,
+                    'Laporan Diklat Divalidasi',
+                    "Laporan diklat '{$namaDiklat}' Anda telah divalidasi oleh HRD."
+                );
+            } else {
+                $this->notificationRepository->createInfo(
+                    $userIdPegawai,
+                    'Laporan Diklat Ditolak',
+                    "Laporan diklat '{$namaDiklat}' Anda ditolak. Harap koordinasi dengan HRD untuk revisi."
+                );
+            }
+        }
 
         return [
             'id_jadwal_diklat' => (int) $jadwal->id,

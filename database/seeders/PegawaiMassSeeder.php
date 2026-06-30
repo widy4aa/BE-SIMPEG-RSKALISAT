@@ -417,7 +417,6 @@ class PegawaiMassSeeder extends Seeder
             JabatanPegawai::query()->create([
                 'pegawai_id' => $pegawai->id,
                 'jabatan_id' => $isCurrent ? $currentJabatanId : $faker->randomElement($jabatanIds),
-                'is_current' => $isCurrent,
                 'started_at' => $startedAt,
                 'ended_at'   => $endedAt,
                 'note'       => $isCurrent ? 'Jabatan saat ini' : 'Riwayat jabatan sebelumnya',
@@ -444,7 +443,6 @@ class PegawaiMassSeeder extends Seeder
             PangkatPegawai::query()->create([
                 'pegawai_id' => $pegawai->id,
                 'pangkat_id' => $careerLadder[$p]['pangkat_id'],
-                'is_current' => false,
                 'started_at' => $startedAt,
                 'ended_at'   => $endedAt,
                 'note'       => 'Riwayat pangkat sebelumnya',
@@ -456,7 +454,6 @@ class PegawaiMassSeeder extends Seeder
         PangkatPegawai::query()->create([
             'pegawai_id' => $pegawai->id,
             'pangkat_id' => $currentEntry['pangkat_id'],
-            'is_current' => true,
             'started_at' => $tmtPangkat,
             'ended_at'   => null,
             'note'       => 'Pangkat saat ini',

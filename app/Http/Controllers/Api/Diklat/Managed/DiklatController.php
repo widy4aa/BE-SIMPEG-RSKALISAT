@@ -7,6 +7,7 @@ use App\Http\Requests\Diklat\StoreHrdDiklatRequest;
 use App\Http\Requests\Diklat\UpdateHrdDiklatRequest;
 use App\Services\Diklat\HrdDiklatMasterService;
 use App\Services\Diklat\HrdDiklatPesertaService;
+use App\Services\Diklat\HrdDiklatReminderService;
 use App\Services\Diklat\HrdDiklatStatusService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ class DiklatController extends Controller
         private readonly HrdDiklatMasterService $masterService,
         private readonly HrdDiklatPesertaService $pesertaService,
         private readonly HrdDiklatStatusService $statusService,
+        private readonly HrdDiklatReminderService $reminderService,
     ) {}
 
     public function storeMaster(StoreHrdDiklatRequest $request): JsonResponse
@@ -131,5 +133,28 @@ class DiklatController extends Controller
         }
 
         return response()->json(['success' => true, 'message' => 'Status validasi berhasil diperbarui.', 'data' => $result]);
+    }
+
+    public function remindUploadLaporan(Request $request, int $diklatId, int $pegawaiId): JsonResponse
+    {
+        if ($diklatId <= 0) {
+            return response()->json(['success' => false, 'message' => 'Parameter ID diklat wajib diisi dengan format angka.'], 400);
+        }
+
+        if ($pegawaiId <= 0) {
+            return response()->json(['success' => false, 'message' => 'Parameter ID pegawai wajib diisi dengan format angka.'], 400);
+        }
+
+        try {
+            $result = $this->reminderService->remindUploadLaporan($diklatId, $pegawaiId);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Pengingat upload '.$result['label_dokumen'].' diklat berhasil dikirim.',
+            'data' => $result,
+        ]);
     }
 }

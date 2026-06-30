@@ -18,7 +18,6 @@ class StoreJabatanRequest extends FormRequest
         return [
             'unit_kerja_id' => ['nullable', 'exists:unit_kerja,id'],
             'nama_jabatan' => ['required', 'string', 'max:255'],
-            'is_current' => ['required', 'boolean'],
             'tmt_mulai' => ['nullable', 'date'],
             'tmt_selesai' => ['nullable', 'date', 'after_or_equal:tmt_mulai'],
             'sk_jabatan' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max

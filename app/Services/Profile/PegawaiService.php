@@ -23,21 +23,10 @@ class PegawaiService
 
         $pegawai = $user?->pegawai;
 
-        $currentProfesi = $pegawai?->profesiPegawai
-            ?->firstWhere('is_current', true)
-            ?? $pegawai?->profesiPegawai?->first();
-
-        $currentJabatan = $pegawai?->jabatanPegawai
-            ?->firstWhere('is_current', true)
-            ?? $pegawai?->jabatanPegawai?->first();
-
-        $currentPangkat = $pegawai?->pangkatPegawai
-            ?->firstWhere('is_current', true)
-            ?? $pegawai?->pangkatPegawai?->first();
-
-        $currentGolonganRuang = $pegawai?->golonganRuangPegawai
-            ?->firstWhere('is_current', true)
-            ?? $pegawai?->golonganRuangPegawai?->first();
+        $currentProfesi = $this->currentRiwayat($pegawai?->profesiPegawai);
+        $currentJabatan = $this->currentRiwayat($pegawai?->jabatanPegawai);
+        $currentPangkat = $this->currentRiwayat($pegawai?->pangkatPegawai);
+        $currentGolonganRuang = $this->currentRiwayat($pegawai?->golonganRuangPegawai);
 
         $lastUpdate = collect([
             $pegawai?->updated_at,
@@ -107,6 +96,21 @@ class PegawaiService
         $diff = $start->diff($today);
 
         return sprintf('%d tahun %d bulan', $diff->y, $diff->m);
+    }
+
+    private function currentRiwayat(mixed $items): mixed
+    {
+        if (! $items) {
+            return null;
+        }
+
+        $collection = collect($items);
+
+        return $collection
+            ->filter(fn ($item) => (bool) ($item->is_current ?? false))
+            ->sortByDesc(fn ($item) => optional($item->started_at)->timestamp ?? 0)
+            ->first()
+            ?? $collection->sortByDesc(fn ($item) => optional($item->started_at)->timestamp ?? 0)->first();
     }
 
     private function buildPhotoProfileUrl(string $path): ?string

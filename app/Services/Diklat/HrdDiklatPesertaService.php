@@ -2,7 +2,10 @@
 
 namespace App\Services\Diklat;
 
+use App\Models\Pegawai;
 use App\Repositories\Diklat\PegawaiDiklatRepository;
+use App\Repositories\Notification\NotificationRepository;
+use App\Services\Notification\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -12,6 +15,8 @@ class HrdDiklatPesertaService
     public function __construct(
         private readonly PegawaiDiklatRepository $pegawaiDiklatRepository,
         private readonly DiklatStatusResolver $statusResolver,
+        private readonly NotificationRepository $notificationRepository,
+        private readonly WhatsappService $whatsapp,
     ) {}
 
     public function getPesertaDiklat(int $diklatId, ?string $section = null): array
@@ -58,6 +63,37 @@ class HrdDiklatPesertaService
             'total_pegawai' => count($peserta),
             'list' => $selectedList,
         ];
+    }
+
+    private function sendNotifTerdaftarDiklat(int $pegawaiId, string $namaDiklat): void
+    {
+        $pegawai = Pegawai::with('pribadi')->find($pegawaiId);
+        if ($pegawai === null) {
+            return;
+        }
+
+        // Notifikasi in-app
+        $userIdPegawai = (int) ($pegawai->user_id ?? 0);
+        if ($userIdPegawai > 0) {
+            $this->notificationRepository->createInfo(
+                $userIdPegawai,
+                'Terdaftar ke Diklat Baru',
+                "Anda telah didaftarkan ke diklat '{$namaDiklat}'. Silakan cek jadwal di aplikasi."
+            );
+        }
+
+        // Notifikasi WhatsApp
+        $noTelp = (string) ($pegawai->pribadi?->no_telp ?? '');
+        if ($noTelp !== '') {
+            $no = preg_replace('/\D/', '', $noTelp);
+            if (str_starts_with($no, '0')) {
+                $no = '62' . substr($no, 1);
+            } elseif (! str_starts_with($no, '62')) {
+                $no = '62' . $no;
+            }
+            $pesan = "🎓 Halo {$pegawai->nama},\n\nAnda telah *didaftarkan* ke diklat:\n*{$namaDiklat}*\n\nSilakan login ke aplikasi SIMPEG untuk melihat detail jadwal.";
+            $this->whatsapp->sendMessage($no, $pesan);
+        }
     }
 
     private function resolveStatusValidasiText(?string $jenisPelaksana, ?string $sertifFilePath, ?string $statusValidasi): ?string
@@ -114,18 +150,72 @@ class HrdDiklatPesertaService
 
             foreach ($newIds as $pegawaiId) {
                 $this->pegawaiDiklatRepository->createJadwalDiklat([
-                    'diklat_id' => $diklatId,
-                    'pegawai_id' => $pegawaiId,
-                    'status_diklat' => $statusDiklat,
-                    'status_kelayakan' => 'layak',
+                    'diklat_id'       => $diklatId,
+                    'pegawai_id'      => $pegawaiId,
+                    'status_diklat'   => $statusDiklat,
+                    'status_kelayakan'=> 'layak',
                     'status_validasi' => null,
                 ]);
+
+                $this->sendNotifTerdaftarDiklat((int) $pegawaiId, (string) ($diklat->nama_kegiatan ?? 'Diklat'));
             }
         });
 
         return [
             'diklat_id' => $diklatId,
             'peserta_terdaftar' => count($pegawaiIds),
+        ];
+    }
+
+    public function remindLaporanDiklat(int $diklatId, int $pegawaiId): array
+    {
+        $diklat = $this->pegawaiDiklatRepository->findDiklatById($diklatId);
+        if ($diklat === null) {
+            throw new InvalidArgumentException('Master Diklat tidak ditemukan.');
+        }
+
+        $jadwal = $this->pegawaiDiklatRepository->findJadwalByDiklatIdAndPegawaiId($diklatId, $pegawaiId);
+        if ($jadwal === null) {
+            throw new InvalidArgumentException('Pegawai tidak terdaftar pada diklat ini.');
+        }
+
+        $jenis        = strtolower((string) ($diklat->jenis_pelaksanaan ?? ''));
+        $labelDokumen = $jenis === 'internal' ? 'laporan' : 'sertifikat';
+        $namaDiklat   = (string) ($diklat->nama_kegiatan ?? 'Diklat');
+
+        $pegawai = Pegawai::with('pribadi')->find($pegawaiId);
+        if ($pegawai === null) {
+            throw new InvalidArgumentException('Data pegawai tidak ditemukan.');
+        }
+
+        $userId = (int) ($pegawai->user_id ?? 0);
+        if ($userId > 0) {
+            $this->notificationRepository->createInfo(
+                $userId,
+                'Segera Upload ' . ucfirst($labelDokumen) . ' Diklat',
+                "Segera upload {$labelDokumen} diklat '{$namaDiklat}' Anda melalui menu Diklat."
+            );
+        }
+
+        $noTelp = (string) ($pegawai->pribadi?->no_telp ?? '');
+        if ($noTelp !== '') {
+            $no = preg_replace('/\D/', '', $noTelp);
+            if (str_starts_with($no, '0')) {
+                $no = '62' . substr($no, 1);
+            } elseif (! str_starts_with($no, '62')) {
+                $no = '62' . $no;
+            }
+            $pesan = "📋 Halo {$pegawai->nama},\n\nHRD mengingatkan Anda untuk segera upload *{$labelDokumen}* diklat:\n*{$namaDiklat}*\n\nSilakan login ke aplikasi SIMPEG dan upload melalui menu Diklat. 🙏";
+            $this->whatsapp->sendMessage($no, $pesan);
+        }
+
+        return [
+            'diklat_id'  => $diklatId,
+            'pegawai_id' => $pegawaiId,
+            'nama_diklat' => $namaDiklat,
+            'label_dokumen' => $labelDokumen,
+            'notif_inapp' => $userId > 0,
+            'notif_wa'    => $noTelp !== '',
         ];
     }
 

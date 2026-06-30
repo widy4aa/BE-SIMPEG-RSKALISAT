@@ -2,13 +2,15 @@
 
 namespace App\Services\Pegawai\Managed;
 
+use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\Pegawai\Managed\AdminPegawaiRepository;
 use Illuminate\Support\Facades\Storage;
 
 class AdminPegawaiService
 {
     public function __construct(
-        private readonly AdminPegawaiRepository $repository
+        private readonly AdminPegawaiRepository $repository,
+        private readonly NotificationRepository $notificationRepository,
     ) {
     }
 
@@ -359,6 +361,14 @@ class AdminPegawaiService
     public function createPegawai(array $data): array
     {
         $pegawai = $this->repository->createPegawaiData($data);
+
+        if ((int) ($pegawai->user_id ?? 0) > 0) {
+            $this->notificationRepository->createInfo(
+                (int) $pegawai->user_id,
+                'Selamat Datang di SIMPEG RSKalisat',
+                "Halo {$pegawai->nama}, akun Anda telah dibuat. Silakan lengkapi data profil Anda untuk memulai."
+            );
+        }
 
         return [
             'id' => $pegawai->id,

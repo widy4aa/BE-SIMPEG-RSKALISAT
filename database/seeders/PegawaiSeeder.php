@@ -472,7 +472,6 @@ class PegawaiSeeder extends Seeder
             ProfesiPegawai::query()->updateOrCreate(
                 [
                     'pegawai_id' => $pegawai->id,
-                    'is_current' => true,
                 ],
                 [
                     'profesi_id' => $seed['profesi_id'],
@@ -484,7 +483,6 @@ class PegawaiSeeder extends Seeder
             PangkatPegawai::query()->updateOrCreate(
                 [
                     'pegawai_id' => $pegawai->id,
-                    'is_current' => true,
                 ],
                 [
                     'pangkat_id' => $newPangkat->id,
@@ -497,7 +495,6 @@ class PegawaiSeeder extends Seeder
                 [
                     'pegawai_id' => $pegawai->id,
                     'jabatan_id' => $seed['jabatan_id'],
-                    'is_current' => true,
                 ],
                 [
                     'started_at' => '2020-01-01',

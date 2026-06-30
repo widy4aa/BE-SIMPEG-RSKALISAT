@@ -65,7 +65,6 @@ class PangkatService
         ];
 
         $pivotData = [
-            'is_current' => (bool) $payload['is_current'],
             'started_at' => $payload['started_at'] ?? null,
             'ended_at' => $payload['ended_at'] ?? null,
             'note' => $payload['note'] ?? null,
@@ -116,7 +115,6 @@ class PangkatService
         if ($skFile !== null) $pangkatData['sk_file_path'] = $skFilePath;
 
         $pivotData = [];
-        if (array_key_exists('is_current', $payload)) $pivotData['is_current'] = (bool) $payload['is_current'];
         if (array_key_exists('started_at', $payload)) $pivotData['started_at'] = $payload['started_at'];
         if (array_key_exists('ended_at', $payload)) $pivotData['ended_at'] = $payload['ended_at'];
         if (array_key_exists('note', $payload)) $pivotData['note'] = $payload['note'];

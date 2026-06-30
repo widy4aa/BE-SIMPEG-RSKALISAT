@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 class PenugasanKlinis extends Model
 {
@@ -17,7 +18,6 @@ class PenugasanKlinis extends Model
         'nomor_surat',
         'tgl_mulai',
         'tgl_kadaluarsa',
-        'is_current',
         'dokumen_file_path',
     ];
 
@@ -26,8 +26,15 @@ class PenugasanKlinis extends Model
         return [
             'tgl_mulai' => 'date',
             'tgl_kadaluarsa' => 'date',
-            'is_current' => 'boolean',
         ];
+    }
+
+    public function getIsCurrentAttribute(): bool
+    {
+        $today = Carbon::today();
+
+        return ($this->tgl_mulai === null || $this->tgl_mulai->lessThanOrEqualTo($today))
+            && ($this->tgl_kadaluarsa === null || $this->tgl_kadaluarsa->greaterThanOrEqualTo($today));
     }
 
     public function pegawai()

@@ -2,13 +2,17 @@
 
 namespace App\Services\RiwayatKarir\Managed;
 
+use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\RiwayatKarir\Managed\StrRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 
 class StrService extends BaseRiwayatKarirService
 {
-    public function __construct(protected readonly StrRepository $repository) {}
+    public function __construct(
+        protected readonly StrRepository $repository,
+        private readonly NotificationRepository $notificationRepository,
+    ) {}
 
     public function getStr(int $pegawaiId): array
     {
@@ -33,6 +37,8 @@ class StrService extends BaseRiwayatKarirService
 
         $str = $this->repository->createStr($pegawai, $data);
 
+        $this->sendNotifStrUpdated($pegawai);
+
         return $this->formatStr($str);
     }
 
@@ -54,7 +60,24 @@ class StrService extends BaseRiwayatKarirService
 
         $updated = $this->repository->updateStr($str, $data);
 
+        $pegawai = $this->getPegawaiOrFail($pegawaiId);
+        $this->sendNotifStrUpdated($pegawai);
+
         return $this->formatStr($updated);
+    }
+
+    private function sendNotifStrUpdated(object $pegawai): void
+    {
+        $userId = (int) ($pegawai->user_id ?? 0);
+        if ($userId <= 0) {
+            return;
+        }
+
+        $this->notificationRepository->createInfo(
+            $userId,
+            'Data STR Diperbarui',
+            'Data STR Anda telah diperbarui oleh admin. Silakan cek di menu riwayat karir.'
+        );
     }
 
     public function deleteStr(int $id, int $pegawaiId): array

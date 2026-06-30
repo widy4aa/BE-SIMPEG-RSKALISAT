@@ -17,7 +17,6 @@ class UpdatePangkatRequest extends FormRequest
     {
         return [
             'nama_pangkat' => ['sometimes', 'required', 'string', 'max:255'],
-            'is_current' => ['sometimes', 'required', 'boolean'],
             'pejabat_penetap' => ['sometimes', 'nullable', 'string', 'max:255'],
             'tmt_sk' => ['sometimes', 'nullable', 'date'],
             'started_at' => ['sometimes', 'nullable', 'date'],

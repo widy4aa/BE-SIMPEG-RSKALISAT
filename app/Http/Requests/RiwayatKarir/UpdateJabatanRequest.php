@@ -18,7 +18,6 @@ class UpdateJabatanRequest extends FormRequest
         return [
             'unit_kerja_id' => ['sometimes', 'nullable', 'exists:unit_kerja,id'],
             'nama_jabatan' => ['sometimes', 'required', 'string', 'max:255'],
-            'is_current' => ['sometimes', 'required', 'boolean'],
             'tmt_mulai' => ['sometimes', 'nullable', 'date'],
             'tmt_selesai' => ['sometimes', 'nullable', 'date', 'after_or_equal:tmt_mulai'],
             'sk_jabatan' => ['sometimes', 'nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'], // 5MB max

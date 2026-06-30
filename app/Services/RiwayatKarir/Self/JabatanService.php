@@ -66,7 +66,6 @@ class JabatanService
         ];
 
         $pivotData = [
-            'is_current' => (bool) $payload['is_current'],
             'started_at' => isset($payload['tmt_mulai']) ? $payload['tmt_mulai'] : null,
             'ended_at' => isset($payload['tmt_selesai']) ? $payload['tmt_selesai'] : null,
             'note' => $payload['note'] ?? null,
@@ -118,7 +117,6 @@ class JabatanService
         if ($skFile !== null) $jabatanData['sk_file_path'] = $skFilePath;
 
         $pivotData = [];
-        if (array_key_exists('is_current', $payload)) $pivotData['is_current'] = (bool) $payload['is_current'];
         if (array_key_exists('tmt_mulai', $payload)) $pivotData['started_at'] = $payload['tmt_mulai'];
         if (array_key_exists('tmt_selesai', $payload)) $pivotData['ended_at'] = $payload['tmt_selesai'];
         if (array_key_exists('note', $payload)) $pivotData['note'] = $payload['note'];

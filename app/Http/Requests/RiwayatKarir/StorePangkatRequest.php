@@ -17,7 +17,6 @@ class StorePangkatRequest extends FormRequest
     {
         return [
             'nama_pangkat' => ['required', 'string', 'max:255'],
-            'is_current' => ['required', 'boolean'],
             'pejabat_penetap' => ['nullable', 'string', 'max:255'],
             'tmt_sk' => ['nullable', 'date'],
             'started_at' => ['nullable', 'date'],

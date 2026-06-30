@@ -50,6 +50,7 @@ Route::middleware([
     Route::get('/hrd/diklat/status/validasi', [ManagedDiklatController::class, 'menungguValidasi']);
     Route::patch('/hrd/diklat/{id}/status/layak', [ManagedDiklatController::class, 'updateStatusKelayakan']);
     Route::patch('/hrd/diklat/{id}/status/validasi', [ManagedDiklatController::class, 'updateStatusValidasi']);
+    Route::post('/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan', [ManagedDiklatController::class, 'remindUploadLaporan']);
 
     Route::get('/generate/laporan-diklat', [LaporanController::class, 'laporanDiklat']);
 });

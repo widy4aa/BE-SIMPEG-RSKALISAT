@@ -33,7 +33,6 @@ class JabatanService extends BaseRiwayatKarirService
         ];
 
         $pivotData = [
-            'is_current' => (bool) $payload['is_current'],
             'started_at' => $payload['tmt_mulai'] ?? null,
             'ended_at'   => $payload['tmt_selesai'] ?? null,
             'note'       => $payload['note'] ?? null,
@@ -58,7 +57,6 @@ class JabatanService extends BaseRiwayatKarirService
         if (array_key_exists('tmt_selesai', $payload))   $jabatanData['tmt_selesai'] = $payload['tmt_selesai'];
 
         $pivotData = [];
-        if (array_key_exists('is_current', $payload)) $pivotData['is_current'] = (bool) $payload['is_current'];
         if (array_key_exists('tmt_mulai', $payload))  $pivotData['started_at'] = $payload['tmt_mulai'];
         if (array_key_exists('tmt_selesai', $payload)) $pivotData['ended_at'] = $payload['tmt_selesai'];
         if (array_key_exists('note', $payload))        $pivotData['note'] = $payload['note'];

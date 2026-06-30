@@ -5,7 +5,10 @@ namespace App\Services\Profile;
 use App\Models\JenisPegawai;
 use App\Models\Profesi;
 use App\Models\PerubahanData;
+use App\Models\User;
+use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\Profile\PegawaiProfileRepository;
+use App\Services\Notification\WhatsappService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -19,6 +22,8 @@ class ProfileService
         private readonly HrdService $hrdService,
         private readonly DirekturService $direkturService,
         private readonly PegawaiProfileRepository $pegawaiProfileRepository,
+        private readonly NotificationRepository $notificationRepository,
+        private readonly WhatsappService $whatsapp,
     ) {
     }
 
@@ -210,12 +215,45 @@ class ProfileService
             throw new InvalidArgumentException('Tidak ada perubahan data yang bisa diajukan.');
         }
 
-        return $this->updateWithAgreement(
+        $perubahanData = $this->updateWithAgreement(
             byUser: $byUser,
             fitur: 'profile',
             note: $note,
             details: $details,
         );
+
+        $this->sendNotifCrSubmit($perubahanData, $pegawai->nama ?? 'Pegawai');
+
+        return $perubahanData;
+    }
+
+    private function sendNotifCrSubmit(PerubahanData $cr, string $namaPegawai): void
+    {
+        $title   = 'Ada Pengajuan Perubahan Data Baru';
+        $message = "Pegawai {$namaPegawai} mengajukan perubahan data profil dan menunggu persetujuan.";
+        $waPesan = "📄 Ada pengajuan perubahan data profil dari *{$namaPegawai}* yang menunggu persetujuan Anda.\n\nSilakan login ke aplikasi SIMPEG untuk meninjau dan menyetujui / menolak pengajuan.";
+
+        $adminHrdUsers = User::query()
+            ->whereIn('role', ['admin', 'hrd'])
+            ->with('pegawai.pribadi')
+            ->get();
+
+        foreach ($adminHrdUsers as $user) {
+            // Notifikasi in-app
+            $this->notificationRepository->createInfo((int) $user->id, $title, $message);
+
+            // Notifikasi WhatsApp
+            $noTelp = (string) ($user->pegawai?->pribadi?->no_telp ?? '');
+            if ($noTelp !== '') {
+                $no = preg_replace('/\D/', '', $noTelp);
+                if (str_starts_with($no, '0')) {
+                    $no = '62' . substr($no, 1);
+                } elseif (! str_starts_with($no, '62')) {
+                    $no = '62' . $no;
+                }
+                $this->whatsapp->sendMessage($no, $waPesan);
+            }
+        }
     }
 
     public function updateProfilePicture(int $byUser, ?UploadedFile $file): array

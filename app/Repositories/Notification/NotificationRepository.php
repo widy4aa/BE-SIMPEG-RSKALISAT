@@ -7,6 +7,17 @@ use Illuminate\Support\Collection;
 
 class NotificationRepository
 {
+    public function createInfo(int $userId, string $title, string $message): NotificationModel
+    {
+        return NotificationModel::query()->create([
+            'user_id' => $userId,
+            'type'    => 'info',
+            'title'   => $title,
+            'message' => $message,
+            'is_read' => false,
+        ]);
+    }
+
     public function getUnreadInfoByUserId(int $userId): Collection
     {
         return NotificationModel::query()

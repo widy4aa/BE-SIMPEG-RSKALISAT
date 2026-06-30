@@ -466,6 +466,7 @@ class AdminPegawaiRepository
         ', [$pegawaiId]))->map(function ($row) {
             $row->started_at = $this->dateOrNull($row->started_at ?? null);
             $row->ended_at = $this->dateOrNull($row->ended_at ?? null);
+            $row->is_current = $this->isCurrentPeriod($row->started_at, $row->ended_at);
             $row->jabatan = (object) [
                 'nama' => $row->jabatan_nama ?? null,
                 'unitKerja' => (object) ['nama' => $row->unit_kerja_nama ?? null],
@@ -490,6 +491,7 @@ class AdminPegawaiRepository
         ', [$pegawaiId]))->map(function ($row) {
             $row->started_at = $this->dateOrNull($row->started_at ?? null);
             $row->ended_at = $this->dateOrNull($row->ended_at ?? null);
+            $row->is_current = $this->isCurrentPeriod($row->started_at, $row->ended_at);
             $row->pangkat = (object) [
                 'nama' => $row->pangkat_nama ?? null,
                 'pejabat_penetap' => $row->pejabat_penetap ?? null,
@@ -591,6 +593,14 @@ class AdminPegawaiRepository
     private function dateOrNull(mixed $value): ?Carbon
     {
         return $value ? Carbon::parse($value) : null;
+    }
+
+    private function isCurrentPeriod(?Carbon $startedAt, ?Carbon $endedAt): bool
+    {
+        $today = Carbon::today();
+
+        return ($startedAt === null || $startedAt->lessThanOrEqualTo($today))
+            && ($endedAt === null || $endedAt->greaterThanOrEqualTo($today));
     }
 
     private function filledString(mixed $value): ?string

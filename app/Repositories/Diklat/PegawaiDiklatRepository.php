@@ -222,6 +222,48 @@ class PegawaiDiklatRepository
         return $row ? $this->findJadwalEntityById((int) $row->id) : null;
     }
 
+    public function findJadwalReminderUploadLaporan(int $diklatId, int $pegawaiId): ?object
+    {
+        $row = DB::selectOne("
+            SELECT
+                ljd.id,
+                ljd.diklat_id,
+                ljd.pegawai_id,
+                ljd.sertif_file_path,
+                ljd.no_sertif,
+                ljd.uploaded_at,
+                ljd.status_diklat,
+                ljd.status_kelayakan,
+                ljd.status_validasi,
+                d.nama_kegiatan,
+                d.tanggal_mulai,
+                d.tanggal_selesai,
+                d.jenis_pelaksanaan,
+                p.nama AS pegawai_nama,
+                u.id AS user_id,
+                pp.no_telp
+            FROM list_jadwal_diklat ljd
+            INNER JOIN diklat d ON d.id = ljd.diklat_id AND d.deleted_at IS NULL
+            INNER JOIN pegawai p ON p.id = ljd.pegawai_id AND p.deleted_at IS NULL
+            INNER JOIN users u ON u.id = p.user_id
+            LEFT JOIN pegawai_pribadi pp ON pp.pegawai_id = p.id
+            WHERE ljd.deleted_at IS NULL
+                AND ljd.diklat_id = ?
+                AND ljd.pegawai_id = ?
+            LIMIT 1
+        ", [$diklatId, $pegawaiId]);
+
+        if ($row === null) {
+            return null;
+        }
+
+        $row->uploaded_at = $this->dateTimeOrNull($row->uploaded_at ?? null);
+        $row->tanggal_mulai = $this->dateOrNull($row->tanggal_mulai ?? null);
+        $row->tanggal_selesai = $this->dateOrNull($row->tanggal_selesai ?? null);
+
+        return $row;
+    }
+
     public function findJadwalById(int $jadwalId): ?object
     {
         return $this->findJadwalEntityById($jadwalId);
@@ -415,6 +457,56 @@ class PegawaiDiklatRepository
                 AND deleted_at IS NULL
                 AND pegawai_id NOT IN ({$placeholders})
         ", [$now, $now, $diklatId, ...$pegawaiIds]);
+    }
+
+    public function getPesertaDiklatBesok(): Collection
+    {
+        $besok = Carbon::tomorrow()->toDateString();
+
+        return collect(DB::select("
+            SELECT
+                ljd.id,
+                ljd.pegawai_id,
+                d.nama_kegiatan,
+                d.tanggal_mulai,
+                d.tempat,
+                p.nama AS pegawai_nama,
+                u.id AS user_id,
+                pp.no_telp
+            FROM list_jadwal_diklat ljd
+            INNER JOIN diklat d ON d.id = ljd.diklat_id AND d.deleted_at IS NULL
+            INNER JOIN pegawai p ON p.id = ljd.pegawai_id AND p.deleted_at IS NULL
+            INNER JOIN users u ON u.id = p.user_id
+            LEFT JOIN pegawai_pribadi pp ON pp.pegawai_id = p.id
+            WHERE ljd.deleted_at IS NULL
+                AND DATE(d.tanggal_mulai) = ?
+        ", [$besok]));
+    }
+
+    public function getPesertaDiklatSelesaiH1BelumUploadLaporan(): Collection
+    {
+        $kemarin = Carbon::yesterday()->toDateString();
+
+        return collect(DB::select("
+            SELECT
+                ljd.id,
+                ljd.pegawai_id,
+                ljd.sertif_file_path,
+                d.nama_kegiatan,
+                d.tanggal_selesai,
+                d.jenis_pelaksanaan,
+                p.nama AS pegawai_nama,
+                u.id AS user_id,
+                pp.no_telp
+            FROM list_jadwal_diklat ljd
+            INNER JOIN diklat d ON d.id = ljd.diklat_id AND d.deleted_at IS NULL
+            INNER JOIN pegawai p ON p.id = ljd.pegawai_id AND p.deleted_at IS NULL
+            INNER JOIN users u ON u.id = p.user_id
+            LEFT JOIN pegawai_pribadi pp ON pp.pegawai_id = p.id
+            WHERE ljd.deleted_at IS NULL
+                AND DATE(d.tanggal_selesai) = ?
+                AND (ljd.sertif_file_path IS NULL OR ljd.sertif_file_path = '')
+        ", [$kemarin]));
     }
 
     public function getJadwalDiklatMenungguKelayakan(): Collection

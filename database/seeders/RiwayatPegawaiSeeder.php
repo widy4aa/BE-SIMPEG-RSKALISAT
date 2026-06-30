@@ -13,7 +13,6 @@ use App\Models\PenugasanKlinis;
 use App\Models\Sip;
 use App\Models\StrPegawai;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Schema;
 
 class RiwayatPegawaiSeeder extends Seeder
 {
@@ -71,7 +70,6 @@ class RiwayatPegawaiSeeder extends Seeder
         JabatanPegawai::query()->create([
             'pegawai_id' => $pegawai->id,
             'jabatan_id' => $jabatanStaf->id,
-            'is_current' => false,
             'started_at' => '2020-01-01',
             'ended_at' => '2023-12-31',
             'note' => 'Riwayat jabatan awal.',
@@ -80,7 +78,6 @@ class RiwayatPegawaiSeeder extends Seeder
         JabatanPegawai::query()->create([
             'pegawai_id' => $pegawai->id,
             'jabatan_id' => $jabatanKoordinator->id,
-            'is_current' => true,
             'started_at' => '2024-01-01',
             'ended_at' => null,
             'note' => 'Jabatan aktif saat ini.',
@@ -90,7 +87,6 @@ class RiwayatPegawaiSeeder extends Seeder
         PangkatPegawai::query()->create([
             'pegawai_id' => $pegawai->id,
             'pangkat_id' => $pangkatPenataMuda->id,
-            'is_current' => false,
             'started_at' => '2020-01-01',
             'ended_at' => '2023-12-31',
             'note' => 'Riwayat pangkat awal.',
@@ -99,7 +95,6 @@ class RiwayatPegawaiSeeder extends Seeder
         PangkatPegawai::query()->create([
             'pegawai_id' => $pegawai->id,
             'pangkat_id' => $pangkatPenataMudaTk1->id,
-            'is_current' => true,
             'started_at' => '2024-01-01',
             'ended_at' => null,
             'note' => 'Pangkat aktif saat ini.',
@@ -113,9 +108,6 @@ class RiwayatPegawaiSeeder extends Seeder
             'tanggal_kadaluarsa' => '2023-12-31',
             'sk_file_path' => 'dokumen/str/budi-str-2019.pdf',
         ];
-        if (Schema::hasColumn('str', 'is_current')) {
-            $strLama['is_current'] = false;
-        }
         StrPegawai::query()->create($strLama);
 
         $strBaru = [
@@ -125,9 +117,6 @@ class RiwayatPegawaiSeeder extends Seeder
             'tanggal_kadaluarsa' => '2028-12-31',
             'sk_file_path' => 'dokumen/str/budi-str-2024.pdf',
         ];
-        if (Schema::hasColumn('str', 'is_current')) {
-            $strBaru['is_current'] = true;
-        }
         StrPegawai::query()->create($strBaru);
 
         Sip::query()->where('pegawai_id', $pegawai->id)->delete();
@@ -139,9 +128,6 @@ class RiwayatPegawaiSeeder extends Seeder
             'tanggal_kadaluarsa' => '2023-12-31',
             'sk_file_path' => 'dokumen/sip/budi-sip-2021.pdf',
         ];
-        if (Schema::hasColumn('sip', 'is_current')) {
-            $sipLama['is_current'] = false;
-        }
         Sip::query()->create($sipLama);
 
         $sipBaru = [
@@ -152,9 +138,6 @@ class RiwayatPegawaiSeeder extends Seeder
             'tanggal_kadaluarsa' => '2028-12-31',
             'sk_file_path' => 'dokumen/sip/budi-sip-2024.pdf',
         ];
-        if (Schema::hasColumn('sip', 'is_current')) {
-            $sipBaru['is_current'] = true;
-        }
         Sip::query()->create($sipBaru);
 
         PenugasanKlinis::query()->where('pegawai_id', $pegawai->id)->delete();
@@ -165,9 +148,6 @@ class RiwayatPegawaiSeeder extends Seeder
             'tgl_kadaluarsa' => '2023-12-31',
             'dokumen_file_path' => 'dokumen/penugasan/budi-penugasan-2022.pdf',
         ];
-        if (Schema::hasColumn('penugasan_klinis', 'is_current')) {
-            $penugasanLama['is_current'] = false;
-        }
         PenugasanKlinis::query()->create($penugasanLama);
 
         $penugasanBaru = [
@@ -177,9 +157,6 @@ class RiwayatPegawaiSeeder extends Seeder
             'tgl_kadaluarsa' => '2026-12-31',
             'dokumen_file_path' => 'dokumen/penugasan/budi-penugasan-2024.pdf',
         ];
-        if (Schema::hasColumn('penugasan_klinis', 'is_current')) {
-            $penugasanBaru['is_current'] = true;
-        }
         PenugasanKlinis::query()->create($penugasanBaru);
     }
 }

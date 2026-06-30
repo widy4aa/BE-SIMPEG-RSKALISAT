@@ -121,7 +121,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('profesi_id')->nullable()->constrained('profesi')->nullOnDelete();
-            $table->boolean('is_current')->default(false);
             $table->date('started_at')->nullable();
             $table->date('ended_at')->nullable();
             $table->text('note')->nullable();
@@ -133,7 +132,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('pangkat_id')->nullable()->constrained('pangkat')->nullOnDelete();
-            $table->boolean('is_current')->default(false);
             $table->date('started_at')->nullable();
             $table->date('ended_at')->nullable();
             $table->text('note')->nullable();
@@ -145,7 +143,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('jabatan_id')->nullable()->constrained('jabatan')->nullOnDelete();
-            $table->boolean('is_current')->default(false);
             $table->date('started_at')->nullable();
             $table->date('ended_at')->nullable();
             $table->text('note')->nullable();
@@ -157,7 +154,6 @@ return new class extends Migration
             $table->id();
             $table->foreignId('pegawai_id')->constrained('pegawai')->cascadeOnDelete();
             $table->foreignId('golongan_ruang_id')->nullable()->constrained('golongan_ruang')->nullOnDelete();
-            $table->boolean('is_current')->default(false);
             $table->date('started_at')->nullable();
             $table->date('ended_at')->nullable();
             $table->text('note')->nullable();
@@ -253,7 +249,6 @@ return new class extends Migration
             $table->string('nomor_str')->nullable();
             $table->date('tanggal_terbit')->nullable();
             $table->date('tanggal_kadaluarsa')->nullable();
-            $table->boolean('is_current')->default(false);
             $table->string('sk_file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -266,7 +261,6 @@ return new class extends Migration
             $table->string('nomor_sip')->nullable();
             $table->date('tanggal_terbit')->nullable();
             $table->date('tanggal_kadaluarsa')->nullable();
-            $table->boolean('is_current')->default(false);
             $table->string('sk_file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -278,7 +272,6 @@ return new class extends Migration
             $table->string('nomor_surat')->nullable();
             $table->date('tgl_mulai')->nullable();
             $table->date('tgl_kadaluarsa')->nullable();
-            $table->boolean('is_current')->default(false);
             $table->string('dokumen_file_path')->nullable();
             $table->timestamps();
             $table->softDeletes();

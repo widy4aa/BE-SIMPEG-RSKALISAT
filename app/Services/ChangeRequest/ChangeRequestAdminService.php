@@ -5,13 +5,18 @@ namespace App\Services\ChangeRequest;
 use App\Models\PegawaiPribadi;
 use App\Models\PerubahanData;
 use App\Repositories\ChangeRequest\ChangeRequestRepository;
+use App\Repositories\Notification\NotificationRepository;
+use App\Services\Notification\WhatsappService;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
 
 class ChangeRequestAdminService
 {
-    public function __construct(private readonly ChangeRequestRepository $changeRequestRepository)
-    {
+    public function __construct(
+        private readonly ChangeRequestRepository $changeRequestRepository,
+        private readonly NotificationRepository $notificationRepository,
+        private readonly WhatsappService $whatsapp,
+    ) {
     }
 
     public function list(?string $status = null, ?string $fitur = null): array
@@ -92,6 +97,8 @@ class ChangeRequestAdminService
             $item->note = $this->mergeAdminNote($item->note, 'APPROVED', $adminNote);
             $this->changeRequestRepository->save($item);
 
+            $this->sendNotifApproveReject($item, true);
+
             return $this->detail((int) $item->id);
         });
     }
@@ -113,8 +120,45 @@ class ChangeRequestAdminService
             $item->note = $this->mergeAdminNote($item->note, 'REJECTED', $adminNote);
             $this->changeRequestRepository->save($item);
 
+            $this->sendNotifApproveReject($item, false);
+
             return $this->detail((int) $item->id);
         });
+    }
+
+    private function sendNotifApproveReject(PerubahanData $item, bool $isApproved): void
+    {
+        $userId = (int) ($item->user?->id ?? 0);
+        if ($userId <= 0) {
+            return;
+        }
+
+        $namaPegawai = (string) ($item->user?->pegawai?->nama ?? 'Pegawai');
+
+        if ($isApproved) {
+            $title   = 'Perubahan Data Profil Disetujui';
+            $message = 'Pengajuan perubahan data profil Anda telah disetujui oleh admin.';
+            $waPesan = "✅ Halo {$namaPegawai},\n\nPengajuan perubahan data profil Anda telah *DISETUJUI* oleh admin.\n\nSilakan login ke aplikasi SIMPEG untuk melihat detail.";
+        } else {
+            $title   = 'Perubahan Data Profil Ditolak';
+            $message = 'Pengajuan perubahan data profil Anda ditolak oleh admin.';
+            $waPesan = "❌ Halo {$namaPegawai},\n\nPengajuan perubahan data profil Anda *DITOLAK* oleh admin.\n\nSilakan login ke aplikasi SIMPEG untuk informasi lebih lanjut.";
+        }
+
+        // Notifikasi in-app
+        $this->notificationRepository->createInfo($userId, $title, $message);
+
+        // Notifikasi WhatsApp
+        $noTelp = (string) ($item->user?->pegawai?->pribadi?->no_telp ?? '');
+        if ($noTelp !== '') {
+            $no = preg_replace('/\D/', '', $noTelp);
+            if (str_starts_with($no, '0')) {
+                $no = '62' . substr($no, 1);
+            } elseif (! str_starts_with($no, '62')) {
+                $no = '62' . $no;
+            }
+            $this->whatsapp->sendMessage($no, $waPesan);
+        }
     }
 
     private function applyProfileDetails(PerubahanData $item): void

@@ -36,6 +36,7 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
   - [Update Status Kelayakan (HRD)](#update-status-kelayakan-hrd)
   - [Get Diklat Menunggu Validasi (HRD)](#get-diklat-menunggu-validasi-hrd)
   - [Update Status Validasi (HRD)](#update-status-validasi-hrd)
+  - [Reminder Upload Laporan Diklat Pegawai (HRD)](#reminder-upload-laporan-diklat-pegawai-hrd)
   - [Create Diklat Pengguna](#create-diklat-pengguna)
   - [Edit Diklat Pengguna](#edit-diklat-pengguna)
   - [Upload Laporan Diklat Pegawai](#upload-laporan-diklat-pegawai)
@@ -598,13 +599,14 @@ Contoh response `200 OK`:
         {
           "id": 10,
           "action_code": "str_will_expire",
-          "title": "STR akan segera kadaluarsa",
-          "message": "STR Anda akan kadaluarsa dalam waktu dekat. Segera lakukan perpanjangan.",
+          "title": "STR Akan Segera Kadaluarsa",
+          "message": "STR akan kadaluarsa dalam 20 hari. Segera lakukan perpanjangan.",
           "action_payload": {
             "status_lengkap": true,
             "sisa_hari": 20,
+            "milestone_label": "21 hari sebelum",
             "keterangan": [
-              "STR aktif"
+              "STR akan kadaluarsa dalam 20 hari"
             ]
           },
           "is_read": false,
@@ -622,8 +624,8 @@ Keterangan field dashboard pegawai:
 - `jumlah_diklat_selesai`: jumlah diklat dengan status `sudah terlaksana`.
 - `jumlah_diklat_dijadwalkan_belum_selesai`: jumlah diklat dengan status `belum terlaksana` atau `sedang terlaksana`.
 - `list_jadwal_diklat_mendatang`: list diklat yang statusnya `belum terlaksana`.
-- `list_aksi`: daftar notifikasi bertipe `action` yang belum `is_resolved` (memberikan peringatan/info jika data pegawai belum lengkap).
-- `list_aksi.action_payload`: detail data aksi, misalnya status STR, kelengkapan keluarga, atau kelengkapan profil pribadi (`keterangan` berisi daftar kolom/dokumen yang belum diisi seperti KTP, KK, profesi, NIK/NIP, dll).
+- `list_aksi`: daftar notifikasi bertipe `action` yang belum `is_resolved` (memberikan peringatan/info jika data pegawai belum lengkap atau dokumen masa berlaku perlu diperbarui).
+- `list_aksi.action_payload`: detail data aksi, misalnya status STR/SIP/Penugasan Klinis, kelengkapan keluarga, atau kelengkapan profil pribadi. Untuk dokumen masa berlaku, payload berisi `sisa_hari`, `milestone_label`, dan `keterangan`. Untuk profil/keluarga, `keterangan` berisi daftar kolom/dokumen yang belum diisi seperti KTP, KK, profesi, NIK/NIP, dll.
 
 Contoh response `401 Unauthorized` (token tidak valid/tidak ada):
 
@@ -1608,6 +1610,73 @@ Contoh response gagal karena laporan belum lengkap (`422 Unprocessable Entity`):
 }
 ```
 
+#### Reminder Upload Laporan Diklat Pegawai (HRD)
+
+- Method: `POST`
+- URL: `/api/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan`
+- Parameter URL:
+  - `diklatId` (required, int) - ID master diklat.
+  - `pegawaiId` (required, int) - ID pegawai peserta diklat.
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+- Body: tidak wajib
+
+Endpoint ini digunakan HRD untuk mengirim pengingat manual kepada satu pegawai agar upload laporan/sertifikat diklat tertentu. Sistem akan mencari data peserta berdasarkan kombinasi `diklatId` dan `pegawaiId` pada tabel `list_jadwal_diklat`.
+
+Efek endpoint:
+
+- Membuat notifikasi in-app `info` untuk pegawai.
+- Mengirim WhatsApp jika nomor telepon pegawai tersedia.
+- Untuk diklat `internal`, label dokumen adalah `laporan`.
+- Untuk diklat `external`, label dokumen adalah `sertifikat`.
+- Jika peserta sudah memiliki `sertif_file_path`, endpoint mengembalikan `422` dan tidak membuat notifikasi baru.
+
+Contoh request:
+
+```http
+POST /api/hrd/diklat/13/pegawai/5/reminder-upload-laporan
+Authorization: Bearer <jwt_token>
+```
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Pengingat upload laporan diklat berhasil dikirim.",
+  "data": {
+    "id_jadwal_diklat": 25,
+    "diklat_id": 13,
+    "pegawai_id": 5,
+    "pegawai_nama": "Budi Santoso",
+    "nama_diklat": "Pelatihan BHD",
+    "jenis_pelaksanaan": "internal",
+    "label_dokumen": "laporan",
+    "in_app_sent": true,
+    "whatsapp_sent": true,
+    "whatsapp_message": null
+  }
+}
+```
+
+Contoh response jika peserta sudah upload (`422 Unprocessable Entity`):
+
+```json
+{
+  "success": false,
+  "message": "Pegawai sudah upload laporan diklat."
+}
+```
+
+Contoh response jika kombinasi diklat dan pegawai tidak ditemukan (`422 Unprocessable Entity`):
+
+```json
+{
+  "success": false,
+  "message": "Data peserta diklat tidak ditemukan."
+}
+```
+
 #### Create Diklat Pengguna
 
 - Method: `POST`
@@ -1956,7 +2025,7 @@ Contoh response `200 OK`:
 
 Keterangan field tambahan:
 
-- `profesi`, `jabatan_sekarang`, `unit_kerja`, `pangkat`, `golongan_ruang`: prioritas data `is_current = true`.
+- `profesi`, `jabatan_sekarang`, `unit_kerja`, `pangkat`, `golongan_ruang`: prioritas data riwayat yang aktif berdasarkan rentang tanggal (`started_at`/`tmt_mulai` sampai `ended_at`/`tmt_selesai`).
 - `masa_kerja`: hasil hitung dari `tgl_masuk` sampai tanggal sekarang.
 - `status_perubahan`: ringkasan perubahan profile terbaru milik user.
 - `status_perubahan.fitur`: fitur pengajuan perubahan terbaru.
@@ -2182,6 +2251,17 @@ Contoh response `200 OK`:
 - Method: `GET`
 - URL: `/api/notifications`
 - Auth: Wajib Bearer token
+- Role yang diizinkan: semua role
+
+**Query Parameter:**
+
+| Parameter | Wajib | Default | Nilai yang diterima | Keterangan |
+|---|---|---|---|---|
+| `type` | Tidak | `info` | `info`, `action` | Filter jenis notifikasi yang dikembalikan |
+
+**`?type=info`** — mengembalikan notifikasi informasi yang belum dibaca (`is_read = false`).
+
+Contoh request: `GET /api/notifications?type=info`
 
 Contoh response `200 OK`:
 
@@ -2190,18 +2270,97 @@ Contoh response `200 OK`:
   "success": true,
   "message": "Daftar notifikasi berhasil diambil.",
   "data": {
+    "type": "info",
     "notifications": [
       {
         "id": 1,
-        "title": "Jadwal Diklat Mendatang",
-        "message": "Anda memiliki jadwal diklat yang belum terlaksana. Silakan cek detail jadwal.",
+        "title": "Perubahan Data Profil Disetujui",
+        "message": "Pengajuan perubahan data profil Anda telah disetujui oleh admin.",
         "is_read": false,
-        "created_at": "2026-04-17 10:00:00"
+        "created_at": "2026-04-20 10:00:00"
+      },
+      {
+        "id": 2,
+        "title": "Terdaftar ke Diklat Baru",
+        "message": "Anda telah didaftarkan ke diklat 'Pelatihan BHD'. Silakan cek jadwal di aplikasi.",
+        "is_read": false,
+        "created_at": "2026-04-21 08:30:00"
       }
     ]
   }
 }
 ```
+
+**`?type=action`** — mengembalikan notifikasi aksi yang belum resolved (`is_resolved = false`). Field tambahan: `action_code`, `action_payload`, `unique_key`, `is_resolved`.
+
+Action masa berlaku dokumen dibuat otomatis untuk STR, SIP, dan Penugasan Klinis. Rentang aktifnya adalah 90 hari sebelum tanggal kadaluarsa sampai 7 hari sesudah kadaluarsa. Setelah lewat 7 hari sesudah kadaluarsa, action akan otomatis `is_resolved = true` pada sync berikutnya.
+
+Milestone yang dipakai pada payload `milestone_label`: `90 hari sebelum`, `60 hari sebelum`, `30 hari sebelum`, `21 hari sebelum`, `14 hari sebelum`, `7 hari sebelum`, `3 hari sebelum`, `2 hari sebelum`, `1 hari sebelum`, `hari ini`, `3 hari sesudah`, `7 hari sesudah`.
+
+Daftar `action_code` dokumen masa berlaku:
+
+| Dokumen | Akan Kadaluarsa | Sudah Kadaluarsa | Unique Key |
+|---|---|---|---|
+| STR | `str_will_expire` | `str_expired` | `dashboard.str.will_expire`, `dashboard.str.expired` |
+| SIP | `sip_will_expire` | `sip_expired` | `dashboard.sip.will_expire`, `dashboard.sip.expired` |
+| Penugasan Klinis | `penugasan_will_expire` | `penugasan_expired` | `dashboard.penugasan.will_expire`, `dashboard.penugasan.expired` |
+
+Contoh request: `GET /api/notifications?type=action`
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Daftar notifikasi aksi berhasil diambil.",
+  "data": {
+    "type": "action",
+    "notifications": [
+      {
+        "id": 5,
+        "action_code": "str_expired",
+        "action_payload": {
+          "status_lengkap": true,
+          "sisa_hari": -5,
+          "milestone_label": "7 hari sesudah",
+          "keterangan": ["STR sudah kadaluarsa sejak 5 hari lalu"]
+        },
+        "unique_key": "dashboard.str.expired",
+        "title": "STR Sudah Kadaluarsa",
+        "message": "STR sudah kadaluarsa 5 hari yang lalu. Segera perbarui.",
+        "is_read": false,
+        "is_resolved": false,
+        "created_at": "2026-04-20 08:00:00"
+      }
+    ]
+  }
+}
+```
+
+Contoh response `422 Unprocessable Entity` (nilai `type` tidak valid):
+
+```json
+{
+  "success": false,
+  "message": "Parameter type tidak valid. Gunakan: info atau action.",
+  "data": null
+}
+```
+
+**Kapan notifikasi `info` dibuat secara otomatis:**
+
+| Event | Penerima | Judul Notif |
+|---|---|---|
+| Admin **menyetujui** change request profil | Pegawai pengaju | "Perubahan Data Profil Disetujui" |
+| Admin **menolak** change request profil | Pegawai pengaju | "Perubahan Data Profil Ditolak" |
+| HRD memvalidasi laporan diklat → **valid** | Pegawai peserta | "Laporan Diklat Divalidasi" |
+| HRD memvalidasi laporan diklat → **tidak valid** | Pegawai peserta | "Laporan Diklat Ditolak" |
+| HRD mendaftarkan pegawai ke jadwal diklat | Pegawai terdaftar | "Terdaftar ke Diklat Baru" |
+| Pegawai submit change request profil | Semua admin & HRD | "Ada Pengajuan Perubahan Data Baru" |
+
+> Seluruh event di atas juga mengirimkan notifikasi **WhatsApp** ke nomor telepon pegawai/admin yang terdaftar.
+
+---
 
 #### 9.2 Tandai 1 Notifikasi Sudah Dibaca
 
@@ -2244,6 +2403,7 @@ Contoh response `200 OK`:
   }
 }
 ```
+
 
 ### 10. Riwayat Karir Pendidikan
 
@@ -2400,7 +2560,6 @@ Menambahkan data riwayat jabatan baru untuk user yang sedang login beserta lampi
 | :--- | :--- | :--- | :--- |
 | `unit_kerja_id` | Integer | Tidak | ID Unit Kerja (dari tabel unit_kerja) |
 | `nama_jabatan` | String | Ya | Nama jabatan |
-| `is_current` | Boolean (0/1) | Ya | Apakah jabatan ini masih dijabat? |
 | `tmt_mulai` | Date | Tidak | Tanggal mulai menjabat (Format: YYYY-MM-DD) |
 | `tmt_selesai` | Date | Tidak | Tanggal selesai menjabat |
 | `sk_jabatan` | File | Tidak | File SK jabatan (max 5MB, format pdf/jpg/png) |
@@ -2434,7 +2593,6 @@ Untuk menghindari limitasi *multipart/form-data* di PHP, Anda dapat menggunakan 
 Field request (*multipart/form-data*):
 - `unit_kerja_id` (sometimes, integer)
 - `nama_jabatan` (sometimes, string)
-- `is_current` (sometimes, boolean: 1/0)
 - `tmt_mulai` (sometimes, date)
 - `tmt_selesai` (sometimes, date)
 - `sk_jabatan` (sometimes, file: pdf/jpg/png, max 5MB)
@@ -2520,7 +2678,6 @@ Response `200 OK`:
 | Parameter | Tipe | Wajib | Validasi | Keterangan |
 | :--- | :--- | :--- | :--- | :--- |
 | `nama_pangkat` | String | Ya | `required`, `string`, `max:255` | Nama pangkat |
-| `is_current` | Boolean (0/1) | Ya | `required`, `boolean` | Pangkat masih aktif? |
 | `pejabat_penetap` | String | Tidak | `nullable`, `string`, `max:255` | Nama pejabat penetap |
 | `tmt_sk` | Date | Tidak | `nullable`, `date` | Tanggal SK (YYYY-MM-DD) |
 | `started_at` | Date | Tidak | `nullable`, `date` | Tanggal mulai pangkat |
@@ -2532,7 +2689,6 @@ Contoh raw input (form-data):
 
 ```text
 nama_pangkat: Penata Tingkat I
-is_current: 1
 pejabat_penetap: Gubernur
 tmt_sk: 2024-01-01
 started_at: 2024-01-01
@@ -2570,7 +2726,6 @@ Gunakan `POST` kalau kirim file (PHP tidak support file upload via `PATCH`). Fil
 | Parameter | Tipe | Wajib | Validasi | Keterangan |
 | :--- | :--- | :--- | :--- | :--- |
 | `nama_pangkat` | String | Opsional | `sometimes`, `required`, `string`, `max:255` | Nama pangkat |
-| `is_current` | Boolean (0/1) | Opsional | `sometimes`, `required`, `boolean` | Pangkat masih aktif? |
 | `pejabat_penetap` | String | Opsional | `sometimes`, `nullable`, `string`, `max:255` | Pejabat penetap |
 | `tmt_sk` | Date | Opsional | `sometimes`, `nullable`, `date` | Tanggal SK |
 | `started_at` | Date | Opsional | `sometimes`, `nullable`, `date` | Tanggal mulai |
@@ -4632,7 +4787,6 @@ Body `POST` tambah jabatan (`multipart/form-data`):
 | `unit_kerja_id` | integer, nullable | FK ke unit_kerja |
 | `tmt_mulai` | date, nullable | TMT mulai jabatan |
 | `tmt_selesai` | date, nullable | TMT selesai jabatan |
-| `is_current` | boolean, required | Jabatan aktif saat ini |
 | `note` | string, nullable | Catatan |
 | `sk_jabatan` | file, nullable | SK jabatan (pdf/jpg/png, max 5 MB) |
 
@@ -4740,7 +4894,6 @@ Body `POST` tambah pangkat (`multipart/form-data`):
 | `nama_pangkat` | string, required | Nama pangkat |
 | `pejabat_penetap` | string, nullable | Pejabat yang menetapkan |
 | `tmt_sk` | date, nullable | TMT SK pangkat |
-| `is_current` | boolean, required | Pangkat aktif |
 | `started_at` | date, nullable | Tanggal mulai berlaku |
 | `ended_at` | date, nullable | Tanggal selesai berlaku |
 | `note` | string, nullable | Catatan |
@@ -4858,8 +5011,10 @@ Response `404` (dokumen tidak ditemukan):
 
 Urgensi pesan ditentukan otomatis berdasarkan sisa hari kadaluarsa:
 - **Kadaluarsa (< 0 hari):** Pesan sangat mendesak 🚨
-- **≤ 30 hari:** Pesan peringatan penting ⚠️
-- **> 30 hari:** Pesan informasi ℹ️
+- **≤ 90 hari:** Pesan peringatan penting ⚠️
+- **> 90 hari:** Pesan informasi ℹ️
+
+Milestone dokumen masa berlaku yang dipakai sistem: `90 hari sebelum`, `60 hari sebelum`, `30 hari sebelum`, `21 hari sebelum`, `14 hari sebelum`, `7 hari sebelum`, `3 hari sebelum`, `2 hari sebelum`, `1 hari sebelum`, `hari ini`, `3 hari sesudah`, `7 hari sesudah`.
 
 ---
 
@@ -5099,7 +5254,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 - **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/pegawai/{id}/{bagian}`, `GET /api/str-sip`, `GET /api/generate/cv`
 - **Diklat:** `GET /api/diklat/all`, `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
-- **Diklat HRD:** `POST /api/hrd/diklat`, `PUT /api/hrd/diklat/{id}`, `GET /api/hrd/diklat/{id}/peserta`, `POST /api/hrd/diklat/{id}/peserta`, `GET /api/hrd/diklat/status/layak`, `PATCH /api/hrd/diklat/{id}/status/layak`, `GET /api/hrd/diklat/status/validasi`, `PATCH /api/hrd/diklat/{id}/status/validasi`
+- **Diklat HRD:** `POST /api/hrd/diklat`, `PUT /api/hrd/diklat/{id}`, `GET /api/hrd/diklat/{id}/peserta`, `POST /api/hrd/diklat/{id}/peserta`, `GET /api/hrd/diklat/status/layak`, `PATCH /api/hrd/diklat/{id}/status/layak`, `GET /api/hrd/diklat/status/validasi`, `PATCH /api/hrd/diklat/{id}/status/validasi`, `POST /api/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan`
 - **Laporan:** `GET /api/generate/laporan-diklat`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`
@@ -5285,7 +5440,7 @@ Tambah riwayat jabatan (ganti token):
 curl -X POST http://127.0.0.1:8000/api/riwayat-karir/jabatan \
   -H "Authorization: Bearer <jwt_token>" \
   -F "nama_jabatan=Perawat" \
-  -F "is_current=1" \
+  -F "tmt_mulai=2024-01-01" \
   -F "sk_jabatan=@/path/to/sk.pdf"
 ```
 
@@ -5317,7 +5472,7 @@ Tambah riwayat pangkat (ganti token):
 curl -X POST http://127.0.0.1:8000/api/riwayat-karir/pangkat \
   -H "Authorization: Bearer <jwt_token>" \
   -F "nama_pangkat=Penata Muda" \
-  -F "is_current=1" \
+  -F "started_at=2024-01-01" \
   -F "sk_pangkat=@/path/to/sk.pdf"
 ```
 

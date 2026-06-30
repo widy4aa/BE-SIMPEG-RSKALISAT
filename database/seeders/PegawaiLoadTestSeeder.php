@@ -99,7 +99,6 @@ class PegawaiLoadTestSeeder extends Seeder
             \App\Models\PangkatPegawai::query()->updateOrCreate(
                 [
                     'pegawai_id' => $pegawai->id,
-                    'is_current' => true,
                 ],
                 [
                     'pangkat_id' => $newPangkat->id,

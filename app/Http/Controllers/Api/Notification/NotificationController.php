@@ -18,12 +18,14 @@ class NotificationController extends Controller
         $claims = $request->input('_jwt_claims', []);
         $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
 
-        $result = $this->notificationService->listByUserId($userId);
+        $type = $request->query('type', 'info');
+
+        $result = $this->notificationService->listByUserId($userId, $type);
 
         return response()->json([
             'success' => $result['success'],
             'message' => $result['message'],
-            'data' => $result['data'],
+            'data'    => $result['data'],
         ], $result['status']);
     }
 

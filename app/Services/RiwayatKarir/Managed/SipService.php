@@ -2,13 +2,17 @@
 
 namespace App\Services\RiwayatKarir\Managed;
 
+use App\Repositories\Notification\NotificationRepository;
 use App\Repositories\RiwayatKarir\Managed\SipRepository;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 
 class SipService extends BaseRiwayatKarirService
 {
-    public function __construct(protected readonly SipRepository $repository) {}
+    public function __construct(
+        protected readonly SipRepository $repository,
+        private readonly NotificationRepository $notificationRepository,
+    ) {}
 
     public function getSip(int $pegawaiId): array
     {
@@ -34,6 +38,8 @@ class SipService extends BaseRiwayatKarirService
 
         $sip = $this->repository->createSip($pegawai, $data);
 
+        $this->sendNotifSipUpdated($pegawai);
+
         return $this->formatSip($sip);
     }
 
@@ -56,7 +62,24 @@ class SipService extends BaseRiwayatKarirService
 
         $updated = $this->repository->updateSip($sip, $data);
 
+        $pegawai = $this->getPegawaiOrFail($pegawaiId);
+        $this->sendNotifSipUpdated($pegawai);
+
         return $this->formatSip($updated);
+    }
+
+    private function sendNotifSipUpdated(object $pegawai): void
+    {
+        $userId = (int) ($pegawai->user_id ?? 0);
+        if ($userId <= 0) {
+            return;
+        }
+
+        $this->notificationRepository->createInfo(
+            $userId,
+            'Data SIP Diperbarui',
+            'Data SIP Anda telah diperbarui oleh admin. Silakan cek di menu riwayat karir.'
+        );
     }
 
     public function deleteSip(int $id, int $pegawaiId): array
