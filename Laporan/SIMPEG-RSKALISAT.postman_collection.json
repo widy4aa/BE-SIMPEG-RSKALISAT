@@ -1,0 +1,7284 @@
+{
+  "info": {
+    "name": "SIMPEG RSKALISAT - REST API",
+    "description": "Koleksi otomatis dari route:list Laravel (191 route). base_url & token diatur di Variables. Jalankan 'POST /api/login' dulu untuk mengisi token otomatis.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "username",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "password",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "01 - Auth",
+      "item": [
+        {
+          "name": "PATCH /api/auth/change-nik",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-nik",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-nik"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nik\": \"3509xxxxxxxxxxxx\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/auth/change-password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/auth/change-password",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "auth",
+                "change-password"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"current_password\": \"oldpass123\",\n  \"new_password\": \"newpass123\",\n  \"new_password_confirmation\": \"newpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/forgot-password/request-otp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forgot-password/request-otp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forgot-password",
+                "request-otp"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"3509xxxxxxxxxxxx\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/forgot-password/reset",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/forgot-password/reset",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "forgot-password",
+                "reset"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"3509xxxxxxxxxxxx\",\n  \"otp\": \"123456\",\n  \"new_password\": \"newpass123\",\n  \"new_password_confirmation\": \"newpass123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{username}}\",\n  \"password\": \"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "// Simpan token otomatis ke variable koleksi",
+                  "let res = pm.response.json();",
+                  "let token = res.data?.token || res.token || res.access_token;",
+                  "if (token) {",
+                  "  pm.collectionVariables.set('token', token);",
+                  "  console.log('Token tersimpan.');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /api/logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/logout",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "logout"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "02 - Profile",
+      "item": [
+        {
+          "name": "GET /api/generate/cv",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/generate/cv",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "generate",
+                "cv"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/me",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/role",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "role"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/profile",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profile"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nama",
+                  "value": "Contoh Data",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/profil/ktp",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profil/ktp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profil",
+                "ktp"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "ktp",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/profil/profil-picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profil/profil-picture",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profil",
+                "profil-picture"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/profile/kk",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile/kk",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "kk"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "kk",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/profile/profile-picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/profile/profile-picture",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "profile",
+                "profile-picture"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Dashboard",
+      "item": [
+        {
+          "name": "GET /api/dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/dashboard",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "dashboard"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "04 - Diklat (Self)",
+      "item": [
+        {
+          "name": "DELETE /api/diklat/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/diklat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "diklat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/generate/laporan-diklat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/generate/laporan-diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "generate",
+                "laporan-diklat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/diklat/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/diklat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "diklat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/diklat/{id}/upload-laporan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/diklat/{id}/upload-laporan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "diklat",
+                "{id}",
+                "upload-laporan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "laporan",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "05 - Keluarga (Self)",
+      "item": [
+        {
+          "name": "DELETE /api/keluarga/anak/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/anak/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "anak",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/keluarga/kontak-darurat/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/kontak-darurat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "kontak-darurat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/keluarga/orang-tua/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/orang-tua/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "orang-tua",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/keluarga/pasangan/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/pasangan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "pasangan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/keluarga/tanggungan-lain/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/tanggungan-lain/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "tanggungan-lain",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/keluarga",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/keluarga/anak",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/anak",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "anak"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/keluarga/kontak-darurat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/kontak-darurat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "kontak-darurat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/keluarga/orang-tua",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/orang-tua",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "orang-tua"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/keluarga/pasangan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/pasangan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "pasangan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/keluarga/tanggungan-lain",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/tanggungan-lain",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "tanggungan-lain"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/keluarga/anak/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/anak/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "anak",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/keluarga/kontak-darurat/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/kontak-darurat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "kontak-darurat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/keluarga/orang-tua/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/orang-tua/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "orang-tua",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/keluarga/pasangan/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/pasangan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "pasangan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/keluarga/tanggungan-lain/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/tanggungan-lain/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "tanggungan-lain",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/anak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/anak",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "anak"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/anak/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/anak/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "anak",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/kontak-darurat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/kontak-darurat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "kontak-darurat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/orang-tua",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/orang-tua",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "orang-tua"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/pasangan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/pasangan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "pasangan"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/pasangan/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/pasangan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "pasangan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/keluarga/tanggungan-lain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/keluarga/tanggungan-lain",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "keluarga",
+                "tanggungan-lain"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "06 - Riwayat Karir (Self)",
+      "item": [
+        {
+          "name": "DELETE /api/riwayat-karir/jabatan/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/riwayat-karir/pangkat/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pangkat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pangkat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/riwayat-karir/pendidikan/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/riwayat-karir/penugasan-klinis/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "penugasan-klinis",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/riwayat-karir/sip/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/sip/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "sip",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/riwayat-karir/str/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/str/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "str",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/riwayat-karir/jabatan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/riwayat-karir/pangkat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pangkat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pangkat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/riwayat-karir/pendidikan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/riwayat-karir/penugasan-klinis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "penugasan-klinis"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/riwayat-karir/sip",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "sip"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/riwayat-karir/str",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/str",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "str"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/riwayat-karir/jabatan/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/riwayat-karir/pangkat/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pangkat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pangkat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/riwayat-karir/pendidikan/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/riwayat-karir/penugasan-klinis/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "penugasan-klinis",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/riwayat-karir/sip/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/sip/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "sip",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/riwayat-karir/str/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/str/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "str",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/jabatan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/jabatan/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/jabatan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "jabatan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/pangkat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pangkat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pangkat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/pangkat/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pangkat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pangkat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/pendidikan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/pendidikan/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/pendidikan/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "pendidikan",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/penugasan-klinis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "penugasan-klinis"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/penugasan-klinis/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/penugasan-klinis/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "penugasan-klinis",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/sip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "sip"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/sip/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/sip/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "sip",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/str",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/str",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "str"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/riwayat-karir/str/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/riwayat-karir/str/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "riwayat-karir",
+                "str",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "07 - Diklat (HRD/Managed)",
+      "item": [
+        {
+          "name": "GET /api/diklat/all",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/diklat/all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "diklat",
+                "all"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/diklat/status/layak",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/status/layak",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "status",
+                "layak"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"layak\",\n  \"catatan\": \"Memenuhi syarat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/diklat/status/validasi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/status/validasi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "status",
+                "validasi"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"valid\",\n  \"catatan\": \"Laporan sesuai\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/diklat/{id}/peserta",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/{id}/peserta",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "{id}",
+                "peserta"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/diklat/{id}/status/layak",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/{id}/status/layak",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "{id}",
+                "status",
+                "layak"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"layak\",\n  \"catatan\": \"Memenuhi syarat\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/diklat/{id}/status/validasi",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/{id}/status/validasi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "{id}",
+                "status",
+                "validasi"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"valid\",\n  \"catatan\": \"Laporan sesuai\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/diklat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "{diklatId}",
+                "pegawai",
+                "{pegawaiId}",
+                "reminder-upload-laporan"
+              ],
+              "variable": [
+                {
+                  "key": "diklatId",
+                  "value": "1"
+                },
+                {
+                  "key": "pegawaiId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "laporan",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/diklat/{id}/peserta",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/{id}/peserta",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "{id}",
+                "peserta"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pegawai_ids\": [\n    1,\n    2,\n    3\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/hrd/diklat/{id}",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "08 - Change Request",
+      "item": [
+        {
+          "name": "GET /api/admin/change-requests",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/change-requests",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "change-requests"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/admin/change-requests/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/change-requests/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "change-requests",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/change-requests/{id}/accept",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/change-requests/{id}/accept",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "change-requests",
+                "{id}",
+                "accept"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"catatan\": \"Disetujui\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/admin/change-requests/{id}/reject",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/admin/change-requests/{id}/reject",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "admin",
+                "change-requests",
+                "{id}",
+                "reject"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"alasan\": \"Data tidak sesuai\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "09 - Pegawai",
+      "item": [
+        {
+          "name": "GET /api/pegawai",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pegawai",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pegawai"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/pegawai/{id}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pegawai/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pegawai",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/pegawai/{id}/{bagian}",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pegawai/{id}/{bagian}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pegawai",
+                "{id}",
+                "{bagian}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "bagian",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/pegawai/{id}/change-role",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pegawai/{id}/change-role",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pegawai",
+                "{id}",
+                "change-role"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"hrd\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/pegawai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pegawai",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pegawai"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "10 - STR/SIP",
+      "item": [
+        {
+          "name": "GET /api/str-sip",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/str-sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "str-sip"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "11 - Settings",
+      "item": [
+        {
+          "name": "GET /api/settings/whatsapp",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/settings/whatsapp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "settings",
+                "whatsapp"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"your-fonnte-token\",\n  \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT /api/settings/whatsapp",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/settings/whatsapp",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "settings",
+                "whatsapp"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"your-fonnte-token\",\n  \"is_active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "12 - HRD Pegawai",
+      "item": [
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "anak",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/keluarga/kontak-darurat/{keluargaId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/kontak-darurat/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "kontak-darurat",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/keluarga/orang-tua/{keluargaId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/orang-tua/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "orang-tua",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "pasangan",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/keluarga/tanggungan-lain/{keluargaId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/tanggungan-lain/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "tanggungan-lain",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "jabatan",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pangkat",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pendidikan",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "penugasan-klinis",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "sip",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "str",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/keluarga/anak",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/anak",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "anak"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/keluarga/kontak-darurat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/kontak-darurat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "kontak-darurat"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/keluarga/orang-tua",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/orang-tua",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "orang-tua"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/keluarga/pasangan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/pasangan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "pasangan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/keluarga/tanggungan-lain",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/tanggungan-lain",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "tanggungan-lain"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/riwayat-karir/jabatan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/jabatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "jabatan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/riwayat-karir/pangkat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pangkat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pangkat"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/riwayat-karir/pendidikan",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pendidikan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pendidikan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "penugasan-klinis"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/riwayat-karir/sip",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "sip"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/hrd/pegawai/{id}/riwayat-karir/str",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/str",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "str"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/inti",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/inti",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "inti"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "anak",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/keluarga/kontak-darurat/{keluargaId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/kontak-darurat/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "kontak-darurat",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/keluarga/orang-tua/{keluargaId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/orang-tua/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "orang-tua",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "pasangan",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/keluarga/tanggungan-lain/{keluargaId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/tanggungan-lain/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "tanggungan-lain",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/pribadi",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/pribadi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "pribadi"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nama",
+                  "value": "Contoh Data",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "jabatan",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pangkat",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pendidikan",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "penugasan-klinis",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "sip",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "str",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/anak",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/anak",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "anak"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/anak/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "anak",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/kontak-darurat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/kontak-darurat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "kontak-darurat"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/orang-tua",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/orang-tua",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "orang-tua"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/pasangan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/pasangan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "pasangan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/pasangan/{keluargaId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "pasangan",
+                "{keluargaId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "keluargaId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/keluarga/tanggungan-lain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/keluarga/tanggungan-lain",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "keluarga",
+                "tanggungan-lain"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/pribadi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/pribadi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "pribadi"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "nama",
+                  "value": "Contoh Data",
+                  "type": "text"
+                },
+                {
+                  "key": "foto",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/reminder/penugasan-klinis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/reminder/penugasan-klinis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "reminder",
+                "penugasan-klinis"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pesan\": \"Mohon segera melengkapi dokumen Anda.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/reminder/str-sip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/reminder/str-sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "reminder",
+                "str-sip"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pesan\": \"Mohon segera melengkapi dokumen Anda.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/jabatan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/jabatan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "jabatan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/jabatan/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "jabatan",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/pangkat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pangkat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pangkat"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pangkat/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pangkat",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/pendidikan",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pendidikan",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pendidikan"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/pendidikan/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "pendidikan",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "penugasan-klinis"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/penugasan-klinis/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "penugasan-klinis",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/sip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "sip"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/sip/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "sip",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/str",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/str",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "str"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/hrd/pegawai/{id}/riwayat-karir/str/{riwayatId}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "hrd",
+                "pegawai",
+                "{id}",
+                "riwayat-karir",
+                "str",
+                "{riwayatId}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                },
+                {
+                  "key": "riwayatId",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "13 - Master Data",
+      "item": [
+        {
+          "name": "DELETE /api/form/golongan-ruang/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/golongan-ruang/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "golongan-ruang",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/jenis-biaya/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-biaya/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-biaya",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/jenis-pegawai/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-pegawai/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-pegawai",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/jenis-sip/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-sip/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-sip",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/kategori-diklat/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/kategori-diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "kategori-diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/profesi/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/profesi/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "profesi",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/tipe-diklat/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/tipe-diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "tipe-diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE /api/form/unit-kerja/{id}",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/unit-kerja/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "unit-kerja",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/golongan-ruang",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/golongan-ruang",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "golongan-ruang"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/jenis-biaya",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-biaya",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-biaya"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/jenis-pegawai",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-pegawai",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-pegawai"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/jenis-sip",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-sip"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/kategori-diklat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/kategori-diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "kategori-diklat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/profesi",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/profesi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "profesi"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/tipe-diklat",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/tipe-diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "tipe-diklat"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET /api/form/unit-kerja",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/unit-kerja",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "unit-kerja"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/golongan-ruang/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/golongan-ruang/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "golongan-ruang",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/jenis-biaya/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-biaya/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-biaya",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/jenis-pegawai/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-pegawai/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-pegawai",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/jenis-sip/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-sip/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-sip",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/kategori-diklat/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/kategori-diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "kategori-diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/profesi/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/profesi/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "profesi",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/tipe-diklat/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/tipe-diklat/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "tipe-diklat",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/form/unit-kerja/{id}",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/unit-kerja/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "unit-kerja",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/golongan-ruang",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/golongan-ruang",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "golongan-ruang"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/jenis-biaya",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-biaya",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-biaya"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/jenis-pegawai",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-pegawai",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-pegawai"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/jenis-sip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/jenis-sip",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "jenis-sip"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/kategori-diklat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/kategori-diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "kategori-diklat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/profesi",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/profesi",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "profesi"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/tipe-diklat",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/tipe-diklat",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "tipe-diklat"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST /api/form/unit-kerja",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/form/unit-kerja",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "form",
+                "unit-kerja"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "14 - Message/WhatsApp",
+      "item": [
+        {
+          "name": "POST /api/pesan/pegawai/{id}",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/pesan/pegawai/{id}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "pesan",
+                "pegawai",
+                "{id}"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"pesan\": \"Mohon segera melengkapi dokumen Anda.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "15 - Notification",
+      "item": [
+        {
+          "name": "GET /api/notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/notifications/read-all",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications/read-all",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "read-all"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PATCH /api/notifications/{id}/read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/notifications/{id}/read",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "notifications",
+                "{id}",
+                "read"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nama\": \"Contoh Data\",\n  \"keterangan\": \"Isi sesuai kebutuhan\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "16 - Health",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "health"
+              ]
+            },
+            "auth": {
+              "type": "noauth"
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

@@ -7,6 +7,8 @@ use App\Services\RiwayatKarir\Managed\JabatanService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RiwayatKarir\StoreJabatanRequest;
+use App\Http\Requests\RiwayatKarir\UpdateJabatanRequest;
 use InvalidArgumentException;
 
 class JabatanController extends Controller
@@ -23,7 +25,7 @@ class JabatanController extends Controller
         }
     }
 
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StoreJabatanRequest $request, int $id): JsonResponse
     {
         try {
             $result = $this->service->createJabatan($id, $request->validated(), $request->file("sk_jabatan"));
@@ -35,7 +37,7 @@ class JabatanController extends Controller
         }
     }
 
-    public function update(Request $request, int $id, int $riwayatId): JsonResponse
+    public function update(UpdateJabatanRequest $request, int $id, int $riwayatId): JsonResponse
     {
         try {
             $result = $this->service->updateJabatan($riwayatId, $id, $request->validated(), $request->file("sk_jabatan"));

@@ -7,6 +7,8 @@ use App\Services\RiwayatKarir\Managed\StrService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RiwayatKarir\StoreStrRequest;
+use App\Http\Requests\RiwayatKarir\UpdateStrRequest;
 use InvalidArgumentException;
 
 class StrController extends Controller
@@ -23,7 +25,7 @@ class StrController extends Controller
         }
     }
 
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StoreStrRequest $request, int $id): JsonResponse
     {
         try {
             $result = $this->service->createStr($id, $request->validated(), $request->file("sk_str"));
@@ -35,7 +37,7 @@ class StrController extends Controller
         }
     }
 
-    public function update(Request $request, int $id, int $riwayatId): JsonResponse
+    public function update(UpdateStrRequest $request, int $id, int $riwayatId): JsonResponse
     {
         try {
             $result = $this->service->updateStr($riwayatId, $id, $request->validated(), $request->file("sk_str"));

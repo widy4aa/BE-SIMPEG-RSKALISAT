@@ -7,6 +7,8 @@ use App\Services\RiwayatKarir\Managed\SipService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RiwayatKarir\StoreSipRequest;
+use App\Http\Requests\RiwayatKarir\UpdateSipRequest;
 use InvalidArgumentException;
 
 class SipController extends Controller
@@ -23,7 +25,7 @@ class SipController extends Controller
         }
     }
 
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StoreSipRequest $request, int $id): JsonResponse
     {
         try {
             $result = $this->service->createSip($id, $request->validated(), $request->file("sk_sip"));
@@ -35,7 +37,7 @@ class SipController extends Controller
         }
     }
 
-    public function update(Request $request, int $id, int $riwayatId): JsonResponse
+    public function update(UpdateSipRequest $request, int $id, int $riwayatId): JsonResponse
     {
         try {
             $result = $this->service->updateSip($riwayatId, $id, $request->validated(), $request->file("sk_sip"));

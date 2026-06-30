@@ -7,6 +7,8 @@ use App\Services\RiwayatKarir\Managed\PenugasanKlinisService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RiwayatKarir\StorePenugasanKlinisRequest;
+use App\Http\Requests\RiwayatKarir\UpdatePenugasanKlinisRequest;
 use InvalidArgumentException;
 
 class PenugasanKlinisController extends Controller
@@ -23,7 +25,7 @@ class PenugasanKlinisController extends Controller
         }
     }
 
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StorePenugasanKlinisRequest $request, int $id): JsonResponse
     {
         try {
             $result = $this->service->createPenugasanKlinis($id, $request->validated(), $request->file("dokumen_file"));
@@ -35,7 +37,7 @@ class PenugasanKlinisController extends Controller
         }
     }
 
-    public function update(Request $request, int $id, int $riwayatId): JsonResponse
+    public function update(UpdatePenugasanKlinisRequest $request, int $id, int $riwayatId): JsonResponse
     {
         try {
             $result = $this->service->updatePenugasanKlinis($riwayatId, $id, $request->validated(), $request->file("dokumen_file"));

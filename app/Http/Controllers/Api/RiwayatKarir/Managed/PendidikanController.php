@@ -7,6 +7,8 @@ use App\Services\RiwayatKarir\Managed\PendidikanService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RiwayatKarir\StorePendidikanRequest;
+use App\Http\Requests\RiwayatKarir\UpdatePendidikanRequest;
 use InvalidArgumentException;
 
 class PendidikanController extends Controller
@@ -23,7 +25,7 @@ class PendidikanController extends Controller
         }
     }
 
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StorePendidikanRequest $request, int $id): JsonResponse
     {
         try {
             $result = $this->service->createPendidikan($id, $request->validated(), $request->file("ijazah"));
@@ -35,7 +37,7 @@ class PendidikanController extends Controller
         }
     }
 
-    public function update(Request $request, int $id, int $riwayatId): JsonResponse
+    public function update(UpdatePendidikanRequest $request, int $id, int $riwayatId): JsonResponse
     {
         try {
             $result = $this->service->updatePendidikan($riwayatId, $id, $request->validated(), $request->file("ijazah"));

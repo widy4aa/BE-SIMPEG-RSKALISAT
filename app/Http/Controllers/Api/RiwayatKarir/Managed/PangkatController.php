@@ -7,6 +7,8 @@ use App\Services\RiwayatKarir\Managed\PangkatService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use App\Http\Requests\RiwayatKarir\StorePangkatRequest;
+use App\Http\Requests\RiwayatKarir\UpdatePangkatRequest;
 use InvalidArgumentException;
 
 class PangkatController extends Controller
@@ -23,7 +25,7 @@ class PangkatController extends Controller
         }
     }
 
-    public function store(Request $request, int $id): JsonResponse
+    public function store(StorePangkatRequest $request, int $id): JsonResponse
     {
         try {
             $result = $this->service->createPangkat($id, $request->validated(), $request->file("sk_pangkat"));
@@ -35,7 +37,7 @@ class PangkatController extends Controller
         }
     }
 
-    public function update(Request $request, int $id, int $riwayatId): JsonResponse
+    public function update(UpdatePangkatRequest $request, int $id, int $riwayatId): JsonResponse
     {
         try {
             $result = $this->service->updatePangkat($riwayatId, $id, $request->validated(), $request->file("sk_pangkat"));
