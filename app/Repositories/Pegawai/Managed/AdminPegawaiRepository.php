@@ -77,6 +77,8 @@ class AdminPegawaiRepository
                 pp.no_telp AS pribadi_no_telp,
                 pp.email AS pribadi_email,
                 pp.foto_path AS pribadi_foto_path,
+                pp.ktp_file_path AS pribadi_ktp_file_path,
+                pp.kk_file_path AS pribadi_kk_file_path,
                 j.id AS jabatan_id_detail,
                 j.nama AS jabatan_nama,
                 uk.id AS unit_kerja_id,
