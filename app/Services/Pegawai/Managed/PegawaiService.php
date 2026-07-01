@@ -48,7 +48,7 @@ class PegawaiService
                 'nik'                => $pegawai->nik,
                 'role'               => $pegawai->user?->role,
                 'link_photo_profil'  => $linkPhotoProfil,
-                'jabatan'            => $pegawai->jabatan?->nama,
+                'pendidikan_terakhir'=> $pegawai->pribadi?->pendidikan_terakhir,
                 'unit_kerja'         => $pegawai->jabatan?->unitKerja?->nama,
                 'email'              => $pegawai->pribadi?->email,
                 'no_telp'            => $pegawai->pribadi?->no_hp ?? $pegawai->pribadi?->no_telp,

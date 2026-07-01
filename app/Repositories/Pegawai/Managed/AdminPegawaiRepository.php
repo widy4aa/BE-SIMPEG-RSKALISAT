@@ -277,16 +277,8 @@ class AdminPegawaiRepository
                 p.nama LIKE ?
                 OR p.nik LIKE ?
                 OR pr.nama LIKE ?
-                OR EXISTS (
-                    SELECT 1
-                    FROM profesi_pegawai ppg
-                    INNER JOIN profesi pr2 ON pr2.id = ppg.profesi_id
-                    WHERE ppg.pegawai_id = p.id
-                        AND ppg.deleted_at IS NULL
-                        AND pr2.nama LIKE ?
-                )
             )';
-            array_push($bindings, $like, $like, $like, $like);
+            array_push($bindings, $like, $like, $like);
         }
 
         $statusKelengkapan = $this->filledString($filters['status_kelengkapan'] ?? null);
@@ -316,19 +308,8 @@ class AdminPegawaiRepository
 
         $profesi = $this->filledString($filters['profesi'] ?? null);
         if ($profesi !== null) {
-            $like = "%{$profesi}%";
-            $where[] = '(
-                pr.nama LIKE ?
-                OR EXISTS (
-                    SELECT 1
-                    FROM profesi_pegawai ppg
-                    INNER JOIN profesi pr2 ON pr2.id = ppg.profesi_id
-                    WHERE ppg.pegawai_id = p.id
-                        AND ppg.deleted_at IS NULL
-                        AND pr2.nama LIKE ?
-                )
-            )';
-            array_push($bindings, $like, $like);
+            $where[] = 'pr.nama LIKE ?';
+            $bindings[] = "%{$profesi}%";
         }
 
         $tahunMasuk = $this->filledString($filters['tahun_masuk'] ?? null);
