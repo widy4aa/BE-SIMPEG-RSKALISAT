@@ -25,11 +25,7 @@ class DirekturDashboardRepository
                     AND pp.deleted_at IS NULL
                 WHERE p.deleted_at IS NULL
                     AND (
-                        ((p.nik IS NULL OR p.nik = '') AND (p.nip IS NULL OR p.nip = ''))
-                        OR p.jenis_pegawai_id IS NULL
-                        OR p.profesi_id IS NULL
-                        OR p.tgl_masuk IS NULL
-                        OR pp.id IS NULL
+                        pp.id IS NULL
                         OR pp.tanggal_lahir IS NULL
                         OR pp.jenis_kelamin IS NULL
                         OR pp.agama IS NULL

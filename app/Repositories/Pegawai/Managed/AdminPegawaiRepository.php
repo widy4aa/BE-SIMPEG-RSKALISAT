@@ -336,11 +336,7 @@ class AdminPegawaiRepository
     private function profileCompleteSql(): string
     {
         return "(
-            ((p.nik IS NOT NULL AND p.nik <> '') OR (p.nip IS NOT NULL AND p.nip <> ''))
-            AND p.jenis_pegawai_id IS NOT NULL
-            AND p.profesi_id IS NOT NULL
-            AND p.tgl_masuk IS NOT NULL
-            AND pp.id IS NOT NULL
+            pp.id IS NOT NULL
             AND pp.tanggal_lahir IS NOT NULL
             AND pp.jenis_kelamin IS NOT NULL
             AND pp.jenis_kelamin <> ''

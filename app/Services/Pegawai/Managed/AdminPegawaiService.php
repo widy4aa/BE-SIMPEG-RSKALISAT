@@ -30,15 +30,20 @@ class AdminPegawaiService
             $linkPhotoProfil = $fotoPath ? '/'.$fotoPath : null;
 
             $isLengkap = true;
-            if (empty($pegawai->nik) || empty($pegawai->jenis_pegawai_id) || empty($pegawai->profesi_id) || empty($pegawai->tgl_masuk)) {
+            $pribadi = $pegawai->pribadi;
+            if (!$pribadi) {
                 $isLengkap = false;
-            } else {
-                $pribadi = $pegawai->pribadi;
-                if (!$pribadi) {
-                    $isLengkap = false;
-                } elseif (empty($pribadi->tanggal_lahir) || empty($pribadi->jenis_kelamin) || empty($pribadi->agama) || empty($pribadi->alamat) || empty($pribadi->no_telp) || empty($pribadi->pendidikan_terakhir)) {
-                    $isLengkap = false;
-                }
+            } elseif (
+                empty($pribadi->tanggal_lahir) || 
+                empty($pribadi->jenis_kelamin) || 
+                empty($pribadi->agama) || 
+                empty($pribadi->alamat) || 
+                empty($pribadi->no_telp) || 
+                empty($pribadi->pendidikan_terakhir) ||
+                empty($pribadi->ktp_file_path) ||
+                empty($pribadi->kk_file_path)
+            ) {
+                $isLengkap = false;
             }
 
             return [

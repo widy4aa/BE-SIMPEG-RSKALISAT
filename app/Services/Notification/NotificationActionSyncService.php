@@ -111,10 +111,6 @@ class NotificationActionSyncService
         // === SYNC PROFIL ===
         $pribadi = $pegawai->pribadi;
         $profileKeterangan = [];
-        if (blank($pegawai->nik) && blank($pegawai->nip)) $profileKeterangan[] = 'NIK / NIP belum terisi';
-        if (blank($pegawai->jenis_pegawai_id)) $profileKeterangan[] = 'Jenis pegawai belum terisi';
-        if (blank($pegawai->profesi_id)) $profileKeterangan[] = 'Profesi belum terisi';
-        if (blank($pegawai->tgl_masuk)) $profileKeterangan[] = 'Tanggal masuk belum terisi';
         if (! $pribadi) {
             $profileKeterangan[] = 'Data pribadi belum terisi';
         } else {
