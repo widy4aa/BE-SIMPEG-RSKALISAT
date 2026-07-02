@@ -53,9 +53,9 @@ class CvRepository
 
         $pegawai->jadwalDiklat = $this->getJadwalDiklatByPegawaiId($pegawaiId);
         $pegawai->jabatanPegawai = $this->getJabatanPegawaiByPegawaiId($pegawaiId);
-        $pegawai->str = $this->getSimpleRows('str', 'pegawai_id', $pegawaiId, ['tanggal_terbit', 'tanggal_kadaluarsa']);
+        $pegawai->str = $this->getSimpleRows('str', 'pegawai_id', $pegawaiId, ['tanggal_terbit', 'tanggal_kadaluarsa'], ['tanggal_terbit', 'tanggal_kadaluarsa']);
         $pegawai->sip = $this->getSipByPegawaiId($pegawaiId);
-        $pegawai->penugasanKlinis = $this->getSimpleRows('penugasan_klinis', 'pegawai_id', $pegawaiId, ['tgl_mulai', 'tgl_kadaluarsa']);
+        $pegawai->penugasanKlinis = $this->getSimpleRows('penugasan_klinis', 'pegawai_id', $pegawaiId, ['tgl_mulai', 'tgl_kadaluarsa'], ['tgl_mulai', 'tgl_kadaluarsa']);
 
         return $pegawai;
     }
@@ -168,6 +168,7 @@ class CvRepository
         ', [$pegawaiId]))->map(function ($row) {
             $row->started_at = $this->dateOrNull($row->started_at ?? null);
             $row->ended_at = $this->dateOrNull($row->ended_at ?? null);
+            $row->is_current = $this->isCurrentPeriod($row->started_at, $row->ended_at);
             $row->jabatan = (object) [
                 'nama' => $row->jabatan_nama ?? null,
                 'unitKerja' => (object) ['nama' => $row->unit_kerja_nama ?? null],
@@ -191,13 +192,14 @@ class CvRepository
         ', [$pegawaiId]))->map(function ($row) {
             $row->tanggal_terbit = $this->dateOrNull($row->tanggal_terbit ?? null);
             $row->tanggal_kadaluarsa = $this->dateOrNull($row->tanggal_kadaluarsa ?? null);
+            $row->is_current = $this->isCurrentPeriod($row->tanggal_terbit, $row->tanggal_kadaluarsa);
             $row->jenisSip = (object) ['nama' => $row->jenis_sip_nama ?? null];
 
             return $row;
         });
     }
 
-    private function getSimpleRows(string $table, string $key, int $value, array $dateFields = []): Collection
+    private function getSimpleRows(string $table, string $key, int $value, array $dateFields = [], array $currentPeriodFields = []): Collection
     {
         return collect(DB::select("
             SELECT *
@@ -205,9 +207,14 @@ class CvRepository
             WHERE {$key} = ?
                 AND deleted_at IS NULL
             ORDER BY id DESC
-        ", [$value]))->map(function ($row) use ($dateFields) {
+        ", [$value]))->map(function ($row) use ($dateFields, $currentPeriodFields) {
             foreach ($dateFields as $field) {
                 $row->{$field} = $this->dateOrNull($row->{$field} ?? null);
+            }
+
+            if ($currentPeriodFields !== []) {
+                [$startField, $endField] = $currentPeriodFields;
+                $row->is_current = $this->isCurrentPeriod($row->{$startField} ?? null, $row->{$endField} ?? null);
             }
 
             return $row;
@@ -217,5 +224,13 @@ class CvRepository
     private function dateOrNull(mixed $value): ?Carbon
     {
         return $value ? Carbon::parse($value)->startOfDay() : null;
+    }
+
+    private function isCurrentPeriod(?Carbon $startedAt, ?Carbon $endedAt): bool
+    {
+        $today = Carbon::today();
+
+        return ($startedAt === null || $startedAt->lessThanOrEqualTo($today))
+            && ($endedAt === null || $endedAt->greaterThanOrEqualTo($today));
     }
 }

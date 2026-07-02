@@ -12,6 +12,12 @@ use Illuminate\Http\JsonResponse;
 
 class ForgotPasswordController extends Controller
 {
+    /**
+     * Jeda waktu (detik) sebelum user boleh meminta / kirim ulang OTP.
+     * Mencegah spam SMS/WhatsApp akibat klik "Kirim Ulang OTP" berulang.
+     */
+    private const RESEND_COOLDOWN_SECONDS = 60;
+
     public function requestOtp(Request $request, WhatsappService $whatsappService): JsonResponse
     {
         $request->validate([
@@ -25,6 +31,7 @@ class ForgotPasswordController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => "Harap tunggu {$seconds} detik sebelum meminta OTP lagi.",
+                'cooldown_seconds' => $seconds,
             ], 429);
         }
 
@@ -59,11 +66,12 @@ class ForgotPasswordController extends Controller
         
         $whatsappService->sendMessage($noTelp, $message);
 
-        \Illuminate\Support\Facades\RateLimiter::hit($key, 60);
+        \Illuminate\Support\Facades\RateLimiter::hit($key, self::RESEND_COOLDOWN_SECONDS);
 
         return response()->json([
             'success' => true,
             'message' => 'OTP berhasil dikirim ke nomor WhatsApp Anda.',
+            'cooldown_seconds' => self::RESEND_COOLDOWN_SECONDS,
         ]);
     }
 
