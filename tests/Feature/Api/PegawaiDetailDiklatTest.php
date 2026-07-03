@@ -91,14 +91,20 @@ class PegawaiDetailDiklatTest extends TestCase
             ->assertJsonPath('data.diklat.data.0.jenis_pelaksana', 'internal')
             ->assertJsonPath('data.diklat.data.0.catatan', 'Wajib membawa laptop.')
             ->assertJsonPath('data.diklat.data.0.sertif', 'dokumen/sertif-diklat/sertif-test.pdf')
-            ->assertJsonPath('data.diklat.data.0.no_sertif', 'CERT-001');
+            ->assertJsonPath('data.diklat.data.0.no_sertif', 'CERT-001')
+            ->assertJsonPath('data.diklat.summary.total_diklat', 1)
+            ->assertJsonPath('data.diklat.summary.diklat_internal', 1)
+            ->assertJsonPath('data.diklat.summary.diklat_external', 0);
 
         $this->getJson("/api/pegawai/{$pegawai->id}/diklat?kelayakan=all&per_page=1", [
             'Authorization' => "Bearer {$token}",
         ])->assertOk()
             ->assertJsonPath('data.diklat.total', 2)
             ->assertJsonPath('data.diklat.per_page', 1)
-            ->assertJsonPath('data.diklat.last_page', 2);
+            ->assertJsonPath('data.diklat.last_page', 2)
+            ->assertJsonPath('data.diklat.summary.total_diklat', 2)
+            ->assertJsonPath('data.diklat.summary.diklat_internal', 1)
+            ->assertJsonPath('data.diklat.summary.diklat_external', 0);
     }
 
     private function createPegawaiWithUser(string $nik, string $nama, string $role): Pegawai

@@ -21,6 +21,12 @@ Route::middleware([
     JwtAuthMiddleware::class,
     RoleMiddleware::class.':hrd',
 ])->group(function () {
+    Route::prefix('hrd/promosi')->group(function () {
+        Route::get('/settings', [\App\Http\Controllers\Api\Hrd\PromotionController::class, 'getSettings']);
+        Route::put('/settings', [\App\Http\Controllers\Api\Hrd\PromotionController::class, 'updateSettings']);
+        Route::get('/rekomendasi', [\App\Http\Controllers\Api\Hrd\PromotionController::class, 'getRecommendations']);
+    });
+
     Route::prefix('hrd/pegawai/{id}')->group(function () {
         Route::patch('/inti', [ManagedPegawaiController::class, 'updateInti']);
         Route::patch('/pribadi', [ManagedPegawaiController::class, 'updatePribadi']);

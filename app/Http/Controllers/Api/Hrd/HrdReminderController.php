@@ -28,17 +28,19 @@ class HrdReminderController extends Controller
 
             if ($tipe === 'str') {
                 $doc = StrPegawai::with('pegawai.pribadi')->where('id', $docId)->where('pegawai_id', $id)->firstOrFail();
-                $namaDokumen = 'STR ('.$doc->nomor_str.')';
+                $jenisDokumen = 'STR';
+                $nomorDokumen = $doc->nomor_str;
                 $kadaluarsa = $doc->tanggal_kadaluarsa;
                 $filePath = $doc->sk_file_path;
             } else {
                 $doc = Sip::with('pegawai.pribadi')->where('id', $docId)->where('pegawai_id', $id)->firstOrFail();
-                $namaDokumen = 'SIP ('.$doc->nomor_sip.')';
+                $jenisDokumen = 'SIP';
+                $nomorDokumen = $doc->nomor_sip;
                 $kadaluarsa = $doc->tanggal_kadaluarsa;
                 $filePath = $doc->sk_file_path;
             }
 
-            return $this->processWaReminder($doc, $namaDokumen, $kadaluarsa, $filePath);
+            return $this->processWaReminder($doc, $jenisDokumen, $nomorDokumen, $kadaluarsa, $filePath);
         } catch (ModelNotFoundException $e) {
             return response()->json(['success' => false, 'message' => 'Data dokumen tidak ditemukan.'], 404);
         } catch (\Exception $e) {
@@ -58,7 +60,8 @@ class HrdReminderController extends Controller
 
             return $this->processWaReminder(
                 $doc,
-                'Penugasan Klinis ('.$doc->nomor_surat.')',
+                'Penugasan Klinis',
+                $doc->nomor_surat,
                 $doc->tgl_kadaluarsa,
                 $doc->dokumen_file_path,
             );
@@ -69,7 +72,7 @@ class HrdReminderController extends Controller
         }
     }
 
-    private function processWaReminder($doc, string $namaDokumen, $kadaluarsa, ?string $filePath): JsonResponse
+    private function processWaReminder($doc, string $jenisDokumen, ?string $nomorDokumen, $kadaluarsa, ?string $filePath): JsonResponse
     {
         $noTelp = $doc->pegawai->pribadi?->no_telp ?? '';
 
@@ -77,21 +80,17 @@ class HrdReminderController extends Controller
             return response()->json(['success' => false, 'message' => 'Pegawai belum memasukkan nomor HP/Telepon.'], 422);
         }
 
-        $selisihHari = (int) now()->diffInDays($kadaluarsa, false);
+        $templateKey = 'wa_template_dokumen_klinis';
+        $templateDefault = "Halo {nama},\n\nKami mengingatkan bahwa dokumen {jenis_dokumen} Anda dengan nomor {nomor} akan / telah kedaluwarsa pada {tanggal_kadaluarsa}.\n\nAnda dapat mengecek dokumen terkait pada tautan berikut: {link_dokumen}\n\nMohon segera memproses perpanjangan dokumen tersebut.";
+        $template = \App\Models\Setting::where('key', $templateKey)->value('value') ?: $templateDefault;
 
-        if ($selisihHari < 0) {
-            $urgensi = "🚨 *SANGAT MENDESAK* 🚨\nDokumen {$namaDokumen} Anda *TELAH KEDALUWARSA* sejak ".abs($selisihHari)." hari yang lalu ({$kadaluarsa->format('d-m-Y')}).";
-        } elseif ($selisihHari <= 30) {
-            $urgensi = "⚠️ *PENGINGAT PENTING* ⚠️\nDokumen {$namaDokumen} Anda akan segera kedaluwarsa dalam *{$selisihHari} hari* ({$kadaluarsa->format('d-m-Y')}).";
-        } else {
-            $urgensi = "ℹ️ *INFORMASI* ℹ️\nDokumen {$namaDokumen} Anda masih aktif hingga {$kadaluarsa->format('d-m-Y')}, namun kami mengingatkan Anda untuk mengecek kembali statusnya.";
-        }
+        $linkDokumen = $filePath ? url('storage/' . $filePath) : '-';
 
-        $pesan = "Halo {$doc->pegawai->nama},\n\n{$urgensi}\n\nHarap segera berkoordinasi dengan pihak HRD untuk melakukan pembaruan dokumen demi kelancaran operasional RS.";
-
-        if ($filePath) {
-            $pesan .= "\n\nAnda dapat meninjau dokumen lama Anda pada tautan berikut:\n".asset($filePath);
-        }
+        $pesan = str_replace(
+            ['{nama}', '{jenis_dokumen}', '{nomor}', '{tanggal_kadaluarsa}', '{link_dokumen}'],
+            [$doc->pegawai->nama, $jenisDokumen, $nomorDokumen ?? '-', $kadaluarsa->format('d M Y'), $linkDokumen],
+            $template
+        );
 
         $result = $this->whatsapp->sendMessage($this->formatPhoneNumber($noTelp), $pesan);
 
@@ -101,7 +100,7 @@ class HrdReminderController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => "Pesan pengingat {$namaDokumen} berhasil dikirim.",
+            'message' => "Pesan pengingat {$jenisDokumen} berhasil dikirim.",
         ]);
     }
 

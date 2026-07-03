@@ -101,7 +101,15 @@ Artisan::command('notifications:diklat-reminder', function (
                 } elseif (! str_starts_with($no, '62')) {
                     $no = '62' . $no;
                 }
-                $pesan = "🎓 Halo {$namaPegawai},\n\nIni adalah pengingat bahwa diklat Anda:\n*{$namaDiklat}*\nakan dimulai *besok* ({$tanggal}) di _{$tempat}_.\n\nHarap hadir tepat waktu. Semangat! 💪";
+                $templateKey = 'wa_template_diklat_h1';
+                $templateDefault = "🎓 Halo {nama},\n\nIni adalah pengingat bahwa diklat Anda:\n*{nama_diklat}*\nakan dimulai *besok* ({tanggal_mulai}) di _{tempat}_.\n\nHarap hadir tepat waktu. Semangat! 💪";
+                $template = \App\Models\Setting::where('key', $templateKey)->value('value') ?: $templateDefault;
+                
+                $pesan = str_replace(
+                    ['{nama}', '{nama_diklat}', '{tanggal_mulai}', '{tempat}'],
+                    [$namaPegawai, $namaDiklat, $tanggal, $tempat],
+                    $template
+                );
                 $whatsapp->sendMessage($no, $pesan);
             }
 
@@ -160,7 +168,15 @@ Artisan::command('notifications:diklat-laporan-reminder', function (
                 } elseif (! str_starts_with($no, '62')) {
                     $no = '62' . $no;
                 }
-                $pesan = "📋 Halo {$namaPegawai},\n\nDiklat *{$namaDiklat}* telah selesai kemarin ({$tanggalSelesai}).\n\nSegera upload *{$labelDokumen}* Anda melalui aplikasi SIMPEG agar dapat diproses oleh HRD. 🙏";
+                $templateKey = 'wa_template_diklat_laporan';
+                $templateDefault = "📋 Halo {nama},\n\nDiklat *{nama_diklat}* telah selesai kemarin ({tanggal_selesai}).\n\nSegera upload *{label_dokumen}* Anda melalui aplikasi SIMPEG agar dapat diproses oleh HRD. 🙏";
+                $template = \App\Models\Setting::where('key', $templateKey)->value('value') ?: $templateDefault;
+                
+                $pesan = str_replace(
+                    ['{nama}', '{nama_diklat}', '{tanggal_selesai}', '{label_dokumen}'],
+                    [$namaPegawai, $namaDiklat, $tanggalSelesai, $labelDokumen],
+                    $template
+                );
                 $whatsapp->sendMessage($no, $pesan);
             }
 
@@ -183,4 +199,97 @@ Schedule::command('notifications:diklat-reminder')
 
 Schedule::command('notifications:diklat-laporan-reminder')
     ->dailyAt('07:05')
+    ->withoutOverlapping();
+
+Artisan::command('notifications:dokumen-klinis-reminder', function (
+    App\Repositories\Notification\NotificationRepository $notifRepo,
+    App\Services\Notification\WhatsappService $whatsapp,
+) {
+    $intervals = [
+        'H-90' => \Carbon\Carbon::today()->addDays(90)->toDateString(),
+        'H-60' => \Carbon\Carbon::today()->addDays(60)->toDateString(),
+        'H-30' => \Carbon\Carbon::today()->addDays(30)->toDateString(),
+        'H-7'  => \Carbon\Carbon::today()->addDays(7)->toDateString(),
+        'H-1'  => \Carbon\Carbon::today()->addDays(1)->toDateString(),
+        'H0'   => \Carbon\Carbon::today()->toDateString(),
+        'H+7'  => \Carbon\Carbon::today()->subDays(7)->toDateString(),
+    ];
+
+    $templateKey = 'wa_template_dokumen_klinis';
+    $templateDefault = "Halo {nama},\n\nKami mengingatkan bahwa dokumen {jenis_dokumen} Anda dengan nomor {nomor} akan / telah kedaluwarsa pada {tanggal_kadaluarsa}.\n\nAnda dapat mengecek dokumen terkait pada tautan berikut: {link_dokumen}\n\nMohon segera memproses perpanjangan dokumen tersebut.";
+    $template = \App\Models\Setting::where('key', $templateKey)->value('value') ?: $templateDefault;
+
+    $processDocuments = function ($query, $jenisDokumen, $colNomor, $colTanggal) use ($intervals, $template, $notifRepo, $whatsapp) {
+        $sent = 0;
+        $failed = 0;
+
+        foreach ($intervals as $label => $date) {
+            $docs = (clone $query)->where($colTanggal, $date)->with('pegawai.pribadi')->get();
+
+            foreach ($docs as $doc) {
+                if (!$doc->pegawai) continue;
+
+                $nama = $doc->pegawai->nama;
+                $nomor = $doc->{$colNomor} ?? '-';
+                $tanggal = $doc->{$colTanggal}->format('d M Y');
+                $userId = $doc->pegawai->user_id;
+                $noTelp = $doc->pegawai->pribadi->no_telp ?? '';
+
+                $fileCol = $jenisDokumen === 'Penugasan Klinis' ? 'dokumen_file_path' : 'sk_file_path';
+                $linkDokumen = $doc->{$fileCol} ? url('storage/' . $doc->{$fileCol}) : '-';
+
+                // In-app
+                if ($userId) {
+                    $notifRepo->createInfo(
+                        $userId,
+                        "Pengingat Kedaluwarsa $jenisDokumen ($label)",
+                        "Dokumen $jenisDokumen Anda akan/telah kedaluwarsa pada $tanggal."
+                    );
+                }
+
+                // WA
+                if ($noTelp !== '') {
+                    $no = preg_replace('/\D/', '', $noTelp);
+                    if (str_starts_with($no, '0')) {
+                        $no = '62' . substr($no, 1);
+                    } elseif (!str_starts_with($no, '62')) {
+                        $no = '62' . $no;
+                    }
+
+                    $pesan = str_replace(
+                        ['{nama}', '{jenis_dokumen}', '{nomor}', '{tanggal_kadaluarsa}', '{link_dokumen}'],
+                        [$nama, $jenisDokumen, $nomor, $tanggal, $linkDokumen],
+                        $template
+                    );
+
+                    try {
+                        $whatsapp->sendMessage($no, $pesan);
+                        $sent++;
+                    } catch (\Throwable $e) {
+                        $failed++;
+                        \Illuminate\Support\Facades\Log::error("Gagal kirim WA $jenisDokumen", ['id' => $doc->id, 'error' => $e->getMessage()]);
+                    }
+                }
+            }
+        }
+        return [$sent, $failed];
+    };
+
+    $this->info("Memproses STR...");
+    [$strSent, $strFailed] = $processDocuments(\App\Models\StrPegawai::query(), 'STR', 'nomor_str', 'tanggal_kadaluarsa');
+    
+    $this->info("Memproses SIP...");
+    [$sipSent, $sipFailed] = $processDocuments(\App\Models\Sip::query(), 'SIP', 'nomor_sip', 'tanggal_kadaluarsa');
+    
+    $this->info("Memproses Penugasan Klinis...");
+    [$pkSent, $pkFailed] = $processDocuments(\App\Models\PenugasanKlinis::query(), 'Penugasan Klinis', 'nomor_surat', 'tgl_kadaluarsa');
+
+    $totalSent = $strSent + $sipSent + $pkSent;
+    $totalFailed = $strFailed + $sipFailed + $pkFailed;
+
+    $this->info("Reminder Dokumen Klinis Selesai. Terkirim: $totalSent, Gagal: $totalFailed.");
+})->purpose('Kirim notifikasi pengingat dokumen klinis (STR, SIP, Penugasan Klinis) secara otomatis berdasarkan H-90, H-60, H-30, dll.');
+
+Schedule::command('notifications:dokumen-klinis-reminder')
+    ->dailyAt('08:00')
     ->withoutOverlapping();

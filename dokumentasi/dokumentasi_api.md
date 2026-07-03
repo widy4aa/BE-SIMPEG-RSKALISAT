@@ -4598,6 +4598,87 @@ Contoh response `200 OK`:
 }
 ```
 
+#### GET Pengaturan Template WhatsApp
+
+- Method: `GET`
+- URL: `/api/settings/whatsapp-templates`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Mengambil daftar *template* pesan WhatsApp yang digunakan oleh sistem pengingat otomatis (cron job) maupun pengingat manual. Teks kembalian dapat berisi nilai yang pernah diset sebelumnya, atau *fallback default* jika belum ada.
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Berhasil mengambil template WhatsApp",
+  "data": {
+    "wa_template_dokumen_klinis": "Halo {nama},\n\nKami mengingatkan bahwa dokumen...",
+    "wa_template_diklat_h1": "🎓 Halo {nama},\n\nIni adalah pengingat bahwa diklat Anda...",
+    "wa_template_diklat_laporan": "📋 Halo {nama},\n\nDiklat *{nama_diklat}* telah selesai kemarin..."
+  }
+}
+```
+
+#### PUT Pengaturan Template WhatsApp
+
+- Method: `PUT`
+- URL: `/api/settings/whatsapp-templates`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Menyimpan atau memperbarui tata bahasa *template* pesan WhatsApp. Seluruh *field* bersifat opsional (`nullable`), kirim *field* yang ingin diperbarui saja.
+
+Request body:
+
+```json
+{
+  "wa_template_dokumen_klinis": "Halo {nama}, dokumen {jenis_dokumen} ({nomor}) Anda kedaluwarsa pada {tanggal_kadaluarsa}.",
+  "wa_template_diklat_h1": "Diingatkan besok diklat {nama_diklat} di {tempat} tgl {tanggal_mulai}.",
+  "wa_template_diklat_laporan": "Jangan lupa upload {label_dokumen} diklat {nama_diklat}."
+}
+```
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Template WhatsApp berhasil diperbarui"
+}
+```
+
+#### POST Preview Template WhatsApp
+
+- Method: `POST`
+- URL: `/api/settings/whatsapp-templates/preview`
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `admin`
+
+Meminta sistem merender (mem-pratinjau) variabel/placeholder dari *template* teks mentah menggunakan *dummy data* (data palsu) agar *Admin* bisa melihat *preview* pesan sebelum benar-benar menyimpannya.
+
+Request body:
+
+```json
+{
+  "key": "wa_template_dokumen_klinis",
+  "teks_template": "Halo {nama}, tolong klik link dokumen ini: {link_dokumen}"
+}
+```
+
+Contoh response `200 OK`:
+
+```json
+{
+  "success": true,
+  "message": "Preview template WhatsApp",
+  "data": {
+    "preview": "Halo Dr. Budi Santoso, tolong klik link dokumen ini: http://simpeg-rskalisat.com/storage/dokumen/dummy.pdf"
+  }
+}
+```
+
 ### 21. HRD Manajemen Data Pegawai
 
 Semua endpoint pada bagian ini hanya dapat diakses oleh role `hrd`. Parameter `{id}` pada URL mengacu pada `pegawai_id` yang ingin dikelola, bukan `id` user yang sedang login.

@@ -296,7 +296,15 @@ class AdminPegawaiService
         $page = min($page, $lastPage);
         $pageItems = $items->slice(($page - 1) * $perPage, $perPage)->values();
 
+        $totalInternal = $items->filter(fn($i) => strtolower((string) ($i['jenis_pelaksana'] ?? '')) === 'internal')->count();
+        $totalExternal = $items->filter(fn($i) => in_array(strtolower((string) ($i['jenis_pelaksana'] ?? '')), ['eksternal', 'external'], true))->count();
+
         return [
+            'summary' => [
+                'total_diklat' => $total,
+                'diklat_internal' => $totalInternal,
+                'diklat_external' => $totalExternal,
+            ],
             'current_page' => $page,
             'data' => $pageItems,
             'from' => $total === 0 ? null : (($page - 1) * $perPage) + 1,

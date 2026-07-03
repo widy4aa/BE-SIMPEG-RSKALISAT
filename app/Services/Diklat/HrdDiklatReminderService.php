@@ -47,7 +47,15 @@ class HrdDiklatReminderService
         $noTelp = trim((string) ($jadwal->no_telp ?? ''));
 
         if ($noTelp !== '') {
-            $pesan = "Halo {$jadwal->pegawai_nama},\n\nDiklat *{$namaDiklat}* telah selesai ({$tanggalSelesai}).\n\nSegera upload *{$labelDokumen}* Anda melalui aplikasi SIMPEG agar dapat diproses oleh HRD.";
+            $templateKey = 'wa_template_diklat_laporan';
+            $templateDefault = "📋 Halo {nama},\n\nDiklat *{nama_diklat}* telah selesai kemarin ({tanggal_selesai}).\n\nSegera upload *{label_dokumen}* Anda melalui aplikasi SIMPEG agar dapat diproses oleh HRD. 🙏";
+            $template = \App\Models\Setting::where('key', $templateKey)->value('value') ?: $templateDefault;
+
+            $pesan = str_replace(
+                ['{nama}', '{nama_diklat}', '{tanggal_selesai}', '{label_dokumen}'],
+                [$jadwal->pegawai_nama, $namaDiklat, $tanggalSelesai, $labelDokumen],
+                $template
+            );
             $result = $this->whatsapp->sendMessage($this->formatPhoneNumber($noTelp), $pesan);
             $whatsappSent = (bool) ($result['success'] ?? false);
             $whatsappMessage = $result['message'] ?? null;

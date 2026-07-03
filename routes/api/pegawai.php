@@ -32,6 +32,10 @@ Route::middleware([
     Route::get('/settings/whatsapp', [SettingController::class, 'getWhatsappSetting']);
     Route::put('/settings/whatsapp', [SettingController::class, 'updateWhatsappSetting']);
 
+    Route::get('/settings/whatsapp-templates', [SettingController::class, 'getWhatsappTemplates']);
+    Route::put('/settings/whatsapp-templates', [SettingController::class, 'updateWhatsappTemplates']);
+    Route::post('/settings/whatsapp-templates/preview', [SettingController::class, 'previewWhatsappTemplate']);
+
     Route::prefix('admin')->group(function () {
         Route::get('/change-requests', [ChangeRequestAdminController::class, 'index']);
         Route::get('/change-requests/{id}', [ChangeRequestAdminController::class, 'show']);
