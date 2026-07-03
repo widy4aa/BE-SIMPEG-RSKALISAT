@@ -7883,6 +7883,97 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "GET WhatsApp Templates",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/settings/whatsapp-templates",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "settings",
+                                "whatsapp-templates"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "PUT WhatsApp Templates",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/settings/whatsapp-templates",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "settings",
+                                "whatsapp-templates"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"wa_template_dokumen_klinis\": \"Halo {nama}, dokumen {jenis_dokumen} ({nomor}) Anda kedaluwarsa pada {tanggal_kadaluarsa}. Link: {link_dokumen}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "POST Preview WA Template",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Accept",
+                                "value": "application/json"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/settings/whatsapp-templates/preview",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "settings",
+                                "whatsapp-templates",
+                                "preview"
+                            ]
+                        },
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"key\": \"wa_template_dokumen_klinis\",\n  \"teks_template\": \"Halo {nama}, tolong cek: {link_dokumen}\"\n}",
+                            "options": {
+                                "raw": {
+                                    "language": "json"
+                                }
+                            }
+                        }
+                    },
+                    "response": []
                 }
             ]
         },
@@ -9904,6 +9995,95 @@
                         }
                     },
                     "response": []
+                },
+                {
+                    "name": "Promosi",
+                    "item": [
+                        {
+                            "name": "GET Promosi Settings",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/promosi/settings",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "promosi",
+                                        "settings"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "PUT Promosi Settings",
+                            "request": {
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/promosi/settings",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "promosi",
+                                        "settings"
+                                    ]
+                                },
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"promosi_min_masa_kerja\": 2,\n  \"promosi_min_jp_diklat\": 40,\n  \"promosi_wajib_str_aktif\": true\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "GET Promosi Rekomendasi",
+                            "request": {
+                                "method": "GET",
+                                "header": [
+                                    {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "url": {
+                                    "raw": "{{base_url}}/api/hrd/promosi/rekomendasi",
+                                    "host": [
+                                        "{{base_url}}"
+                                    ],
+                                    "path": [
+                                        "api",
+                                        "hrd",
+                                        "promosi",
+                                        "rekomendasi"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
                 }
             ]
         },
