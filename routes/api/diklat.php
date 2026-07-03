@@ -44,6 +44,7 @@ Route::middleware([
 ])->group(function () {
     Route::post('/hrd/diklat', [ManagedDiklatController::class, 'storeMaster']);
     Route::put('/hrd/diklat/{id}', [ManagedDiklatController::class, 'updateMaster']);
+    Route::delete('/hrd/diklat/{id}', [ManagedDiklatController::class, 'destroyMaster']);
     Route::get('/hrd/diklat/{id}/peserta', [ManagedDiklatController::class, 'peserta']);
     Route::post('/hrd/diklat/{id}/peserta', [ManagedDiklatController::class, 'syncPeserta']);
     Route::get('/hrd/diklat/status/layak', [ManagedDiklatController::class, 'menungguKelayakan']);

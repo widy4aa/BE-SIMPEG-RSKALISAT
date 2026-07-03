@@ -1290,6 +1290,53 @@ Contoh response sukses (`200`):
 }
 ```
 
+#### Hapus Master Diklat (HRD)
+
+- Method: `DELETE`
+- URL: `/api/hrd/diklat/{id}`
+- Parameter URL: `id` (required, int) - ID dari Master Diklat
+- Auth: Wajib Bearer token
+- Role yang diizinkan: `hrd`
+
+Endpoint ini digunakan oleh HRD untuk membatalkan/menghapus jadwal diklat secara permanen (soft delete).
+
+**Syarat & Ketentuan:**
+1. Master Diklat tidak boleh dihapus jika `tanggal_mulai` sudah terlewati (status sedang berlangsung atau selesai).
+2. Master Diklat tidak boleh dihapus jika sudah ada minimal 1 peserta yang mengunggah laporan/sertifikat.
+3. Menghapus Master Diklat akan otomatis menghapus seluruh daftar peserta (cascade delete).
+
+Contoh response sukses (`200 OK`):
+
+```json
+{
+  "success": true,
+  "message": "Master Diklat berhasil dihapus.",
+  "data": {
+    "id_diklat": 13,
+    "nama_kegiatan": "Workshop Kepemimpinan Update",
+    "status": "deleted"
+  }
+}
+```
+
+Contoh response gagal karena sudah berlangsung/selesai (`422 Unprocessable Entity`):
+
+```json
+{
+  "success": false,
+  "message": "Jadwal diklat tidak dapat dihapus karena waktu pelaksanaan sudah atau sedang berlangsung."
+}
+```
+
+Contoh response gagal karena ada laporan (`422 Unprocessable Entity`):
+
+```json
+{
+  "success": false,
+  "message": "Master Diklat tidak dapat dihapus karena sudah ada peserta yang mengunggah laporan/sertifikat."
+}
+```
+
 #### Get Peserta Diklat (HRD)
 
 - Method: `GET`
@@ -5254,7 +5301,7 @@ Dashboard pegawai menampilkan ringkasan: identitas (`nama`, `nip`, `jabatan`, `u
 
 - **Umum:** `GET /api/role`, `GET /api/dashboard`, `GET /api/diklat`, `GET /api/profile`, `GET /api/pegawai`, `GET /api/pegawai/{id}`, `GET /api/pegawai/{id}/{bagian}`, `GET /api/str-sip`, `GET /api/generate/cv`
 - **Diklat:** `GET /api/diklat/all`, `POST /api/diklat`, `PATCH /api/diklat/{id}`, `DELETE /api/diklat/{id}`, `POST /api/diklat/{id}/upload-laporan`
-- **Diklat HRD:** `POST /api/hrd/diklat`, `PUT /api/hrd/diklat/{id}`, `GET /api/hrd/diklat/{id}/peserta`, `POST /api/hrd/diklat/{id}/peserta`, `GET /api/hrd/diklat/status/layak`, `PATCH /api/hrd/diklat/{id}/status/layak`, `GET /api/hrd/diklat/status/validasi`, `PATCH /api/hrd/diklat/{id}/status/validasi`, `POST /api/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan`
+- **Diklat HRD:** `POST /api/hrd/diklat`, `PUT /api/hrd/diklat/{id}`, `DELETE /api/hrd/diklat/{id}`, `GET /api/hrd/diklat/{id}/peserta`, `POST /api/hrd/diklat/{id}/peserta`, `GET /api/hrd/diklat/status/layak`, `PATCH /api/hrd/diklat/{id}/status/layak`, `GET /api/hrd/diklat/status/validasi`, `PATCH /api/hrd/diklat/{id}/status/validasi`, `POST /api/hrd/diklat/{diklatId}/pegawai/{pegawaiId}/reminder-upload-laporan`
 - **Laporan:** `GET /api/generate/laporan-diklat`
 - **Profile:** `PATCH /api/profile`, `POST /api/profil/profil-picture`, `POST /api/profile/profile-picture`, `POST /api/profil/ktp`, `POST /api/profile/kk`
 - **Notifikasi:** `GET /api/notifications`, `PATCH /api/notifications/{id}/read`, `PATCH /api/notifications/read-all`

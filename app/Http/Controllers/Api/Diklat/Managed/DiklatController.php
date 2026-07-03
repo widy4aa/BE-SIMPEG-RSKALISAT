@@ -157,4 +157,22 @@ class DiklatController extends Controller
             'data' => $result,
         ]);
     }
+
+    public function destroyMaster(Request $request, int $id): JsonResponse
+    {
+        $claims = $request->input('_jwt_claims', []);
+        $userId = (int) (is_array($claims) ? ($claims['sub'] ?? 0) : 0);
+
+        if ($id <= 0) {
+            return response()->json(['success' => false, 'message' => 'Parameter ID diklat wajib diisi dengan format angka.'], 400);
+        }
+
+        try {
+            $result = $this->masterService->deleteMasterDiklat($id, $userId);
+        } catch (InvalidArgumentException $exception) {
+            return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+        }
+
+        return response()->json(['success' => true, 'message' => 'Master Diklat berhasil dihapus.', 'data' => $result]);
+    }
 }

@@ -167,4 +167,51 @@ class HrdDiklatMasterService
             'jenis_pelaksana' => (string) ($diklat->jenis_pelaksanaan ?? ''),
         ];
     }
+
+    public function deleteMasterDiklat(int $diklatId, int $userId): array
+    {
+        if ($userId <= 0) {
+            throw new InvalidArgumentException('User login tidak valid.');
+        }
+
+        $pegawai = $this->pegawaiDiklatRepository->findPegawaiByUserId($userId);
+        if ($pegawai === null) {
+            throw new InvalidArgumentException('Data pegawai untuk user login tidak ditemukan.');
+        }
+
+        $diklat = $this->pegawaiDiklatRepository->findDiklatById($diklatId);
+        if ($diklat === null) {
+            throw new InvalidArgumentException('Master Diklat tidak ditemukan.');
+        }
+
+        // Rule 1: Cek waktu pelaksanaan (tidak boleh dihapus jika sudah/sedang berlangsung)
+        $tanggalMulai = Carbon::parse($diklat->tanggal_mulai)->startOfDay();
+        $hariIni = Carbon::now()->startOfDay();
+
+        if ($tanggalMulai->lte($hariIni)) {
+            throw new InvalidArgumentException('Jadwal diklat tidak dapat dihapus karena waktu pelaksanaan sudah atau sedang berlangsung.');
+        }
+
+        // Rule 2: Hapus cascade peserta (ListJadwalDiklat) terkait
+        // Kita fetch ListJadwalDiklat by diklat_id, jika ada yang punya sertifikat/laporan maka tolak
+        $pesertaQuery = \App\Models\ListJadwalDiklat::where('diklat_id', $diklatId);
+        
+        $adaLaporan = (clone $pesertaQuery)->whereNotNull('sertif_file_path')->exists();
+        if ($adaLaporan) {
+            throw new InvalidArgumentException('Master Diklat tidak dapat dihapus karena sudah ada peserta yang mengunggah laporan/sertifikat.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($diklatId, $pesertaQuery) {
+            // Soft delete peserta
+            $pesertaQuery->delete();
+            // Soft delete diklat
+            \App\Models\Diklat::where('id', $diklatId)->delete();
+        });
+
+        return [
+            'id_diklat' => $diklatId,
+            'nama_kegiatan' => $diklat->nama_kegiatan,
+            'status' => 'deleted',
+        ];
+    }
 }

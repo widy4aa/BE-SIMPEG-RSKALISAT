@@ -119,4 +119,105 @@ class HrdDiklatMutationTest extends TestCase
 
         return $user;
     }
+
+    public function test_hrd_can_delete_belum_terlaksana_master_diklat(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9600000000000003', 'HRD Delete');
+
+        $jenis = \App\Models\JenisDiklat::firstOrCreate(['nama' => 'Test Jenis']);
+        $kategori = \App\Models\KategoriDiklat::firstOrCreate(['nama' => 'Test Kategori']);
+
+        $diklat = \App\Models\Diklat::create([
+            'nama_kegiatan' => 'Diklat Batal',
+            'jenis_diklat_id' => $jenis->id,
+            'kategori_diklat_id' => $kategori->id,
+            'created_by' => $hrd->pegawai->id,
+            'penyelenggara' => 'Test',
+            'tempat' => 'Test',
+            'tanggal_mulai' => now()->addDays(5)->toDateString(), // Belum terlaksana
+            'tanggal_selesai' => now()->addDays(6)->toDateString(),
+            'jp' => 10,
+            'jenis_pelaksanaan' => 'internal'
+        ]);
+
+        \App\Models\ListJadwalDiklat::create([
+            'diklat_id' => $diklat->id,
+            'pegawai_id' => $hrd->pegawai->id,
+            'status_diklat' => 'belum terlaksana'
+        ]);
+
+        $response = $this->withTokenFor($hrd)->deleteJson("/api/hrd/diklat/{$diklat->id}");
+
+        $response->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('message', 'Master Diklat berhasil dihapus.');
+
+        $this->assertSoftDeleted('diklat', ['id' => $diklat->id]);
+        $this->assertSoftDeleted('list_jadwal_diklat', ['diklat_id' => $diklat->id]);
+    }
+
+    public function test_hrd_cannot_delete_berlangsung_or_selesai_master_diklat(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9600000000000004', 'HRD Delete 2');
+
+        $jenis = \App\Models\JenisDiklat::firstOrCreate(['nama' => 'Test Jenis']);
+        $kategori = \App\Models\KategoriDiklat::firstOrCreate(['nama' => 'Test Kategori']);
+
+        $diklat = \App\Models\Diklat::create([
+            'nama_kegiatan' => 'Diklat Sedang Berlangsung',
+            'jenis_diklat_id' => $jenis->id,
+            'kategori_diklat_id' => $kategori->id,
+            'created_by' => $hrd->pegawai->id,
+            'penyelenggara' => 'Test',
+            'tempat' => 'Test',
+            'tanggal_mulai' => now()->subDays(1)->toDateString(), // Sudah lewat (berlangsung)
+            'tanggal_selesai' => now()->addDays(1)->toDateString(),
+            'jp' => 10,
+            'jenis_pelaksanaan' => 'internal'
+        ]);
+
+        $response = $this->withTokenFor($hrd)->deleteJson("/api/hrd/diklat/{$diklat->id}");
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Jadwal diklat tidak dapat dihapus karena waktu pelaksanaan sudah atau sedang berlangsung.');
+
+        $this->assertDatabaseHas('diklat', ['id' => $diklat->id, 'deleted_at' => null]);
+    }
+
+    public function test_hrd_cannot_delete_master_diklat_if_laporan_exists(): void
+    {
+        $hrd = $this->createUserWithPegawai('hrd', '9600000000000005', 'HRD Delete 3');
+
+        $jenis = \App\Models\JenisDiklat::firstOrCreate(['nama' => 'Test Jenis']);
+        $kategori = \App\Models\KategoriDiklat::firstOrCreate(['nama' => 'Test Kategori']);
+
+        $diklat = \App\Models\Diklat::create([
+            'nama_kegiatan' => 'Diklat Ada Laporan',
+            'jenis_diklat_id' => $jenis->id,
+            'kategori_diklat_id' => $kategori->id,
+            'created_by' => $hrd->pegawai->id,
+            'penyelenggara' => 'Test',
+            'tempat' => 'Test',
+            'tanggal_mulai' => now()->addDays(5)->toDateString(), // Belum terlaksana tapi anehnya ada laporan
+            'tanggal_selesai' => now()->addDays(6)->toDateString(),
+            'jp' => 10,
+            'jenis_pelaksanaan' => 'internal'
+        ]);
+
+        \App\Models\ListJadwalDiklat::create([
+            'diklat_id' => $diklat->id,
+            'pegawai_id' => $hrd->pegawai->id,
+            'status_diklat' => 'belum terlaksana',
+            'sertif_file_path' => 'dokumen/test.pdf' // Laporan ada
+        ]);
+
+        $response = $this->withTokenFor($hrd)->deleteJson("/api/hrd/diklat/{$diklat->id}");
+
+        $response->assertStatus(422)
+            ->assertJsonPath('success', false)
+            ->assertJsonPath('message', 'Master Diklat tidak dapat dihapus karena sudah ada peserta yang mengunggah laporan/sertifikat.');
+
+        $this->assertDatabaseHas('diklat', ['id' => $diklat->id, 'deleted_at' => null]);
+    }
 }
