@@ -200,12 +200,15 @@ class HrdDashboardRepository
                 ];
             };
 
+            $jenisDiklatAsn = DB::table('jenis_diklat')->where('nama', 'ASN')->first();
+            $jenisDiklatTenkes = DB::table('jenis_diklat')->where('nama', 'Tenkes')->first();
+
             if ($type === null || $type === 'diklat_asn') {
-                $result['diklat_asn'] = $getDiklatStats(1);
+                $result['diklat_asn'] = $jenisDiklatAsn ? $getDiklatStats($jenisDiklatAsn->id) : null;
             }
 
             if ($type === null || $type === 'diklat_tenkes') {
-                $result['diklat_tenkes'] = $getDiklatStats(2);
+                $result['diklat_tenkes'] = $jenisDiklatTenkes ? $getDiklatStats($jenisDiklatTenkes->id) : null;
             }
         }
 
