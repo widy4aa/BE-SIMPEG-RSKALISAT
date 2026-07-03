@@ -118,37 +118,22 @@ class AdminPegawaiService
                 'kk_file_path' => $pribadi?->kk_file_path,
             ],
             'keluarga' => [
-                'pasangan' => $pegawai->pasangan?->map(fn($p) => [
-                    'id' => $p->id,
-                    'nama' => $p->nama_lengkap,
-                    'status_hubungan' => $p->status_pernikahan,
-                    'pekerjaan' => $p->pekerjaan,
-                    'no_hp' => null,
-                ]) ?? [],
-                'anak' => $pegawai->anak?->map(fn($a) => [
-                    'id' => $a->id,
-                    'nama' => $a->nama_lengkap,
-                    'tanggal_lahir' => $a->tanggal_lahir?->format('Y-m-d'),
-                    'pendidikan' => $a->pendidikan_terakhir,
-                ]) ?? [],
-                'orang_tua' => $pegawai->orangTua?->map(fn($o) => [
-                    'id' => $o->id,
-                    'nama_ayah' => $o->nama_ayah,
-                    'nama_ibu' => $o->nama_ibu,
-                    'status_hidup' => $o->status_hidup,
-                    'alamat' => $o->alamat,
-                ]) ?? [],
-                'kontak_darurat' => $pegawai->kontakDarurat?->map(fn($k) => [
-                    'id' => $k->id,
-                    'nama' => $k->nama_kontak,
-                    'hubungan' => $k->hubungan_keluarga,
-                    'no_hp' => $k->nomor_hp,
-                ]) ?? [],
-                'tanggungan_lain' => $pegawai->tanggunganLain?->map(fn($t) => [
-                    'id' => $t->id,
-                    'nama' => $t->nama,
-                    'hubungan' => $t->hubungan_keluarga,
-                ]) ?? [],
+                'total_keluarga' => ($pegawai->pasangan?->count() ?? 0) + ($pegawai->anak?->count() ?? 0) + ($pegawai->orangTua?->count() ?? 0) + ($pegawai->kontakDarurat?->count() ?? 0) + ($pegawai->tanggunganLain?->count() ?? 0),
+                'rincian' => [
+                    'pasangan' => collect($pegawai->pasangan)->map(function ($p) {
+                        $data = method_exists($p, 'toArray') ? $p->toArray() : (array) $p;
+                        $data['link_buku_nikah'] = !empty($data['buku_nikah_file_path']) ? '/' . $data['buku_nikah_file_path'] : null;
+                        return $data;
+                    })->toArray(),
+                    'anak' => collect($pegawai->anak)->map(function ($a) {
+                        $data = method_exists($a, 'toArray') ? $a->toArray() : (array) $a;
+                        $data['link_akta_kelahiran'] = !empty($data['akta_kelahiran_file_path']) ? '/' . $data['akta_kelahiran_file_path'] : null;
+                        return $data;
+                    })->toArray(),
+                    'orang_tua' => collect($pegawai->orangTua)->map(fn($o) => method_exists($o, 'toArray') ? $o->toArray() : (array) $o)->toArray(),
+                    'kontak_darurat' => collect($pegawai->kontakDarurat)->map(fn($k) => method_exists($k, 'toArray') ? $k->toArray() : (array) $k)->toArray(),
+                    'tanggungan_lain' => collect($pegawai->tanggunganLain)->map(fn($t) => method_exists($t, 'toArray') ? $t->toArray() : (array) $t)->toArray(),
+                ],
             ],
             'riwayat_karir' => [
                 'pendidikan' => $pegawai->pendidikan?->map(fn($pd) => [
