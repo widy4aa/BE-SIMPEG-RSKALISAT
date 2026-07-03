@@ -68,6 +68,7 @@ class CvService
                         'tanggal_selesai' => $diklat->tanggal_selesai ? $diklat->tanggal_selesai->format('Y-m-d') : '-',
                         'jp' => $diklat->jp ?? '-',
                         'no_sertif' => $jd->no_sertif ?? '-',
+                        'link_sertifikat' => $jd->sertif_file_path ? url('storage/' . $jd->sertif_file_path) : '-',
                     ];
                 }
             }
