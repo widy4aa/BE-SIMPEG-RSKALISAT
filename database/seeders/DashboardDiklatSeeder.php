@@ -48,7 +48,8 @@ class DashboardDiklatSeeder extends Seeder
             return;
         }
 
-        $adminId = 1; // Asumsi admin user ID
+        // Ambil ID pegawai pertama sebagai admin_id (created_by) agar tidak error foreign key
+        $adminId = $pegawais->first()->id;
 
         // Kita akan membuat 15 Diklat untuk ASN dan 15 Diklat untuk Tenkes
         $jenisDiklats = [
