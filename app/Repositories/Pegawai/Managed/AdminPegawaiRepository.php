@@ -156,12 +156,12 @@ class AdminPegawaiRepository
         $pegawai = $this->mapPegawaiDetailRow($row);
         $pribadiId = $pegawai->pribadi?->id;
 
-        $pegawai->pasangan = $this->selectCollection('SELECT * FROM pasangan WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
-        $pegawai->anak = $this->selectCollection('SELECT * FROM anak WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId], ['tanggal_lahir']);
-        $pegawai->orangTua = $this->selectCollection('SELECT * FROM orang_tua WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
-        $pegawai->kontakDarurat = $this->selectCollection('SELECT * FROM kontak_darurat WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
-        $pegawai->tanggunganLain = $this->selectCollection('SELECT * FROM tanggungan_lain WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
-        $pegawai->pendidikan = $this->selectCollection('SELECT * FROM pendidikan WHERE pegawai_pribadi_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pribadiId]);
+        $pegawai->pasangan = \App\Models\Pasangan::where('pegawai_pribadi_id', $pribadiId)->orderBy('id', 'desc')->get();
+        $pegawai->anak = \App\Models\Anak::where('pegawai_pribadi_id', $pribadiId)->orderBy('id', 'desc')->get();
+        $pegawai->orangTua = \App\Models\OrangTua::where('pegawai_pribadi_id', $pribadiId)->orderBy('id', 'desc')->get();
+        $pegawai->kontakDarurat = \App\Models\KontakDarurat::where('pegawai_pribadi_id', $pribadiId)->orderBy('id', 'desc')->get();
+        $pegawai->tanggunganLain = \App\Models\TanggunganLain::where('pegawai_pribadi_id', $pribadiId)->orderBy('id', 'desc')->get();
+        $pegawai->pendidikan = \App\Models\Pendidikan::where('pegawai_pribadi_id', $pribadiId)->orderBy('id', 'desc')->get();
         $pegawai->str = $this->selectCollection('SELECT * FROM str WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tanggal_terbit', 'tanggal_kadaluarsa']);
         $pegawai->sip = $this->getSipByPegawaiId($pegawaiId);
         $pegawai->penugasanKlinis = $this->selectCollection('SELECT * FROM penugasan_klinis WHERE pegawai_id = ? AND deleted_at IS NULL ORDER BY id DESC', [$pegawaiId], ['tgl_mulai', 'tgl_kadaluarsa']);
@@ -435,6 +435,10 @@ class AdminPegawaiRepository
             SELECT
                 jp.*,
                 j.nama AS jabatan_nama,
+                j.unit_kerja_id,
+                j.tmt_mulai AS jabatan_tmt_mulai,
+                j.tmt_selesai AS jabatan_tmt_selesai,
+                j.sk_file_path AS jabatan_sk_file_path,
                 uk.nama AS unit_kerja_nama
             FROM jabatan_pegawai jp
             LEFT JOIN jabatan j ON j.id = jp.jabatan_id AND j.deleted_at IS NULL
@@ -448,7 +452,11 @@ class AdminPegawaiRepository
             $row->is_current = $this->isCurrentPeriod($row->started_at, $row->ended_at);
             $row->jabatan = (object) [
                 'nama' => $row->jabatan_nama ?? null,
+                'unit_kerja_id' => $row->unit_kerja_id ?? null,
                 'unitKerja' => (object) ['nama' => $row->unit_kerja_nama ?? null],
+                'tmt_mulai' => $this->dateOrNull($row->jabatan_tmt_mulai ?? null),
+                'tmt_selesai' => $this->dateOrNull($row->jabatan_tmt_selesai ?? null),
+                'sk_file_path' => $row->jabatan_sk_file_path ?? null,
             ];
 
             return $row;
@@ -461,7 +469,9 @@ class AdminPegawaiRepository
             SELECT
                 pp.*,
                 p.nama AS pangkat_nama,
-                p.pejabat_penetap
+                p.pejabat_penetap,
+                p.tmt_sk AS pangkat_tmt_sk,
+                p.sk_file_path AS pangkat_sk_file_path
             FROM pangkat_pegawai pp
             LEFT JOIN pangkat p ON p.id = pp.pangkat_id AND p.deleted_at IS NULL
             WHERE pp.pegawai_id = ?
@@ -474,6 +484,8 @@ class AdminPegawaiRepository
             $row->pangkat = (object) [
                 'nama' => $row->pangkat_nama ?? null,
                 'pejabat_penetap' => $row->pejabat_penetap ?? null,
+                'tmt_sk' => $this->dateOrNull($row->pangkat_tmt_sk ?? null),
+                'sk_file_path' => $row->pangkat_sk_file_path ?? null,
             ];
 
             return $row;

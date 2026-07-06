@@ -54,12 +54,8 @@ class DataKeluargaService
     private function formatAnak($anak): array
     {
         return $anak->map(function ($a) {
-            $data = $a->toArray();
-            if (!empty($a->akta_kelahiran_file_path)) {
-                $data['link_akta_kelahiran'] = '/'.$a->akta_kelahiran_file_path;
-            } else {
-                $data['link_akta_kelahiran'] = null;
-            }
+            $data = method_exists($a, 'toArray') ? $a->toArray() : (array) $a;
+            $data['link_akta_kelahiran'] = !empty($data['akta_kelahiran_file_path']) ? '/'.$data['akta_kelahiran_file_path'] : null;
             return $data;
         })->toArray();
     }

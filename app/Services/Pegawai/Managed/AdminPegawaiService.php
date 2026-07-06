@@ -147,45 +147,50 @@ class AdminPegawaiService
                 ]) ?? [],
                 'jabatan' => $pegawai->jabatanPegawai?->map(fn($jp) => [
                     'id' => $jp->id,
-                    'jabatan' => $jp->jabatan?->nama,
-                    'unit_kerja' => $jp->jabatan?->unitKerja?->nama ?? ($jp->is_current ? $pegawai->jabatan?->unitKerja?->nama : null),
-                    'tanggal_mulai' => $jp->started_at?->format('Y-m-d'),
-                    'tanggal_selesai' => $jp->ended_at?->format('Y-m-d'),
+                    'unit_kerja_id' => $jp->jabatan?->unit_kerja_id ?? null,
+                    'unit_kerja_nama' => $jp->jabatan?->unitKerja?->nama ?? '',
+                    'nama_jabatan' => $jp->jabatan?->nama ?? '',
                     'is_current' => (bool)$jp->is_current,
-                    'file_path' => $jp->sk_file_path ?? null,
+                    'tmt_mulai' => $this->formatDateString($jp->jabatan?->tmt_mulai ?? $jp->started_at ?? null),
+                    'tmt_selesai' => $this->formatDateString($jp->jabatan?->tmt_selesai ?? $jp->ended_at ?? null),
+                    'link_sk' => $jp->jabatan?->sk_file_path ? '/' . $jp->jabatan->sk_file_path : null,
+                    'note' => $jp->note ?? '',
                 ]) ?? [],
                 'str' => $pegawai->str?->map(fn($s) => [
                     'id' => $s->id,
                     'nomor_str' => $s->nomor_str,
-                    'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
-                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
-                    'status' => $this->resolveTanggalStatus($s->tanggal_kadaluarsa),
+                    'tanggal_terbit' => $this->formatDateString($s->tanggal_terbit ?? null),
+                    'tanggal_kadaluarsa' => $this->formatDateString($s->tanggal_kadaluarsa ?? null),
+                    'status' => $this->resolveTanggalStatus($s->tanggal_kadaluarsa ?? null),
                     'file_path' => $s->sk_file_path,
                 ]) ?? [],
                 'sip' => $pegawai->sip?->map(fn($s) => [
                     'id' => $s->id,
-                    'jenis_sip' => $s->jenisSip?->nama,
+                    'jenis_sip' => $s->jenisSip?->nama ?? null,
                     'nomor_sip' => $s->nomor_sip,
-                    'tanggal_terbit' => $s->tanggal_terbit?->format('Y-m-d'),
-                    'tanggal_kadaluarsa' => $s->tanggal_kadaluarsa?->format('Y-m-d'),
-                    'status' => $this->resolveTanggalStatus($s->tanggal_kadaluarsa),
+                    'tanggal_terbit' => $this->formatDateString($s->tanggal_terbit ?? null),
+                    'tanggal_kadaluarsa' => $this->formatDateString($s->tanggal_kadaluarsa ?? null),
+                    'status' => $this->resolveTanggalStatus($s->tanggal_kadaluarsa ?? null),
                     'file_path' => $s->sk_file_path,
                 ]) ?? [],
                 'penugasan_klinis' => $pegawai->penugasanKlinis?->map(fn($pk) => [
                     'id' => $pk->id,
                     'nomor_surat' => $pk->nomor_surat,
-                    'tanggal_mulai' => $pk->tgl_mulai?->format('Y-m-d'),
-                    'tanggal_kadaluarsa' => $pk->tgl_kadaluarsa?->format('Y-m-d'),
-                    'status' => $this->resolveTanggalStatus($pk->tgl_kadaluarsa),
+                    'tanggal_mulai' => $this->formatDateString($pk->tgl_mulai ?? null),
+                    'tanggal_kadaluarsa' => $this->formatDateString($pk->tgl_kadaluarsa ?? null),
+                    'status' => $this->resolveTanggalStatus($pk->tgl_kadaluarsa ?? null),
                     'file_path' => $pk->dokumen_file_path,
                 ]) ?? [],
                 'pangkat' => $pegawai->riwayatPangkat?->map(fn($p) => [
                     'id' => $p->id,
-                    'pangkat' => $p->pangkat?->nama,
-                    'pejabat_penetap' => $p->pangkat?->pejabat_penetap,
-                    'tanggal_mulai' => $p->started_at?->format('Y-m-d'),
-                    'tanggal_selesai' => $p->ended_at?->format('Y-m-d'),
+                    'nama_pangkat' => $p->pangkat?->nama ?? '',
                     'is_current' => (bool)$p->is_current,
+                    'pejabat_penetap' => $p->pangkat?->pejabat_penetap ?? null,
+                    'tmt_sk' => $this->formatDateString($p->pangkat?->tmt_sk ?? null),
+                    'started_at' => $this->formatDateString($p->started_at ?? null),
+                    'ended_at' => $this->formatDateString($p->ended_at ?? null),
+                    'link_sk' => $p->pangkat?->sk_file_path ? '/' . $p->pangkat->sk_file_path : null,
+                    'note' => $p->note ?? '',
                 ]) ?? [],
             ],
             'diklat' => $pegawai->jadwalDiklat?->map(fn($jd) => [
@@ -404,7 +409,19 @@ class AdminPegawaiService
         return max(1, min($perPage, 100));
     }
 
-    private function resolveTanggalStatus(mixed $tanggalKadaluarsa): string
+    
+    private function formatDateString(mixed $date): ?string
+    {
+        if (empty($date)) return null;
+        if ($date instanceof \Carbon\Carbon) return $date->format('Y-m-d');
+        try {
+            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+
+private function resolveTanggalStatus(mixed $tanggalKadaluarsa): string
     {
         if ($tanggalKadaluarsa === null || $tanggalKadaluarsa === '') {
             return 'aktif';

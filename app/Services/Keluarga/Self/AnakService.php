@@ -16,12 +16,8 @@ class AnakService
         $anak = $this->repository->getAnakByUserId($userId);
         
         $items = $anak->map(function ($item) {
-            $data = $item->toArray();
-            if (!empty($item->akta_kelahiran_file_path)) {
-                $data['link_akta_kelahiran'] = '/'.$item->akta_kelahiran_file_path;
-            } else {
-                $data['link_akta_kelahiran'] = null;
-            }
+            $data = method_exists($item, 'toArray') ? $item->toArray() : (array) $item;
+            $data['link_akta_kelahiran'] = !empty($data['akta_kelahiran_file_path']) ? '/'.$data['akta_kelahiran_file_path'] : null;
             return $data;
         })->toArray();
 
