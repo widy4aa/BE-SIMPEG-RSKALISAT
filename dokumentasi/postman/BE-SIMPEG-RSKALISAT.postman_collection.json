@@ -3527,6 +3527,100 @@
                                 }
                             },
                             "response": []
+                        },
+                        {
+                            "name": "Promosi",
+                            "item": [
+                                {
+                                    "name": "Get Rekomendasi Promosi",
+                                    "request": {
+                                        "method": "GET",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "url": {
+                                            "raw": "{{base_url}}/hrd/promosi/rekomendasi",
+                                            "host": [
+                                                "{{base_url}}"
+                                            ],
+                                            "path": [
+                                                "hrd",
+                                                "promosi",
+                                                "rekomendasi"
+                                            ]
+                                        }
+                                    },
+                                    "response": []
+                                },
+                                {
+                                    "name": "Get Pengaturan Promosi",
+                                    "request": {
+                                        "method": "GET",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "url": {
+                                            "raw": "{{base_url}}/hrd/promosi/settings",
+                                            "host": [
+                                                "{{base_url}}"
+                                            ],
+                                            "path": [
+                                                "hrd",
+                                                "promosi",
+                                                "settings"
+                                            ]
+                                        }
+                                    },
+                                    "response": []
+                                },
+                                {
+                                    "name": "Update Pengaturan Promosi",
+                                    "request": {
+                                        "method": "PUT",
+                                        "header": [
+                                            {
+                                                "key": "Accept",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            },
+                                            {
+                                                "key": "Content-Type",
+                                                "value": "application/json",
+                                                "type": "text"
+                                            }
+                                        ],
+                                        "body": {
+                                            "mode": "raw",
+                                            "raw": "{\n  \"promosi_min_masa_kerja\": 2,\n  \"promosi_min_jp_diklat\": 20,\n  \"promosi_wajib_str_aktif\": true,\n  \"promosi_bobot_masa_kerja\": 40,\n  \"promosi_bobot_diklat\": 30,\n  \"promosi_bobot_pendidikan\": 30,\n  \"promosi_passing_grade\": 75\n}",
+                                            "options": {
+                                                "raw": {
+                                                    "language": "json"
+                                                }
+                                            }
+                                        },
+                                        "url": {
+                                            "raw": "{{base_url}}/hrd/promosi/settings",
+                                            "host": [
+                                                "{{base_url}}"
+                                            ],
+                                            "path": [
+                                                "hrd",
+                                                "promosi",
+                                                "settings"
+                                            ]
+                                        }
+                                    },
+                                    "response": []
+                                }
+                            ]
                         }
                     ],
                     "id": "f6152e4e-2e91-4737-917c-34df9aa2b75b"

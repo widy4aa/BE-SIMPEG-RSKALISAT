@@ -135,6 +135,10 @@ Dokumentasi lengkap endpoint REST API untuk sistem informasi manajemen pegawai R
     - [21.4 Riwayat Karir Pegawai (HRD)](#214-riwayat-karir-pegawai-hrd)
     - [21.5 Reminder WhatsApp STR/SIP & Penugasan Klinis (HRD)](#215-reminder-whatsapp-strsip-penugasan-klinis-hrd)
   - [22. Kirim Pesan WhatsApp ke Pegawai](#22-kirim-pesan-whatsapp-ke-pegawai)
+  - [23. Rekomendasi Promosi (HRD)](#23-rekomendasi-promosi-hrd)
+    - [23.1 Dapatkan Rekomendasi Promosi](#231-dapatkan-rekomendasi-promosi)
+    - [23.2 Dapatkan Pengaturan Promosi](#232-dapatkan-pengaturan-promosi)
+    - [23.3 Update Pengaturan Promosi](#233-update-pengaturan-promosi)
 - [Ringkasan Endpoint Per Role](#ringkasan-endpoint-per-role)
   - [Admin](#admin)
     - [Admin Approval Change Request](#admin-approval-change-request)
@@ -5199,6 +5203,122 @@ Response `422` (gagal kirim — token tidak valid):
 ```
 
 ---
+
+### 23. Rekomendasi Promosi (HRD)
+
+Endpoint untuk fitur rekomendasi promosi (kenaikan jabatan) otomatis berdasarkan parameter-parameter kinerja dan profil pegawai.
+
+#### 23.1 Dapatkan Rekomendasi Promosi
+Mendapatkan daftar pegawai yang direkomendasikan untuk promosi berdasarkan algoritma pembobotan.
+
+- **Method:** `GET`
+- **URL:** `/api/hrd/promosi/rekomendasi`
+- **Auth:** Wajib Bearer Token
+- **Role:** `hrd`
+
+**Response Sukses:**
+```json
+{
+  "success": true,
+  "message": "Data rekomendasi promosi berhasil dihitung berdasarkan konfigurasi terbaru.",
+  "data": [
+    {
+      "id": 10,
+      "nama": "Dr. Sarah",
+      "nik": "350123...",
+      "jabatan_sekarang": "Dokter Umum",
+      "profesi": "Dokter",
+      "skor_akhir": 85.5,
+      "lulus_passing_grade": true,
+      "detail_perhitungan": {
+        "masa_kerja": {
+          "nilai": 5,
+          "skor": 100,
+          "bobot": 40,
+          "nilai_akhir": 40
+        },
+        "diklat": {
+          "total_jp": 45,
+          "skor": 100,
+          "bobot": 30,
+          "nilai_akhir": 30
+        },
+        "pendidikan": {
+          "str": "S2",
+          "skor": 50,
+          "bobot": 30,
+          "nilai_akhir": 15
+        }
+      },
+      "keterangan": "Memenuhi Syarat"
+    }
+  ]
+}
+```
+
+#### 23.2 Dapatkan Pengaturan Promosi
+Mendapatkan nilai pengaturan dan bobot yang digunakan untuk algoritma perhitungan rekomendasi promosi.
+
+- **Method:** `GET`
+- **URL:** `/api/hrd/promosi/settings`
+- **Auth:** Wajib Bearer Token
+- **Role:** `hrd`
+
+**Response Sukses:**
+```json
+{
+  "success": true,
+  "message": "Pengaturan rekomendasi promosi berhasil diambil.",
+  "data": {
+    "promosi_min_masa_kerja": 2,
+    "promosi_min_jp_diklat": 20,
+    "promosi_wajib_str_aktif": true,
+    "promosi_bobot_masa_kerja": 40,
+    "promosi_bobot_diklat": 30,
+    "promosi_bobot_pendidikan": 30,
+    "promosi_passing_grade": 75
+  }
+}
+```
+
+#### 23.3 Update Pengaturan Promosi
+Memperbarui parameter-parameter untuk algoritma rekomendasi promosi. **Total dari ketiga bobot (`masa_kerja`, `diklat`, `pendidikan`) harus sama dengan 100**.
+
+- **Method:** `PUT`
+- **URL:** `/api/hrd/promosi/settings`
+- **Auth:** Wajib Bearer Token
+- **Role:** `hrd`
+
+**Request Body:**
+```json
+{
+  "promosi_min_masa_kerja": 2,
+  "promosi_min_jp_diklat": 20,
+  "promosi_wajib_str_aktif": true,
+  "promosi_bobot_masa_kerja": 40,
+  "promosi_bobot_diklat": 30,
+  "promosi_bobot_pendidikan": 30,
+  "promosi_passing_grade": 75
+}
+```
+
+**Response Sukses:**
+```json
+{
+  "success": true,
+  "message": "Pengaturan rekomendasi promosi berhasil diperbarui.",
+  "data": {
+    "promosi_min_masa_kerja": 2,
+    "promosi_min_jp_diklat": 20,
+    "promosi_wajib_str_aktif": true,
+    "promosi_bobot_masa_kerja": 40,
+    "promosi_bobot_diklat": 30,
+    "promosi_bobot_pendidikan": 30,
+    "promosi_passing_grade": 75
+  }
+}
+```
+
 
 ## Ringkasan Endpoint Per Role
 
